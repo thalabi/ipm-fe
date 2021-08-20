@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- Tables -->
+    <changeSet id="sales_table" author="thalabi">
+    	<createSequence sequenceName="sales_seq"/>
+        <createTable tableName="sales">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="lk" type="varchar(255)"> 
+                <constraints nullable="false"/> 
+            </column> 
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="transaction_date" type="timestamp"/> 
+            <column name="product" type="varchar(64)"/> 
+            <column name="price" type="decimal"/> 
+            <column name="payment_type" type="varchar(32)"/> 
+            <column name="name" type="varchar(32)"/> 
+            <column name="city" type="varchar(64)"/>
+            <column name="state" type="varchar(32)"/>
+            <column name="country" type="varchar(32)"/>
+            <column name="account_created" type="timestamp"/>
+            <column name="last_login" type="timestamp"/>
+            <column name="latitude" type="decimal"/>
+            <column name="longitude" type="decimal"/>
+            <column name="us_zip" type="varchar(6)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- Tables -->
+    <changeSet id="group_permission_table" author="thalabi">
+        <createTable tableName="group_permission">
+            <column name="group_id" type="bigint"> 
+                <constraints primaryKey="true"/>
+            </column> 
+            <column name="permission_id" type="bigint"> 
+                <constraints primaryKey="true"/>
+            </column> 
+
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="group_permission" constraintName="group_permission_fk_1" referencedColumnNames="id" referencedTableName="GROUP"/> 
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="group_permission" constraintName="group_permission_fk_2" referencedColumnNames="id" referencedTableName="permission"/> 
+    </changeSet>
+
+</databaseChangeLog>

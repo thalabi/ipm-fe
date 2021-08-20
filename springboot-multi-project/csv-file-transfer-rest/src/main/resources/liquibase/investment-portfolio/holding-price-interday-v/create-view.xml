@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="create-view-h2" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
+        <comment>Create holding_price_interday_v</comment>
+
+    	<createView viewName="holding_price_interday_v" replaceIfExists="true">
+			<![CDATA[
+with 
+latest_date as (
+	select max(date) date from exchange_rate where from_currency='USD' and to_currency='CAD'
+),
+rate_on_latest_date as (
+	select rate from exchange_rate er join latest_date on er.date=latest_date.date and er.from_currency='USD' and er.to_currency='CAD'
+),
+cad_and_usd_values as (
+	select p.position_snapshot, sum(p.quantity*p.price) value from position p join instrument i on p.instrument_id = i.id where i.currency = 'CAD' group by p.position_snapshot
+	union all
+	select p.position_snapshot, sum(p.quantity*p.price*(select rate from rate_on_latest_date)) value from position p join instrument i on p.instrument_id = i.id where i.currency = 'USD' group by p.position_snapshot
+)
+select row_number() over (order by position_snapshot) id, position_snapshot, sum(value) market_value from cad_and_usd_values group by position_snapshot order by position_snapshot
+			]]>    
+		</createView>
+
+    </changeSet>
+
+    <changeSet id="create-view-oracle" author="thalabi">
+	    <preConditions onFail="CONTINUE">
+	        <dbms type="oracle" />
+	    </preConditions>
+        <comment>Create holding_price_interday_v</comment>
+
+    	<createView viewName="holding_price_interday_v" replaceIfExists="true">
+			<![CDATA[
+select 1 from dual			
+			]]>    
+		</createView>
+
+    </changeSet>
+</databaseChangeLog>

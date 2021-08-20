@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- Tables -->
+    <changeSet id="area_code_table" author="thalabi">
+    	<createSequence sequenceName="area_code_seq"/>
+        <createTable tableName="area_code">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="lk" type="varchar(255)"> 
+                <constraints nullable="false"/> 
+            </column> 
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="code" type="varchar(3)"/> 
+            <column name="location" type="varchar(64)"/> 
+            <column name="country" type="varchar(3)"/> 
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

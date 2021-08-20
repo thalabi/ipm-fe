@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- Tables -->
+    <changeSet id="holding_table" author="thalabi">
+    	<createSequence sequenceName="holding_seq"/>
+        <createTable tableName="holding">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="lk" type="varchar(255)"> 
+                <constraints nullable="false"/> 
+            </column> 
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="as_of_date" type="date"/> 
+            <column name="instrument_id" type="bigint"/>
+            <column name="portfolio_id" type="bigint"/>
+            <column name="quantity" type="decimal(10,4)"/> 
+        </createTable>
+        <addForeignKeyConstraint baseTableName="holding" baseColumnNames="instrument_id" constraintName="holding_fk_1" referencedTableName="instrument" referencedColumnNames="id"/> 
+        <addForeignKeyConstraint baseTableName="holding" baseColumnNames="portfolio_id" constraintName="holding_fk_2" referencedTableName="portfolio" referencedColumnNames="id"/> 
+    </changeSet>
+
+</databaseChangeLog>

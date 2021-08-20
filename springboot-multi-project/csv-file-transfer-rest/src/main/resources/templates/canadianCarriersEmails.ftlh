@@ -1,0 +1,1 @@
+${cellPhone}@txt.bell.ca, ${cellPhone}@fido.ca, ${cellPhone}@pcs.rogers.com, ${cellPhone}@msg.telus.com, ${cellPhone}@msg.koodomobile.com, ${cellPhone}@txt.freedommobile.ca

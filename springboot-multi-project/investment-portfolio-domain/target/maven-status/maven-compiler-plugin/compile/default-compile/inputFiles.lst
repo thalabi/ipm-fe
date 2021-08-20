@@ -1,0 +1,11 @@
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\InvestmentPortfolioTableEnum.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\repository\ExchangeRateRepository.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\repository\PositionRepository.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\Portfolio.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\Position.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\Instrument.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\ExchangeRate.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\repository\HoldingRepository.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\repository\InstrumentRepository.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\domain\Holding.java
+C:\workspace-eclipse\springboot-multi-project\investment-portfolio-domain\src\main\java\com\kerneldc\portfolio\repository\PortfolioRepository.java
