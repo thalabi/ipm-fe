@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.enums.IEntityEnum;
@@ -20,6 +21,8 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			+ ")", nativeQuery = true)
 	List<Holding> findLatestAsOfDateHoldings();
 	
+	@Query(value = "select h.instrument_id instrumentId, i.ticker, i.exchange, i.currency, i.name, h.quantity from holding h join instrument i on h.instrument_id = i.id where h.portfolio_id = :portfolioId", nativeQuery = true)
+	List<HoldingDetail> findByPortfolioId(@Param("portfolioId") Long portfolioId);
 
 	@Override
 	default IEntityEnum canHandle() {
