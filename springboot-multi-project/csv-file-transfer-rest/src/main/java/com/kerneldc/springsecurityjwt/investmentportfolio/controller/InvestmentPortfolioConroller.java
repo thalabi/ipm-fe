@@ -50,7 +50,7 @@ public class InvestmentPortfolioConroller {
     	var holdingDetailList = holdingRepository.findByPortfolioId(portfolioId);
     	LOGGER.info("holdingDetailList: {}", holdingDetailList);
     	holdingDetailList.stream().forEach(holdingDetail -> {
-    		LOGGER.info("{} {} {} {} {} {}", holdingDetail.getInstrumentId(), holdingDetail.getTicker(), holdingDetail.getExchange(), holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity());
+    		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), holdingDetail.getExchange(), holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity());
     	});
     	Map<String, List<HoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
     	LOGGER.info("End ...");
