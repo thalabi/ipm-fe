@@ -17,6 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**").allowedOrigins(corsUrlsToAllow).maxAge(corsMaxAgeInSecs)
+		.allowedMethods("GET", "HEAD", "POST", "DELETE") // by default GET, HEAD, and POST are allowed
 		//.allowedHeaders("Content-Disposition").exposedHeaders("Content-Disposition")
 		.allowedHeaders("*").exposedHeaders("*")
 		;

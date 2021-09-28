@@ -11,4 +11,6 @@ public interface HoldingDetail {
 	String getCurrency();
 	String getName();
 	Float getQuantity();
+	
+	Long getVersion();
 }

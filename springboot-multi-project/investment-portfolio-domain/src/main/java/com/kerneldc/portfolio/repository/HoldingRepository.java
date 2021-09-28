@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.enums.IEntityEnum;
@@ -11,8 +12,9 @@ import com.kerneldc.portfolio.domain.Holding;
 import com.kerneldc.portfolio.domain.InvestmentPortfolioTableEnum;
 
 public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
-	
-	List<Holding> findByAsOfDate(LocalDate asOfDate);
+
+	// TODO figure out a way to globally define a formatter
+	List<Holding> findByPortfolioIdAndInstrumentIdAndAsOfDate(Long portfolioId, Long instrumentId, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOfDate);
 	
 	@Query(value =
 			"select * from holding h2 where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (\r\n"
@@ -20,7 +22,7 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			+ ")", nativeQuery = true)
 	List<Holding> findLatestAsOfDateHoldings();
 	
-	@Query(value = "select h.id, h.as_of_date asOfDate, h.instrument_id instrumentId, i.ticker, i.exchange, i.currency, i.name, h.quantity from holding h join instrument i on h.instrument_id = i.id where h.portfolio_id = :portfolioId order by h.instrument_id, h.as_of_date", nativeQuery = true)
+	@Query(value = "select h.id, h.as_of_date asOfDate, h.instrument_id instrumentId, i.ticker, i.exchange, i.currency, i.name, h.quantity, h.version from holding h join instrument i on h.instrument_id = i.id where h.portfolio_id = :portfolioId order by h.instrument_id, h.as_of_date", nativeQuery = true)
 	List<HoldingDetail> findByPortfolioId(Long portfolioId);
 
 	@Override

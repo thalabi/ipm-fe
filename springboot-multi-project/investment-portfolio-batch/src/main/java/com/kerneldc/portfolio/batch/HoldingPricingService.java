@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.enums.CurrencyEnum;
@@ -28,6 +29,8 @@ import yahoofinance.YahooFinance;
 @RequiredArgsConstructor
 @Slf4j
 public class HoldingPricingService /*implements ApplicationRunner*/ {
+	
+	private static final String CASH_TICKER = "CASH";
 
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
@@ -78,6 +81,14 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	}
 	
 	private PriceAndTimestamp getPrice(Instrument instrument) throws IOException {
+		if (StringUtils.equals(instrument.getTicker(), CASH_TICKER)) {
+			return new PriceAndTimestamp(BigDecimal.ONE, null);
+		} else {
+			return getSecurityPrice(instrument);
+		}
+	}
+	
+	private PriceAndTimestamp getSecurityPrice(Instrument instrument) throws IOException {
 		var priceAndTimestamp = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();
 		var exchange = instrument.getExchange();
