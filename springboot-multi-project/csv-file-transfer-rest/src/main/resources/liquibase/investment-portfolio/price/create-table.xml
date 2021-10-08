@@ -8,9 +8,9 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<!-- Tables -->
-    <changeSet id="position_table" author="thalabi">
-    	<createSequence sequenceName="position_seq"/>
-        <createTable tableName="position">
+    <changeSet id="price_table" author="thalabi">
+    	<createSequence sequenceName="price_seq"/>
+        <createTable tableName="price">
             <column name="id" type="bigint">
                 <constraints primaryKey="true"/>
             </column>
@@ -21,17 +21,12 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="position_snapshot" type="datetime"/> 
             <column name="instrument_id" type="bigint"/>
-            <column name="portfolio_id" type="bigint"/>
-            <column name="quantity" type="decimal(10,4)"/>
-<column name="price_id" type="bigint"/>             
             <column name="price" type="decimal(10,4)"/>
             <column name="price_timestamp" type="datetime"/> 
+            <column name="price_timestamp_from_source" type="boolean"/> 
         </createTable>
-        <addForeignKeyConstraint baseTableName="position" baseColumnNames="instrument_id" constraintName="position_fk_1" referencedTableName="instrument" referencedColumnNames="id"/> 
-        <addForeignKeyConstraint baseTableName="position" baseColumnNames="portfolio_id" constraintName="position_fk_2" referencedTableName="portfolio" referencedColumnNames="id"/> 
-        <addForeignKeyConstraint baseTableName="position" baseColumnNames="price_id" constraintName="position_fk_3" referencedTableName="price" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="price" baseColumnNames="instrument_id" constraintName="price_fk_1" referencedTableName="instrument" referencedColumnNames="id"/> 
     </changeSet>
 
 </databaseChangeLog>

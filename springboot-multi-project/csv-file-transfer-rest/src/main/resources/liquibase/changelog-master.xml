@@ -48,6 +48,7 @@
 	<include file="liquibase/investment-portfolio/instrument/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-1.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/data/insert.xml"/>
 
 	<include file="liquibase/investment-portfolio/portfolio/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/portfolio/create-unique-constraint-lk.xml"/>
@@ -56,6 +57,11 @@
 	<include file="liquibase/investment-portfolio/holding/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/holding/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/investment-portfolio/holding/create-unique-constraint-1.xml"/>
+
+	<include file="liquibase/investment-portfolio/price/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/price/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/price/create-unique-constraint-1.xml"/>
+	<include file="liquibase/investment-portfolio/price/data/insert.xml"/>
 
 	<include file="liquibase/investment-portfolio/position/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/position/create-unique-constraint-lk.xml"/>

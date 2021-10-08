@@ -35,6 +35,11 @@ public class Position extends AbstractPersistableEntity {
     @JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
 	private Float quantity;
+	
+    @ManyToOne
+    @JoinColumn(name = "price_id")
+	private Price priceEntity;
+	
 	private BigDecimal price;
 	private LocalDateTime priceTimestamp;
 

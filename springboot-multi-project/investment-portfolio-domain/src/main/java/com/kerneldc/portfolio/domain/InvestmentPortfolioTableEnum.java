@@ -10,7 +10,8 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	HOLDING(Holding.class, false, new String[] {"AS_OF_DATE","TICKER","EXCHANGE","QUANTITY","INSTITUTION","ACCOUNT_NUMBER"}),
 	POSITION(Position.class, false),
 	EXCHANGE_RATE(ExchangeRate.class, false, new String[] {"DATE","FROM_CURRENCY","TO_CURRENCY", "RATE"}),
-	HOLDING_PRICE_INTERDAY_V(HoldingPriceInterdayV.class, true, new String[] {"POSITION_SNAPSHOT","MARKET_VALUE"})
+	HOLDING_PRICE_INTERDAY_V(HoldingPriceInterdayV.class, true, new String[] {"POSITION_SNAPSHOT","MARKET_VALUE"}),
+	PRICE(Price.class, false)
 	;
 
 	Class<? extends AbstractEntity> entity;

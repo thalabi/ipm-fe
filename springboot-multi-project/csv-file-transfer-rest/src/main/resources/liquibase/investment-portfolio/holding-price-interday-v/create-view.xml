@@ -23,9 +23,13 @@ rate_on_latest_date as (
 	select rate from exchange_rate er join latest_date on er.date=latest_date.date and er.from_currency='USD' and er.to_currency='CAD'
 ),
 cad_and_usd_values as (
-	select p.position_snapshot, sum(p.quantity*p.price) value from position p join instrument i on p.instrument_id = i.id where i.currency = 'CAD' group by p.position_snapshot
+	select po.position_snapshot, sum(po.quantity*pr.price) value from position po
+	join instrument i on po.instrument_id = i.id
+	join price pr on po.price_id = pr.id where i.currency = 'CAD' group by po.position_snapshot
 	union all
-	select p.position_snapshot, sum(p.quantity*p.price*(select rate from rate_on_latest_date)) value from position p join instrument i on p.instrument_id = i.id where i.currency = 'USD' group by p.position_snapshot
+	select po.position_snapshot, sum(po.quantity*pr.price*(select rate from rate_on_latest_date)) value from position po
+	join instrument i on po.instrument_id = i.id
+	join price pr on po.price_id = pr.id where i.currency = 'USD' group by po.position_snapshot
 )
 select row_number() over (order by position_snapshot) id, position_snapshot, sum(value) market_value from cad_and_usd_values group by position_snapshot order by position_snapshot
 			]]>    

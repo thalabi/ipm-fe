@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="price_data" author="thalabi">
+		<insert tableName="price">
+			<column name="id" value="-1"/>
+			<column name="lk" value="-1_1958-09-27T00:00:00"/>
+			<column name="version" value="0"/>
+
+			<column name="instrument_id" value="-1"/>
+			<column name="price" value="1"/>
+			<column name="price_timestamp" value="1958-09-27T00:00:00.000"/>
+			<column name="price_timestamp_from_source" value="true"/>
+		</insert>
+
+		<insert tableName="price">
+			<column name="id" value="-2"/>
+			<column name="lk" value="-2_1958-09-27T00:00:00"/>
+			<column name="version" value="0"/>
+
+			<column name="instrument_id" value="-2"/>
+			<column name="price" value="1"/>
+			<column name="price_timestamp" value="1958-09-27T00:00:00.000"/>
+			<column name="price_timestamp_from_source" value="true"/>
+		</insert>
+	</changeSet>
+</databaseChangeLog>	
