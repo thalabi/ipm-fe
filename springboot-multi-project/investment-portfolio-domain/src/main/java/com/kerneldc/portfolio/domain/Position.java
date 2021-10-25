@@ -1,7 +1,6 @@
 package com.kerneldc.portfolio.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -25,7 +24,7 @@ public class Position extends AbstractPersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Setter(AccessLevel.NONE)
-	private LocalDateTime positionSnapshot;
+	private OffsetDateTime positionSnapshot;
 	@Setter(AccessLevel.NONE)
     @ManyToOne
     @JoinColumn(name = "instrument_id")
@@ -38,12 +37,9 @@ public class Position extends AbstractPersistableEntity {
 	
     @ManyToOne
     @JoinColumn(name = "price_id")
-	private Price priceEntity;
-	
-	private BigDecimal price;
-	private LocalDateTime priceTimestamp;
+	private Price price;
 
-	public void setPositionSnapshot(LocalDateTime positionSnapshot) {
+	public void setPositionSnapshot(OffsetDateTime positionSnapshot) {
 		this.positionSnapshot = positionSnapshot;
 		setLogicalKeyHolder();
 	}

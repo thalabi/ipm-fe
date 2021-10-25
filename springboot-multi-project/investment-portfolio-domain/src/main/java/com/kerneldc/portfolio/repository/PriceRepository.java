@@ -1,5 +1,6 @@
 package com.kerneldc.portfolio.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.kerneldc.common.BaseTableRepository;
@@ -12,6 +13,15 @@ public interface PriceRepository extends BaseTableRepository<Price, Long> {
 	
 	List<Price> findByLogicalKeyHolder(LogicalKeyHolder logicalKeyHolder);
 	
+//	@Modifying
+//	@Query(value = """
+//			delete from price where id in (select price_id from position where position_snapshot = :positionSnapshot)
+//			"""
+//			, nativeQuery = true)
+//	void deleteByPositionSnapshot(LocalDateTime positionSnapshot);
+	
+	Long deleteByIdIn(Collection<Long> idCollection);
+
 	@Override
 	default IEntityEnum canHandle() {
 		return InvestmentPortfolioTableEnum.PRICE;

@@ -19,9 +19,9 @@ import lombok.Getter;
 public class HoldingPriceInterdayV extends AbstractImmutableEntity {
 	
 	@CsvBindByName(column = "position_snapshot")
-	@Description("columnDisplayOrder=1,title=As of")
+	@Description("columnDisplayOrder=1,title=As of,format=timestamp")
 	private LocalDateTime positionSnapshot;
 	@CsvBindByName(column = "market_value")
-	@Description("columnDisplayOrder=2")
+	@Description("columnDisplayOrder=2,format=currency")
 	private BigDecimal marketValue;
 }

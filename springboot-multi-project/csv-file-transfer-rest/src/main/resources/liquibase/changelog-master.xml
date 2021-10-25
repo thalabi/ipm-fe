@@ -73,4 +73,5 @@
 	<include file="liquibase/investment-portfolio/exchange-rate/data/insert.xml"/>
 
 	<include file="liquibase/investment-portfolio/holding-price-interday-v/create-view.xml"/>
+
 </databaseChangeLog>

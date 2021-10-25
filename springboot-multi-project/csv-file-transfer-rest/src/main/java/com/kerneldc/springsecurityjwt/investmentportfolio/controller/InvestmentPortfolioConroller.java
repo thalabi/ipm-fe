@@ -22,6 +22,8 @@ import com.kerneldc.portfolio.repository.HoldingDetail;
 import com.kerneldc.portfolio.repository.HoldingRepository;
 import com.kerneldc.portfolio.repository.InstrumentRepository;
 import com.kerneldc.portfolio.repository.PortfolioRepository;
+import com.kerneldc.portfolio.repository.PositionRepository;
+import com.kerneldc.portfolio.repository.PositionSnapshot;
 import com.kerneldc.springsecurityjwt.controller.PingResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class InvestmentPortfolioConroller {
 	private final HoldingRepository holdingRepository;
 	private final PortfolioRepository portfolioRepository;
 	private final InstrumentRepository instrumentRepository;
+	private final PositionRepository positionRepository;
 	
     @GetMapping("/priceHoldings")
 	public ResponseEntity<PingResponse> priceHoldings() {
@@ -119,4 +122,35 @@ public class InvestmentPortfolioConroller {
     	LOGGER.info("End ...");
     	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
     }
+
+    @GetMapping("/getDistinctPositionSnapshots")
+	public ResponseEntity<List<PositionSnapshot>> getDistinctPositionSnapshots() {
+    	LOGGER.info("Begin ...");
+    	
+//    	var positionList = positionRepository.findAll();
+//
+//		var positionSnapshotSet = positionList.stream()
+//				.map(position -> PositionSnapshotVO.builder().positionSnapshot(position.getPositionSnapshot()).build())
+//				.collect(Collectors.toCollection(TreeSet::new));
+//    	positionSnapshotSet.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
+
+    	var positionSnapshotList = positionRepository.selectAllPositionSnapshots();
+    	positionSnapshotList.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
+       	LOGGER.info("End ...");
+    	return ResponseEntity.ok(positionSnapshotList);
+    }
+    
+    @PostMapping("/purgePositionSnapshot")
+    public ResponseEntity<String> purgePositionSnapshot(@Valid @RequestBody PurgePositionSnapshotRequest purgePositionSnapshotRequest) {
+    	LOGGER.info("Begin ...");
+    	
+    	LOGGER.info("purgePositionSnapshotRequest.getPositionSnapshot(): {}", purgePositionSnapshotRequest.getPositionSnapshot());
+		var purgePositionSnapshotResult = holdingPricingService.purgePositionSnapshot(purgePositionSnapshotRequest.getPositionSnapshot());
+		LOGGER.info("Purged {} position and {} price records.", purgePositionSnapshotResult.positionDeleteCount(),
+				purgePositionSnapshotResult.priceDeleteCount());
+    	
+    	LOGGER.info("End ...");
+    	return ResponseEntity.ok(StringUtils.EMPTY);
+    }
+
 }

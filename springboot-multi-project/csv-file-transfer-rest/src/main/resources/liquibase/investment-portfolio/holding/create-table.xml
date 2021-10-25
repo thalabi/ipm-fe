@@ -21,7 +21,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="as_of_date" type="date"/> 
+            <column name="as_of_date" type="timestamp(3) with time zone"/> 
             <column name="instrument_id" type="bigint"/>
             <column name="portfolio_id" type="bigint"/>
             <column name="quantity" type="decimal(10,4)"/> 

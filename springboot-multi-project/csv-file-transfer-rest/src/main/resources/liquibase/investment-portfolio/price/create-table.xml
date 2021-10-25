@@ -23,7 +23,7 @@
 
             <column name="instrument_id" type="bigint"/>
             <column name="price" type="decimal(10,4)"/>
-            <column name="price_timestamp" type="datetime"/> 
+            <column name="price_timestamp" type="timestamp(3) with time zone"/> 
             <column name="price_timestamp_from_source" type="boolean"/> 
         </createTable>
         <addForeignKeyConstraint baseTableName="price" baseColumnNames="instrument_id" constraintName="price_fk_1" referencedTableName="instrument" referencedColumnNames="id"/> 

@@ -1,7 +1,7 @@
 package com.kerneldc.portfolio.domain;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -30,7 +30,7 @@ public class Price extends AbstractPersistableEntity {
 	private Instrument instrument;
 	private BigDecimal price;
 	@Setter(AccessLevel.NONE)
-	private LocalDateTime priceTimestamp;
+	private OffsetDateTime priceTimestamp;
 	// priceTimestampFromSource indicates if the priceTimestamp field was available from source or was replaced by the current timestamp
 	private Boolean priceTimestampFromSource;
 
@@ -38,7 +38,7 @@ public class Price extends AbstractPersistableEntity {
 		this.instrument = instrument;
 		setLogicalKeyHolder();
 	}
-	public void setPriceTimestamp(LocalDateTime priceTimestamp) {
+	public void setPriceTimestamp(OffsetDateTime priceTimestamp) {
 		this.priceTimestamp = priceTimestamp;
 		setLogicalKeyHolder();
 	}

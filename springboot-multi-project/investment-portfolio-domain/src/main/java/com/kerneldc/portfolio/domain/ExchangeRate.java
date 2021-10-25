@@ -1,6 +1,6 @@
 package com.kerneldc.portfolio.domain;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ public class ExchangeRate extends AbstractPersistableEntity {
 
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
-	private LocalDate date;
+	private OffsetDateTime date;
 	@CsvBindByName(column = "from_currency")
 	@Setter(AccessLevel.NONE)
 	@Enumerated(EnumType.STRING)
@@ -39,7 +39,7 @@ public class ExchangeRate extends AbstractPersistableEntity {
 	@CsvBindByName
 	private Double rate;
 
-	public void setDate(LocalDate date) {
+	public void setDate(OffsetDateTime date) {
 		this.date = date;
 		setLogicalKeyHolder();
 	}

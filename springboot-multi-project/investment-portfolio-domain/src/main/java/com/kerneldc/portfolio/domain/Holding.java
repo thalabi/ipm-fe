@@ -1,6 +1,6 @@
 package com.kerneldc.portfolio.domain;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -29,7 +29,7 @@ public class Holding extends AbstractPersistableEntity {
 	@CsvBindByName(column = "as_of_date")
 	@CsvDate("yyyy-MM-dd")
 	@Setter(AccessLevel.NONE)
-	private LocalDate asOfDate;
+	private OffsetDateTime asOfDate;
 	@Setter(AccessLevel.NONE)
     @ManyToOne
     @JoinColumn(name = "instrument_id")
@@ -57,7 +57,7 @@ public class Holding extends AbstractPersistableEntity {
 	@CsvBindByName
 	private Float quantity;
 
-	public void setAsOfDate(LocalDate asOfDate) {
+	public void setAsOfDate(OffsetDateTime asOfDate) {
 		this.asOfDate = asOfDate;
 		setLogicalKeyHolder();
 	}

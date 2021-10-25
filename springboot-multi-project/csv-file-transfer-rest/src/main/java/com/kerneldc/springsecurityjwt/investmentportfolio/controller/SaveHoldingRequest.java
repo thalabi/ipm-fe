@@ -1,6 +1,6 @@
 package com.kerneldc.springsecurityjwt.investmentportfolio.controller;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -21,7 +21,7 @@ public class SaveHoldingRequest {
     @Positive
     private Float quantity;
     @NotNull
-    private LocalDate asOfDate;
+    private OffsetDateTime asOfDate;
     @PositiveOrZero
     private Long version;
 }

@@ -1,13 +1,16 @@
 package com.kerneldc.portfolio.batch;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +24,7 @@ import com.kerneldc.portfolio.domain.Price;
 import com.kerneldc.portfolio.repository.HoldingRepository;
 import com.kerneldc.portfolio.repository.PositionRepository;
 import com.kerneldc.portfolio.repository.PriceRepository;
+import com.kerneldc.portfolio.util.TimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +45,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private final PriceRepository priceRepository;
 	private final ExchangeRateService exchangeRateService;
 	
-	private LocalDateTime snapshotDatetime;
+	private Instant snapshotInstant;
 	
 	//private static final Price CASH_PRICE = new Price();
 	private Price CASH_CAD_PRICE;
@@ -59,7 +63,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 //    }
 
 	public int priceHoldings() throws IOException, InterruptedException {
-        snapshotDatetime = LocalDateTime.now();
+        snapshotInstant = Instant.now();
         
         CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
         CASH_USD_PRICE = priceRepository.findById(-2l).orElseThrow();
@@ -73,7 +77,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         priceCache.clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
-        	LOGGER.info("holding: {}", holding);
+        	//LOGGER.info("holding: {}", holding);
         	//getAndPersistStockPrice(holding);
         	positionList.add(getStockPrice(holding));
         }
@@ -92,15 +96,15 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		var price = getPrice(instrument);
 
 		var position = new Position();
-		position.setPositionSnapshot(snapshotDatetime);
+		position.setPositionSnapshot(OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault()));
 		position.setInstrument(instrument);
 		position.setPortfolio(holding.getPortfolio());
 		position.setQuantity(holding.getQuantity());
 
-		position.setPriceEntity(price);
+		position.setPrice(price);
 
-		position.setPrice(price.getPrice());
-		position.setPriceTimestamp(price.getPriceTimestamp());
+		//position.setPrice(price.getPrice());
+		//position.setPriceTimestamp(price.getPriceTimestamp());
 		return position;
 	}
 
@@ -117,26 +121,9 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private void getAndPersistExchangeRates() throws IOException, InterruptedException {
 		var fromCurrency = CurrencyEnum.USD;
 		var toCurrency = CurrencyEnum.CAD;
-		exchangeRateService.retrieveAndPersistExchangeRate(snapshotDatetime.toLocalDate(), fromCurrency, toCurrency);
+		exchangeRateService.retrieveAndPersistExchangeRate(snapshotInstant, fromCurrency, toCurrency);
 	}
 
-	private void getAndPersistStockPrice(Holding holding) throws IOException {
-		var instrument = holding.getInstrument();
-		var price = getPrice(instrument);
-		
-		var p = new Position();
-		p.setPositionSnapshot(snapshotDatetime);
-		p.setInstrument(instrument);
-		p.setPortfolio(holding.getPortfolio());
-		p.setQuantity(holding.getQuantity());
-		
-		p.setPriceEntity(price);
-		
-		p.setPrice(price.getPrice());
-		p.setPriceTimestamp(price.getPriceTimestamp());
-		positionRepository.save(p);
-	}
-	
 	private Price getPrice(Instrument instrument) throws IOException {
 		
 		if (OFFLINE_MODE) {
@@ -183,13 +170,14 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			price = new Price();
 			price.setInstrument(instrument);
 			if (quote.getLastTradeTime() != null) {
-				price.setPriceTimestamp(toLocalDateTime(quote.getLastTradeTime().getTime()));
+				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(quote.getLastTradeTime().getTime()));
 				price.setPriceTimestampFromSource(true);
 			} else {
-				price.setPriceTimestamp(snapshotDatetime);
+				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
 				price.setPriceTimestampFromSource(false);
 				LOGGER.warn("PriceTimestamp was not available from source for {} {}. Used current timestamp", ticker, instrument.getExchange());
 			}
+			// check if the price is already in the table
 			var priceList = priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder());
 			if (CollectionUtils.isNotEmpty(priceList)) {
 				price = priceList.get(0);
@@ -204,11 +192,23 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		return price;
 	}
 	
-	private LocalDateTime toLocalDateTime(Date dateToConvert) {
-		if (dateToConvert == null) {
-			return null;
-		}
-		return LocalDateTime.ofInstant(dateToConvert.toInstant(), ZoneId.systemDefault());
+	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {/*public BeanTransformerResult (){ this(null, null); }*/};
+	@Transactional
+	public PurgePositionSnapshotResult purgePositionSnapshot(OffsetDateTime positionSnapshot) {
+		var positionList = positionRepository.findByPositionSnapshot(positionSnapshot);
+		var priceIdList = positionList.stream().map(position -> position.getPrice().getId()).collect(Collectors.toSet());
+		var positionDeleteCount = positionRepository.deleteByPositionSnapshot(positionSnapshot);
+		LOGGER.debug("priceIdList, size and contents: {} {}", priceIdList.size(), priceIdList);
+		// we do not want to delete the Cash price records so will remove them from the list
+		while (priceIdList.remove(Long.valueOf(-1)));
+		while (priceIdList.remove(Long.valueOf(-2)));
+		// look if among this priceIdList are used by another snapshot run
+		var priceIdListUsedInAnotherSnapshot = positionRepository.selectExistingPriceIds(priceIdList);
+		LOGGER.debug("existingPriceIdList, size and contents: {} {}", priceIdListUsedInAnotherSnapshot.size(), priceIdListUsedInAnotherSnapshot);
+		priceIdList.removeAll(priceIdListUsedInAnotherSnapshot);
+		LOGGER.debug("priceIdList, size and contents: {} {}", priceIdList.size(), priceIdList);
+		
+		var priceDeleteCount = priceRepository.deleteByIdIn(priceIdList);
+		return new PurgePositionSnapshotResult(positionDeleteCount, priceDeleteCount);
 	}
-
 }
