@@ -7,6 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +27,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.kerneldc.springsecurityjwt.TestUtil;
 import com.kerneldc.springsecurityjwt.security.CustomUserDetails;
 import com.kerneldc.springsecurityjwt.security.JwtUtil;
-import com.kerneldc.springsecurityjwt.security.repository.UserRepository;
 import com.kerneldc.springsecurityjwt.security.service.CustomUserDetailsService;
 import com.kerneldc.springsecurityjwt.security.service.SecurityService;
 import com.kerneldc.springsecurityjwt.springconfig.UnauthorizedHandler;
@@ -39,9 +41,11 @@ class SecurityControllerTest {
 	@Autowired
     private MockMvc mockMvc;
 	@MockBean
-	private CustomUserDetailsService customUserDetailsService;
+	EntityManager entityManager;
 	@MockBean
-	private UserRepository userRepository;
+	EntityManagerFactory entityManagerFactory;	
+	@MockBean
+	private CustomUserDetailsService customUserDetailsService;
 	@MockBean
 	private JwtUtil jwtUtil;
 	@MockBean
@@ -60,7 +64,7 @@ class SecurityControllerTest {
 		.andExpect(MockMvcResultMatchers.jsonPath("timestamp").isNotEmpty());
 	}
 
-	@Disabled("Test does not work due to Spring returnong http status code 200 eventhough the resource is secured")
+	@Disabled("Test does not work due to Spring returning http status code 200 eventhough the resource is secured")
 	@Test
 	@DisplayName("/ping with an unauthorized user")
 	@WithAnonymousUser
