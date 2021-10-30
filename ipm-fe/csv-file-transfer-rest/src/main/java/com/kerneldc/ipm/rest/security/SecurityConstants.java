@@ -1,0 +1,11 @@
+package com.kerneldc.ipm.rest.security;
+
+public class SecurityConstants {
+
+	private SecurityConstants() {
+		throw new IllegalStateException("Utility class");
+	}
+	public static final String AUTH_HEADER_NAME = "Authorization";
+	public static final String AUTH_HEADER_SCHEMA = "Bearer";
+	
+}

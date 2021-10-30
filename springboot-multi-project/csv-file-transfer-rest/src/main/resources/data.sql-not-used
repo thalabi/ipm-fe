@@ -1,3 +1,0 @@
-insert into "USER" (version, created, enabled, first_name, last_name, modified, password, username, id) values
-(0, CURRENT_TIMESTAMP, true, '', '', CURRENT_TIMESTAMP, '$2a$10$OZvjiwzODjX0zRE3LZns5eyezoC4mMgtj7i7dAwcJvWPfp.TtW5xK', 'username', 100),
-(0, CURRENT_TIMESTAMP, true, '', '', CURRENT_TIMESTAMP, '$2a$10$OZvjiwzODjX0zRE3LZns5eyezoC4mMgtj7i7dAwcJvWPfp.TtW5xK', 'username2', 101);
