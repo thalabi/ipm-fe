@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import freemarker.core.ParseException;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 //@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @SpringBootTest
+@ActiveProfiles("test")
 
 @Slf4j
 class FeeeMarkerTest {
