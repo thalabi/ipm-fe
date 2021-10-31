@@ -18,6 +18,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<java.version>15</java.version>
+		<repo-url>http://localhost:8081</repo-url>
 	</properties>
 	<modules>
 		<module>common-domain</module>
@@ -114,5 +115,26 @@
 			
 		</plugins>
 	</build>
+	
+	<distributionManagement>
+
+		<snapshotRepository>
+			<id>kerneldc-nexus</id>
+			<url>${repo-url}/repository/maven-snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>kerneldc-nexus</id>
+			<name>Releases</name>
+			<url>${repo-url}/repository/maven-releases</url>
+		</repository>
+
+	</distributionManagement>
+
+	<scm>
+		<url>scm:git:https://github.com/thalabi/ipm-fe</url>
+		<connection>scm:git:https://github.com/thalabi/ipm-fe</connection>
+		<developerConnection>scm:git:https://github.com/thalabi/ipm-fe</developerConnection>
+	  	<tag>HEAD</tag>
+	</scm>
 	
 </project>
