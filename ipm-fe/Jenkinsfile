@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven 3.5.2' 
+        jdk 'jdk-15.0.2+7-27' 
+    }
+    stages {
+        stage ('Initialize') {
+            steps {
+                sh '''
+                echo "PATH = ${PATH}"
+                echo "M2_HOME = ${M2_HOME}"
+                echo "BRANCH_NAME = ${BRANCH_NAME}"
+                java -version
+                '''
+            }
+        }
+
+        stage ('Build') {
+            steps {
+                sh '''
+                cd ipm-fe
+                mvn clean package
+                '''
+            }
+		}
+		
+        stage ('Deploy') {
+			when {
+			    not {
+			        branch 'master'
+			    }
+			}
+			steps {
+                sh '''
+                cd ipm-fe
+                mvn deploy -Dmaven.test.skip=true
+                '''
+            }
+        }
+    }
+}
