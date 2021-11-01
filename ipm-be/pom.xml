@@ -13,7 +13,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
-	<artifactId>ipm-fe-project</artifactId>
+	<artifactId>ipm-be-project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
@@ -124,9 +124,9 @@
 	</distributionManagement>
 
 	<scm>
-		<url>scm:git:https://github.com/thalabi/ipm-fe</url>
-		<connection>scm:git:https://github.com/thalabi/ipm-fe</connection>
-		<developerConnection>scm:git:https://github.com/thalabi/ipm-fe</developerConnection>
+		<url>scm:git:https://github.com/thalabi/ipm-be</url>
+		<connection>scm:git:https://github.com/thalabi/ipm-be</connection>
+		<developerConnection>scm:git:https://github.com/thalabi/ipm-be</developerConnection>
 	  	<tag>HEAD</tag>
 	</scm>
 	

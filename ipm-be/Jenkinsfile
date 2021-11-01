@@ -19,7 +19,7 @@ pipeline {
         stage ('Build') {
             steps {
                 sh '''
-                cd ipm-fe
+                cd ipm-be
                 mvn clean package
                 '''
             }
