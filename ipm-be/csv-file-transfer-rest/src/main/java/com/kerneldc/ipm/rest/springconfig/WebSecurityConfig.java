@@ -71,8 +71,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.authorizeRequests()
 				.mvcMatchers("/appInfoController/*", "/securityController/authenticate",
 						"/securityController/forgotPassword", "/securityController/resetPassword",
-						"/data-rest/*")
-				.permitAll().anyRequest().authenticated();
+						"/data-rest/*", "/actuator/*").permitAll()
+				.anyRequest().authenticated();
 
 		// Add our jwtAuthenticationFilter
 		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
