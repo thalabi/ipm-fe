@@ -33,7 +33,7 @@ pipeline {
 			}
 			steps {
                 sh '''
-                cd ipm-fe
+                cd ipm-be
                 mvn deploy -Dmaven.test.skip=true
                 '''
             }
