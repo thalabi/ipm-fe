@@ -22,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmailService {
 
-	static final String RESET_PASSWORD_EMAIL_FROM = "noreply-springsecurityjwt@kerneldc.com";
+	@Value("${application.email.resetPasswordEmailFrom}")
+	private String resetPasswordEmailFrom;
 	private static final String RESET_PASSWORD_EMAIL_SUBJECT = "Reset password";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT = "Reset password confirmation";
 	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "resetPasswordEmail.ftlh";
@@ -40,7 +41,7 @@ public class EmailService {
 	public void sendPasswordResetEmail(String to, String resetPasswordUrl) throws MessagingException, IOException, TemplateException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		mimeMessageHelper.setFrom(RESET_PASSWORD_EMAIL_FROM);
+		mimeMessageHelper.setFrom(resetPasswordEmailFrom);
 		mimeMessageHelper.setTo(to);
 		mimeMessageHelper.setSubject(RESET_PASSWORD_EMAIL_SUBJECT);
 		mimeMessageHelper.setText(processResetPasswordTemplate(resetPasswordJwtExpiryInMinutes/60, resetPasswordUrl), true);
@@ -51,7 +52,7 @@ public class EmailService {
 	public void sendPasswordResetConfirmationEmail(String to, String loginUrl) throws MessagingException, IOException, TemplateException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		mimeMessageHelper.setFrom(RESET_PASSWORD_EMAIL_FROM);
+		mimeMessageHelper.setFrom(resetPasswordEmailFrom);
 		mimeMessageHelper.setTo(to);
 		mimeMessageHelper.setSubject(RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT);
 		mimeMessageHelper.setText(processResetPasswordConfirmationTemplate(loginUrl), true);
