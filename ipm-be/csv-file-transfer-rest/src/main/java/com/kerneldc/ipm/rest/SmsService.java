@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SmsService {
 	
-	private static final String SMS_SECURITY_CODE_FROM = EmailService.RESET_PASSWORD_EMAIL_FROM;
+	private static final String SMS_SECURITY_CODE_FROM = "noreply-ipm@kerneldc.com";
 	private static final String SMS_SECURITY_CODE_TEMPLATE = "smsSecurityCode.ftlh";
 	private static final String CANADIAN_CARRIERS_EMAILS_TEMPLATE = "canadianCarriersEmails.ftlh";
 	private static final String AMERICAN_CARRIERS_EMAILS_TEMPLATE = "americanCarriersEmails.ftlh";
