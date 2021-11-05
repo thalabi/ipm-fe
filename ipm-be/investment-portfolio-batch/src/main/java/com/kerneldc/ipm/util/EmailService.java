@@ -36,6 +36,7 @@ public class EmailService {
 	private String dailyMarketValueNotificationFrom;
 	private static final String RESET_PASSWORD_EMAIL_SUBJECT = "Reset password";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT = "Reset password confirmation";
+	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
 	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "resetPasswordEmail.ftlh";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE = "resetPasswordConfirmationEmail.ftlh";
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE = "dailyMarketValueNotification.ftlh";
@@ -86,7 +87,8 @@ public class EmailService {
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 		mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
 		mimeMessageHelper.setTo(InternetAddress.parse(to));
-		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues));
+		mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
+		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues), true);
 //		var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues);
 //		LOGGER.debug(resultTest);
 		javaMailSender.send(mimeMessage);
