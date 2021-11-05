@@ -1,6 +1,8 @@
 package com.kerneldc.ipm.batch;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -47,6 +49,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private static final String CASH_TICKER = "CASH";
 
 	private static final boolean OFFLINE_MODE = false;
+	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");  
 
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
@@ -113,7 +116,15 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		var todaysSnapshot = nMarketValues.get(todaysIndex).getPositionSnapshot();
 		var todaysMarketValue = nMarketValues.get(todaysIndex).getMarketValue();
 		nMarketValues.remove(todaysIndex);
-		emailService.sendDailyMarketValueNotification("tarif.halabi@gmail.com", todaysSnapshot, todaysMarketValue, nMarketValues);
+		
+		Float percentChange; 
+		if (CollectionUtils.isEmpty(nMarketValues)) {
+			percentChange = null;
+		} else {
+			var yesterdaysMarketValue = nMarketValues.get(nMarketValues.size()-1).getMarketValue();
+			percentChange = todaysMarketValue.subtract(yesterdaysMarketValue).divide(yesterdaysMarketValue, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).floatValue();
+		}
+		emailService.sendDailyMarketValueNotification("tarif.halabi@gmail.com", todaysSnapshot, todaysMarketValue, percentChange, nMarketValues);
 	}
 
 	private void persistPositions(ArrayList<Position> positionList) {

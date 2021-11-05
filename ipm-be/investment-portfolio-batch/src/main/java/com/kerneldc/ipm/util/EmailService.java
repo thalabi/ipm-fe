@@ -82,16 +82,18 @@ public class EmailService {
 		LOGGER.info("Sent sms email to: {}", to);
 	}
 	
-	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, List<HoldingPriceInterdayV> nMarketValues) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 		mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
 		mimeMessageHelper.setTo(InternetAddress.parse(to));
 		mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
-		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues), true);
+		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues), true);
 		javaMailSender.send(mimeMessage);
-//		var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues);
-//		LOGGER.debug(resultTest);
+		/*
+		 * var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot,
+		 * todaysMarketValue, percentChange, nMarketValues); LOGGER.debug(resultTest);
+		 */
 		LOGGER.info("Sent daily market value notification email to: {}", to);
 	}
 
@@ -107,10 +109,11 @@ public class EmailService {
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE), templateModelMap);
 	}
 	
-	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, List<HoldingPriceInterdayV> nMarketValues) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
 		templateModelMap.put("todaysMarketValue", todaysMarketValue);
+		templateModelMap.put("percentChange", percentChange);
 		templateModelMap.put("nMarketValues", nMarketValues);
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
