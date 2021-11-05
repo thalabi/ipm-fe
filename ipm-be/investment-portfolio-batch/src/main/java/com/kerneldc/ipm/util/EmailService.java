@@ -89,9 +89,9 @@ public class EmailService {
 		mimeMessageHelper.setTo(InternetAddress.parse(to));
 		mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
 		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues), true);
+		javaMailSender.send(mimeMessage);
 //		var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues);
 //		LOGGER.debug(resultTest);
-		javaMailSender.send(mimeMessage);
 		LOGGER.info("Sent daily market value notification email to: {}", to);
 	}
 
