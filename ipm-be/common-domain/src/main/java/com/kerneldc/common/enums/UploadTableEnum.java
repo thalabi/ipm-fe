@@ -1,8 +1,11 @@
-package com.kerneldc.ipm.rest.csv.domain;
+package com.kerneldc.common.enums;
 
 import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
-import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.common.domain.AreaCode;
+import com.kerneldc.common.domain.BioStats;
+import com.kerneldc.common.domain.HydroUsage;
+import com.kerneldc.common.domain.Sales;
 
 public enum UploadTableEnum implements IEntityEnum {
 	SALES(Sales.class),

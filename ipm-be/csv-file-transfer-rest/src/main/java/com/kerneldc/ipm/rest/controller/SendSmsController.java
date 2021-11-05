@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import com.kerneldc.ipm.rest.SmsService;
+import com.kerneldc.ipm.util.SmsService;
 
 import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;

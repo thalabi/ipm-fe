@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest.csv.domain;
+package com.kerneldc.common.domain;
 
 import java.util.Objects;
 
@@ -8,7 +8,6 @@ import javax.persistence.SequenceGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.rest.core.annotation.Description;
 
-import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.enums.ShortMonthEnum;
 import com.opencsv.bean.CsvBindByName;
 

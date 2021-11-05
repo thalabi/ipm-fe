@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.rest.csv.domain.UploadTableEnum;
+import com.kerneldc.common.enums.UploadTableEnum;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;

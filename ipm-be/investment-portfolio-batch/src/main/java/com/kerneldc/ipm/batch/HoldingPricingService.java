@@ -1,6 +1,7 @@
 package com.kerneldc.ipm.batch;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -18,14 +20,20 @@ import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.enums.CurrencyEnum;
 import com.kerneldc.ipm.domain.Holding;
+import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.domain.Price;
+import com.kerneldc.ipm.repository.HoldingPriceInterdayVRepository;
 import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
+import com.kerneldc.ipm.util.EmailService;
 import com.kerneldc.ipm.util.TimeUtils;
 
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import yahoofinance.Stock;
@@ -43,7 +51,9 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
 	private final PriceRepository priceRepository;
+	private final HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	private final ExchangeRateService exchangeRateService;
+	private final EmailService emailService;
 	
 	private Instant snapshotInstant;
 	
@@ -62,7 +72,10 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 //        priceHoldings();
 //    }
 
-	public int priceHoldings() throws IOException, InterruptedException {
+	public int priceHoldings() throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
+		return priceHoldings(true); 
+	}
+	public int priceHoldings(boolean sendNotifications) throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
         snapshotInstant = Instant.now();
         
         CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
@@ -77,15 +90,32 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         priceCache.clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
-        	//LOGGER.info("holding: {}", holding);
-        	//getAndPersistStockPrice(holding);
         	positionList.add(getStockPrice(holding));
         }
         persistPrices();
         persistPositions(positionList);
+        if (sendNotifications) {
+        	sendPriceHoldingsNotifications();
+        }
         return holdingList.size();
 	}
 	
+	private void sendPriceHoldingsNotifications() throws TemplateNotFoundException, MalformedTemplateNameException, MessagingException, ParseException, IOException, TemplateException {
+		var nMarketValues =  holdingPriceInterdayVRepository.selectLastestNMarketValues(5);
+		for (HoldingPriceInterdayV holdingPriceInterdayV : nMarketValues) {
+			LOGGER.info("holdingPriceInterdayV: {}", holdingPriceInterdayV);
+		}
+		if (CollectionUtils.isEmpty(nMarketValues)) {
+			LOGGER.warn("No market values available");
+			return;
+		}
+		var todaysIndex = nMarketValues.size()-1;
+		var todaysSnapshot = nMarketValues.get(todaysIndex).getPositionSnapshot();
+		var todaysMarketValue = nMarketValues.get(todaysIndex).getMarketValue();
+		nMarketValues.remove(todaysIndex);
+		emailService.sendDailyMarketValueNotification("tarif.halabi@gmail.com", todaysSnapshot, todaysMarketValue, nMarketValues);
+	}
+
 	private void persistPositions(ArrayList<Position> positionList) {
 		var savedPositionList = positionRepository.saveAll(positionList);
 		LOGGER.info("Saved {} position records", savedPositionList.size());

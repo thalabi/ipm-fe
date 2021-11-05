@@ -12,12 +12,12 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import com.kerneldc.ipm.rest.EmailService;
 import com.kerneldc.ipm.rest.exception.ApplicationException;
 import com.kerneldc.ipm.rest.security.JwtUtil;
 import com.kerneldc.ipm.rest.security.JwtUtil.JwtAndKey;
 import com.kerneldc.ipm.rest.security.domain.user.User;
 import com.kerneldc.ipm.rest.security.repository.UserRepository;
+import com.kerneldc.ipm.util.EmailService;
 
 import freemarker.template.TemplateException;
 import io.jsonwebtoken.Jwts;

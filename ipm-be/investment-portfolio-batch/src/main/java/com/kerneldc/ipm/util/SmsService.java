@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest;
+package com.kerneldc.ipm.util;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.kerneldc.common.enums.CountryEnum;
-import com.kerneldc.ipm.rest.csv.repository.AreaCodeRepository;
+import com.kerneldc.common.repository.AreaCodeRepository;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;

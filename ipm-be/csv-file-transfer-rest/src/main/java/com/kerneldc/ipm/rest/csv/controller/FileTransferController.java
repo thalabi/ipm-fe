@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.common.enums.UploadTableEnum;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
-import com.kerneldc.ipm.rest.csv.domain.UploadTableEnum;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.rest.csv.service.transformer.CsvFileTransformerService;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;

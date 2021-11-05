@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.util;
+	package com.kerneldc.ipm.util;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -33,4 +33,7 @@ public class TimeUtils {
 		return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
 	}
 
+	public static Date toDate(LocalDateTime localDateTime) {
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
 }

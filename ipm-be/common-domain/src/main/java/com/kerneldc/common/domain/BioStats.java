@@ -1,11 +1,10 @@
-package com.kerneldc.ipm.rest.csv.domain;
+package com.kerneldc.common.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.SequenceGenerator;
 
-import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.enums.GenderEnum;
 import com.opencsv.bean.CsvBindByName;
 

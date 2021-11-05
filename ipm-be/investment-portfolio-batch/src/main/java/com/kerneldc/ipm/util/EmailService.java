@@ -1,8 +1,12 @@
-package com.kerneldc.ipm.rest;
+package com.kerneldc.ipm.util;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -14,8 +18,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
+
 import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -24,10 +32,13 @@ public class EmailService {
 
 	@Value("${application.email.resetPasswordEmailFrom}")
 	private String resetPasswordEmailFrom;
+	@Value("${application.email.dailyMarketValueNotificationFrom}")
+	private String dailyMarketValueNotificationFrom;
 	private static final String RESET_PASSWORD_EMAIL_SUBJECT = "Reset password";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT = "Reset password confirmation";
 	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "resetPasswordEmail.ftlh";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE = "resetPasswordConfirmationEmail.ftlh";
+	private static final String DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE = "dailyMarketValueNotification.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
 	private int resetPasswordJwtExpiryInMinutes;
@@ -69,6 +80,18 @@ public class EmailService {
 		javaMailSender.send(mimeMessage);
 		LOGGER.info("Sent sms email to: {}", to);
 	}
+	
+	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, List<HoldingPriceInterdayV> nMarketValues) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+		var mimeMessage = javaMailSender.createMimeMessage();
+		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
+		mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
+		mimeMessageHelper.setTo(InternetAddress.parse(to));
+		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues));
+//		var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, nMarketValues);
+//		LOGGER.debug(resultTest);
+		javaMailSender.send(mimeMessage);
+		LOGGER.info("Sent daily market value notification email to: {}", to);
+	}
 
 	private String processResetPasswordTemplate(int linkExpiryInHours, String resetPasswordUrl) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
@@ -80,5 +103,13 @@ public class EmailService {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("loginUrl", loginUrl);
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE), templateModelMap);
+	}
+	
+	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, List<HoldingPriceInterdayV> nMarketValues) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+		Map<String, Object> templateModelMap = new HashMap<>();
+		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
+		templateModelMap.put("todaysMarketValue", todaysMarketValue);
+		templateModelMap.put("nMarketValues", nMarketValues);
+		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
 }

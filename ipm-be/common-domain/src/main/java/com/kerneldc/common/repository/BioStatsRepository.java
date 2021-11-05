@@ -1,9 +1,9 @@
-package com.kerneldc.ipm.rest.csv.repository;
+package com.kerneldc.common.repository;
 
 import com.kerneldc.common.BaseTableRepository;
+import com.kerneldc.common.domain.BioStats;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.rest.csv.domain.BioStats;
-import com.kerneldc.ipm.rest.csv.domain.UploadTableEnum;
+import com.kerneldc.common.enums.UploadTableEnum;
 
 public interface BioStatsRepository extends BaseTableRepository<BioStats, Long> {
 

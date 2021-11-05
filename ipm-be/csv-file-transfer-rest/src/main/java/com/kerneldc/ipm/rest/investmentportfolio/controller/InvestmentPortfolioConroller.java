@@ -1,10 +1,12 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,6 +28,7 @@ import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
 import com.kerneldc.ipm.rest.controller.PingResponse;
 
+import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +52,7 @@ public class InvestmentPortfolioConroller {
 			var holdingCount = holdingPricingService.priceHoldings();
 	    	pingResponse.setMessage(String.format("Priced %d holdings", holdingCount));
 	    	pingResponse.setTimestamp(LocalDateTime.now());
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException | InterruptedException | MessagingException | ParseException | TemplateException e) {
 			Thread.currentThread().interrupt();
 	    	pingResponse.setMessage(e.getMessage());
 	    	pingResponse.setTimestamp(LocalDateTime.now());
