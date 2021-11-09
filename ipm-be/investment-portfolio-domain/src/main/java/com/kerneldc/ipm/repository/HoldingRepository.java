@@ -33,7 +33,7 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			)
 			select h.id, cast(h.as_of_date as varchar) asOfDate, h.instrument_id instrumentId, i.ticker, i.exchange, i.currency, i.name, h.quantity, lp.latest_price latestPrice, cast(lp.latest_price_timestamp as varchar) latestPriceTimestamp, h.version from holding h
 			join instrument i on h.instrument_id = i.id
-			join latest_price lp on h.instrument_id = lp.instrument_id
+			left outer join latest_price lp on h.instrument_id = lp.instrument_id
 			where h.portfolio_id = :portfolioId order by h.instrument_id, h.as_of_date
 			"""
 			, nativeQuery = true)
