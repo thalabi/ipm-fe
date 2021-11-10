@@ -5,8 +5,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.enums.CurrencyEnum;
@@ -76,7 +81,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 //    }
 
 	public int priceHoldings() throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
-		return priceHoldings(true); 
+		return priceHoldings(false); 
 	}
 	public int priceHoldings(boolean sendNotifications) throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
         snapshotInstant = Instant.now();
@@ -180,10 +185,15 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 					throw new IllegalArgumentException("Currency should be either CAD or USD");
 			}
 		} else {
-			return getSecurityPrice(instrument);
+			if (instrument.getExchange().equals("CF")) {
+				return getMutualFundPrice(instrument);
+			} else {
+				return getSecurityPrice(instrument);
+			}
 		}
 	}
 	
+	// TODO refactor with getMutualFundPrice
 	private Price getSecurityPrice(Instrument instrument) throws IOException {
 		var price = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();
@@ -224,6 +234,72 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 				price = priceList.get(0);
 			} else {
 				price.setPrice(quote.getPrice());
+			}
+			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp());
+			priceCache.put(instrument.getId(), price);
+		} else {
+			LOGGER.info("Found {} {} in price cache", ticker, exchange);
+		}
+		return price;
+	}
+	
+	// TODO refactor with getSecurityPrice
+	private Price getMutualFundPrice(Instrument instrument) throws IOException {
+		var price = priceCache.get(instrument.getId());
+		var ticker = instrument.getTicker();
+		var exchange = instrument.getExchange();
+
+		if (price == null) {
+			Document document = Jsoup
+				    .connect("https://www.theglobeandmail.com/investing/markets/funds/" + ticker + "." + exchange)
+				    .get();
+			System.out.println(document);
+	
+			var tradeTimeElements = document.selectXpath("//barchart-field[@name='tradeTime']");
+			OffsetDateTime tradeTime = null;
+			if (tradeTimeElements.size() == 1) {
+				String tradeTimeString = tradeTimeElements.get(0).attr("value");
+				System.out.println("tardeTimeString: "+tradeTimeString);
+				if (StringUtils.isNotEmpty(tradeTimeString)) {
+					try {
+						var ldt = LocalDateTime.parse(tradeTimeString+"000000", DateTimeFormatter.ofPattern("MM/dd/yyHHmmss"));
+						tradeTime = OffsetDateTime.of(ldt, ZoneId.of("Canada/Eastern").getRules().getOffset(ldt));
+					} catch (DateTimeParseException e) {
+						System.err.println(tradeTimeString+"000000" + " can not be parsed using pattern " + "MM/dd/yyHHmmss");
+					}
+				}
+			}
+			
+			var lastPriceElements = document.selectXpath("//barchart-field[@name='lastPrice']");
+			BigDecimal lastPrice = null;
+			if (lastPriceElements.size() == 1) {
+				String lastPriceString = lastPriceElements.get(0).attr("value");
+				System.out.println(lastPriceString);
+				try {
+					lastPrice = new BigDecimal(lastPriceString);
+				} catch (NumberFormatException e) {
+					System.err.println(lastPriceString + " can not be parsed as a number");
+				}
+			}
+			
+			
+			price = new Price();
+			price.setInstrument(instrument);
+	
+			if (tradeTime != null) {
+				price.setPriceTimestamp(tradeTime);
+				price.setPriceTimestampFromSource(true);
+			} else {
+				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
+				price.setPriceTimestampFromSource(false);
+				LOGGER.warn("TradeTime was not available from source for {} {}. Used current timestamp", ticker, instrument.getExchange());
+			}
+			// check if the price is already in the table
+			var priceList = priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder());
+			if (CollectionUtils.isNotEmpty(priceList)) {
+				price = priceList.get(0);
+			} else {
+				price.setPrice(lastPrice);
 			}
 			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp());
 			priceCache.put(instrument.getId(), price);
