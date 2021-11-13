@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kerneldc.common.enums.CurrencyEnum;
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.ExchangeRate;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
 import com.kerneldc.ipm.util.TimeUtils;
@@ -36,7 +37,7 @@ public class ExchangeRateService {
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
-	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws IOException, InterruptedException {
+	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
 		var response = callApi(workingBusinessDay, fromCurrency, toCurrency);
@@ -75,20 +76,35 @@ public class ExchangeRateService {
 		return TimeUtils.toInstant(workingBusinessDay);
 	}
 	
-	private HttpResponse<String> callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws IOException, InterruptedException {
+	private HttpResponse<String> callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {
 		var client = HttpClient.newHttpClient();
 		//var dateString = date.format(dateTimeFormatter);
 		var dateString = dateTimeFormatter.format(date);
+		var url = String.format("https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s", fromCurrency, toCurrency, dateString);
 		var request = HttpRequest.newBuilder(
-			       URI.create("https://www.bankofcanada.ca/valet/observations/FX"+fromCurrency+toCurrency+"/json?start_date="+dateString))
+			       URI.create(url))
 			   .header("accept", "application/json")
 			   .build();
-		return client.send(request, BodyHandlers.ofString());
+		try {
+			return client.send(request, BodyHandlers.ofString());
+		} catch (IOException | InterruptedException e) {
+			Thread.currentThread().interrupt();
+			var message = String.format("Exception converting %s to %s while contacting: %s", fromCurrency, toCurrency, url);
+			LOGGER.error(message, e);
+			throw new ApplicationException(message);
+		}
 	}
 	
-	private Double parseRate(String jsonResponse) throws JsonProcessingException {
+	private Double parseRate(String jsonResponse) throws ApplicationException {
 		var mapper = new ObjectMapper();
-		JsonNode root = mapper.readTree(jsonResponse);
+		JsonNode root;
+		try {
+			root = mapper.readTree(jsonResponse);
+		} catch (JsonProcessingException e) {
+			var message = String.format("Exception whne parsing json response: %s", jsonResponse);
+			LOGGER.error(message, e);
+			throw new ApplicationException(message);
+		}
 		LOGGER.debug(root.toPrettyString());
 		var observations = root.path("observations");
 		Double rate = null;

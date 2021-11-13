@@ -1,12 +1,9 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.repository.HoldingDetail;
@@ -26,9 +24,8 @@ import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
-import com.kerneldc.ipm.rest.controller.PingResponse;
+import com.kerneldc.ipm.rest.controller.PriceHoldingResponse;
 
-import freemarker.template.TemplateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,20 +42,22 @@ public class InvestmentPortfolioConroller {
 	private final PositionRepository positionRepository;
 	
     @GetMapping("/priceHoldings")
-	public ResponseEntity<PingResponse> priceHoldings() {
+	public ResponseEntity<PriceHoldingResponse> priceHoldings() {
     	LOGGER.info("Begin ...");
-    	var pingResponse = new PingResponse();
+    	var priceHoldingResponse = new PriceHoldingResponse();
     	try {
 			var holdingCount = holdingPricingService.priceHoldings();
-	    	pingResponse.setMessage(String.format("Priced %d holdings", holdingCount));
-	    	pingResponse.setTimestamp(LocalDateTime.now());
-		} catch (IOException | InterruptedException | MessagingException | ParseException | TemplateException e) {
+			LOGGER.info("Priced {} holdings.", holdingCount);
+	    	priceHoldingResponse.setMessage(StringUtils.EMPTY);
+	    	priceHoldingResponse.setTimestamp(LocalDateTime.now());
+		} catch (ApplicationException e) {
 			Thread.currentThread().interrupt();
-	    	pingResponse.setMessage(e.getMessage());
-	    	pingResponse.setTimestamp(LocalDateTime.now());
+			LOGGER.error("Exception pricing holdings:\n", e);
+	    	priceHoldingResponse.setMessage(e.getMessage());
+	    	priceHoldingResponse.setTimestamp(LocalDateTime.now());
 		}
     	LOGGER.info("End ...");
-    	return ResponseEntity.ok(pingResponse);
+    	return ResponseEntity.ok(priceHoldingResponse);
     }
 
     @GetMapping("/getHoldingDetails")

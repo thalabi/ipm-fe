@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TimeUtils {
@@ -14,26 +15,29 @@ public class TimeUtils {
 	}
 
 	public static OffsetDateTime toOffsetDateTime(Instant instant) {
-		return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+		return instant == null ? null : OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 	
 	public static OffsetDateTime toOffsetDateTime(Date date) {
-		return toOffsetDateTime(date.toInstant());
+		return date == null ? null : toOffsetDateTime(date.toInstant());
 	}
 
+	public static OffsetDateTime toOffsetDateTime(Calendar calendar) {
+		return calendar == null ? null : toOffsetDateTime(calendar.toInstant());
+	}
 	public static LocalDate toLocalDate(Instant instant) {
-		return LocalDate.ofInstant(instant, ZoneId.systemDefault());
+		return instant == null ? null : LocalDate.ofInstant(instant, ZoneId.systemDefault());
 	}
 
 	public static LocalDateTime toLocalDateTime(Instant instant) {
-		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		return instant == null ? null : LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 	
 	public static Instant toInstant(LocalDate localDate) {
-		return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+		return localDate == null ? null : localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
 	}
 
 	public static Date toDate(LocalDateTime localDateTime) {
-		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		return localDateTime == null ? null :  Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
 }

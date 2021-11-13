@@ -12,7 +12,7 @@ import javax.persistence.EntityNotFoundException;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import com.kerneldc.ipm.rest.exception.ApplicationException;
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.rest.security.JwtUtil;
 import com.kerneldc.ipm.rest.security.JwtUtil.JwtAndKey;
 import com.kerneldc.ipm.rest.security.domain.user.User;

@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest.exception;
+package com.kerneldc.common.exception;
 
 public class ApplicationException extends Exception {
 

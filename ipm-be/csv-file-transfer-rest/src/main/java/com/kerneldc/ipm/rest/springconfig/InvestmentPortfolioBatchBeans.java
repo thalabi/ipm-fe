@@ -9,6 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.kerneldc.common.repository.AreaCodeRepository;
 import com.kerneldc.ipm.batch.ExchangeRateService;
 import com.kerneldc.ipm.batch.HoldingPricingService;
+import com.kerneldc.ipm.batch.MutualFundPriceService;
+import com.kerneldc.ipm.batch.StockPriceService;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
 import com.kerneldc.ipm.repository.HoldingPriceInterdayVRepository;
 import com.kerneldc.ipm.repository.HoldingRepository;
@@ -36,6 +38,6 @@ public class InvestmentPortfolioBatchBeans {
 			ExchangeRateRepository exchangeRateRepository, HoldingPriceInterdayVRepository holdingPriceInterdayVRepository,
 			EmailService emailService) {
 		return new HoldingPricingService(holdingRepository, positionRepository, priceRepository, holdingPriceInterdayVRepository,
-				new ExchangeRateService(exchangeRateRepository), emailService);
+				new ExchangeRateService(exchangeRateRepository), new MutualFundPriceService(priceRepository), new StockPriceService(priceRepository), emailService);
 	}
 }

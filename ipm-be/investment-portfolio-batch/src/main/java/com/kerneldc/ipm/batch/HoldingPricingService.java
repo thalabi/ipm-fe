@@ -1,31 +1,23 @@
 package com.kerneldc.ipm.batch;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.enums.CurrencyEnum;
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
 import com.kerneldc.ipm.domain.Instrument;
@@ -36,15 +28,9 @@ import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.EmailService;
-import com.kerneldc.ipm.util.TimeUtils;
 
-import freemarker.template.MalformedTemplateNameException;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 
 @Service
 @RequiredArgsConstructor
@@ -61,29 +47,21 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private final PriceRepository priceRepository;
 	private final HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	private final ExchangeRateService exchangeRateService;
+	private final MutualFundPriceService mutualFundPriceService;
+	private final StockPriceService stockPriceService;
 	private final EmailService emailService;
 	
 	private Instant snapshotInstant;
 	
-	//private static final Price CASH_PRICE = new Price();
 	private Price CASH_CAD_PRICE;
 	private Price CASH_USD_PRICE;
-//	{		
-//		CASH_PRICE.setPrice(BigDecimal.ONE);
-//	}
 	
 	private Map<Long, Price> priceCache = new HashMap<>();
-//	@Override
-//    public void run(ApplicationArguments args) throws Exception {
-//        LOGGER.info("Application started with option names : {}", args.getOptionNames());
-//
-//        priceHoldings();
-//    }
 
-	public int priceHoldings() throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
+	public int priceHoldings() throws ApplicationException {
 		return priceHoldings(false); 
 	}
-	public int priceHoldings(boolean sendNotifications) throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
+	public int priceHoldings(boolean sendNotifications) throws ApplicationException {
         snapshotInstant = Instant.now();
         
         CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
@@ -108,7 +86,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         return holdingList.size();
 	}
 	
-	private void sendPriceHoldingsNotifications() throws TemplateNotFoundException, MalformedTemplateNameException, MessagingException, ParseException, IOException, TemplateException {
+	private void sendPriceHoldingsNotifications() throws ApplicationException {
 		var nMarketValues =  holdingPriceInterdayVRepository.selectLastestNMarketValues(5);
 		for (HoldingPriceInterdayV holdingPriceInterdayV : nMarketValues) {
 			LOGGER.info("holdingPriceInterdayV: {}", holdingPriceInterdayV);
@@ -137,7 +115,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		LOGGER.info("Saved {} position records", savedPositionList.size());
 	}
 
-	private Position getStockPrice(Holding holding) throws IOException {
+	private Position getStockPrice(Holding holding) throws ApplicationException {
 		var instrument = holding.getInstrument();
 		var price = getPrice(instrument);
 
@@ -149,28 +127,25 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 		position.setPrice(price);
 
-		//position.setPrice(price.getPrice());
-		//position.setPriceTimestamp(price.getPriceTimestamp());
 		return position;
 	}
 
 	private void persistPrices() {
 		var priceCollection = priceCache.values();
 		LOGGER.info("Price cache count: {}", priceCollection.size());
-		// remove price records that already exist
-		//priceCollection.removeIf(price -> ! /* not */ priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder()).isEmpty());
 			
 		var savedPriceList = priceRepository.saveAll(priceCollection);
 		LOGGER.info("Saved {} price records", savedPriceList.size());
 	}
 
-	private void getAndPersistExchangeRates() throws IOException, InterruptedException {
+	private void getAndPersistExchangeRates() throws ApplicationException {
+		
 		var fromCurrency = CurrencyEnum.USD;
 		var toCurrency = CurrencyEnum.CAD;
 		exchangeRateService.retrieveAndPersistExchangeRate(snapshotInstant, fromCurrency, toCurrency);
 	}
 
-	private Price getPrice(Instrument instrument) throws IOException {
+	private Price getPrice(Instrument instrument) throws ApplicationException {
 		
 		if (OFFLINE_MODE) {
 			return CASH_CAD_PRICE;
@@ -186,129 +161,12 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			}
 		} else {
 			if (instrument.getExchange().equals("CF")) {
-				return getMutualFundPrice(instrument);
+				return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
 			} else {
-				return getSecurityPrice(instrument);
+				return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
 			}
 		}
 	}
-	
-	// TODO refactor with getMutualFundPrice
-	private Price getSecurityPrice(Instrument instrument) throws IOException {
-		var price = priceCache.get(instrument.getId());
-		var ticker = instrument.getTicker();
-		var exchange = instrument.getExchange();
-		if (price == null) {
-			Stock stock;
-			// For instruments in the TSE and CNSX exchanges try appending .TO and then .CN to the symbol 
-			if (Arrays.asList("TSE","CNSX").contains(exchange)) {
-				ticker = ticker.replace(".", "-");
-				stock = YahooFinance.get(ticker + ".TO");
-				if (stock == null) {
-					stock = YahooFinance.get(ticker + ".CN");
-				}
-			} else {
-				stock = YahooFinance.get(ticker);
-			}
-	
-			var quote =  stock.getQuote();
-//			var price = quote.getPrice();
-//			var priceTimestamp = toLocalDateTime(quote.getLastTradeTime() != null ?  quote.getLastTradeTime().getTime() : null);
-//			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price, priceTimestamp);
-//			priceAndTimestamp = new PriceAndTimestamp(price, priceTimestamp);
-//			priceCache.put(instrument.getId(), priceAndTimestamp);
-			
-			price = new Price();
-			price.setInstrument(instrument);
-			if (quote.getLastTradeTime() != null) {
-				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(quote.getLastTradeTime().getTime()));
-				price.setPriceTimestampFromSource(true);
-			} else {
-				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
-				price.setPriceTimestampFromSource(false);
-				LOGGER.warn("PriceTimestamp was not available from source for {} {}. Used current timestamp", ticker, instrument.getExchange());
-			}
-			// check if the price is already in the table
-			var priceList = priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder());
-			if (CollectionUtils.isNotEmpty(priceList)) {
-				price = priceList.get(0);
-			} else {
-				price.setPrice(quote.getPrice());
-			}
-			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp());
-			priceCache.put(instrument.getId(), price);
-		} else {
-			LOGGER.info("Found {} {} in price cache", ticker, exchange);
-		}
-		return price;
-	}
-	
-	// TODO refactor with getSecurityPrice
-	private Price getMutualFundPrice(Instrument instrument) throws IOException {
-		var price = priceCache.get(instrument.getId());
-		var ticker = instrument.getTicker();
-		var exchange = instrument.getExchange();
-
-		if (price == null) {
-			Document document = Jsoup
-				    .connect("https://www.theglobeandmail.com/investing/markets/funds/" + ticker + "." + exchange)
-				    .get();
-			System.out.println(document);
-	
-			var tradeTimeElements = document.selectXpath("//barchart-field[@name='tradeTime']");
-			OffsetDateTime tradeTime = null;
-			if (tradeTimeElements.size() == 1) {
-				String tradeTimeString = tradeTimeElements.get(0).attr("value");
-				System.out.println("tardeTimeString: "+tradeTimeString);
-				if (StringUtils.isNotEmpty(tradeTimeString)) {
-					try {
-						var ldt = LocalDateTime.parse(tradeTimeString+"000000", DateTimeFormatter.ofPattern("MM/dd/yyHHmmss"));
-						tradeTime = OffsetDateTime.of(ldt, ZoneId.of("Canada/Eastern").getRules().getOffset(ldt));
-					} catch (DateTimeParseException e) {
-						System.err.println(tradeTimeString+"000000" + " can not be parsed using pattern " + "MM/dd/yyHHmmss");
-					}
-				}
-			}
-			
-			var lastPriceElements = document.selectXpath("//barchart-field[@name='lastPrice']");
-			BigDecimal lastPrice = null;
-			if (lastPriceElements.size() == 1) {
-				String lastPriceString = lastPriceElements.get(0).attr("value");
-				System.out.println(lastPriceString);
-				try {
-					lastPrice = new BigDecimal(lastPriceString);
-				} catch (NumberFormatException e) {
-					System.err.println(lastPriceString + " can not be parsed as a number");
-				}
-			}
-			
-			
-			price = new Price();
-			price.setInstrument(instrument);
-	
-			if (tradeTime != null) {
-				price.setPriceTimestamp(tradeTime);
-				price.setPriceTimestampFromSource(true);
-			} else {
-				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
-				price.setPriceTimestampFromSource(false);
-				LOGGER.warn("TradeTime was not available from source for {} {}. Used current timestamp", ticker, instrument.getExchange());
-			}
-			// check if the price is already in the table
-			var priceList = priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder());
-			if (CollectionUtils.isNotEmpty(priceList)) {
-				price = priceList.get(0);
-			} else {
-				price.setPrice(lastPrice);
-			}
-			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp());
-			priceCache.put(instrument.getId(), price);
-		} else {
-			LOGGER.info("Found {} {} in price cache", ticker, exchange);
-		}
-		return price;
-	}
-	
 	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {/*public BeanTransformerResult (){ this(null, null); }*/};
 	@Transactional
 	public PurgePositionSnapshotResult purgePositionSnapshot(OffsetDateTime positionSnapshot) {

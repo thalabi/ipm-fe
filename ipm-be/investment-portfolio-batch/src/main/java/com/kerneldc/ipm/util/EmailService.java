@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
 
 import freemarker.template.Configuration;
@@ -82,14 +83,22 @@ public class EmailService {
 		LOGGER.info("Sent sms email to: {}", to);
 	}
 	
-	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
-		mimeMessageHelper.setTo(InternetAddress.parse(to));
-		mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
-		mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues), true);
-		javaMailSender.send(mimeMessage);
+		try {
+			mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
+			mimeMessageHelper.setTo(InternetAddress.parse(to));
+			mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
+			mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues), true);
+			javaMailSender.send(mimeMessage);
+		} catch (MessagingException | ParseException | IOException | TemplateException e) {
+			var message = "Exception while sending Daily Market Value Notification email."; 
+			LOGGER.error(message, e);
+			//return new PriceQuote(null, null, message + " (" + e.getMessage() + ")");
+			throw new ApplicationException(message + " (" + e.getMessage() + ")");
+			
+		}
 		/*
 		 * var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot,
 		 * todaysMarketValue, percentChange, nMarketValues); LOGGER.debug(resultTest);

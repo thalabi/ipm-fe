@@ -1,9 +1,7 @@
 package com.kerneldc.ipm.rest.task;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -12,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.mail.MessagingException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AgeFileFilter;
@@ -26,11 +23,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 
-import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -108,7 +105,13 @@ public class ScheduledTasks {
 */
 	
 	@Scheduled(cron = "0 0 17 * * MON-FRI")
-	public void getHoldingPrices() throws IOException, InterruptedException, MessagingException, ParseException, TemplateException {
-		holdingPricingService.priceHoldings(true);
+	public void getHoldingPrices() {
+		try {
+			holdingPricingService.priceHoldings(true);
+		} catch (ApplicationException e) {
+			// TODO Auto-generated catch block
+			// TODO email exception
+			e.printStackTrace();
+		}
 	}
 }

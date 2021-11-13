@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kerneldc.ipm.rest.exception.ApplicationException;
+import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.rest.security.CustomUserDetails;
 import com.kerneldc.ipm.rest.security.ForgotPasswordRequest;
 import com.kerneldc.ipm.rest.security.JwtUtil;
