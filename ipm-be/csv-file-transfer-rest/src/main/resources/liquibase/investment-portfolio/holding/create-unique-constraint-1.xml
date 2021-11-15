@@ -7,9 +7,27 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="holding_unique_constraint_1" author="thalabi">
+    <changeSet id="holding_unique_constraint_1_h2" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
 
         <addUniqueConstraint columnNames="as_of_date,instrument_id,portfolio_id" constraintName="holding_unique_1" tableName="holding"/>
+    
+    </changeSet>
+    
+    <!-- Create a unique index instead of a unique constraint as Oracle does not allow TIME/TIMESTAMP WITH TIME ZONE columns in unique constraint or pk -->
+    <changeSet id="holding_unique_constraint_1_oracle" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="oracle" />
+	    </preConditions>
+
+		<createIndex indexName="holding_unique_1" tableName="holding"
+			unique="true">
+			<column name="as_of_date"/>
+			<column name="instrument_id"/>
+			<column name="portfolio_id"/>
+		</createIndex>
     
     </changeSet>
 </databaseChangeLog>

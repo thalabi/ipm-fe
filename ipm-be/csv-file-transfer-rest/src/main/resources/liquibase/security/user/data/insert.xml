@@ -14,7 +14,7 @@
 			<column name="version" value="0"/>
 
 			<column name="username" value="thalabi"/>
-			<column name="password" value="$2a$10$tzWGr/8jAV3238e4L7O2.eNdlJ0s15QNb7ZKNXGFqCGcOPbde/Zv6"/>
+			<column name="PASSWORD" value="$2a$10$tzWGr/8jAV3238e4L7O2.eNdlJ0s15QNb7ZKNXGFqCGcOPbde/Zv6"/>
 			<column name="enabled" value="y"/>
 			<column name="email" value="tarif.halabi@gmail.com"/>
 			<column name="cell_phone" value="4162005175"/>
@@ -26,7 +26,7 @@
 			<column name="version" value="0"/>
 
 			<column name="username" value="thalabi-viewer"/>
-			<column name="password" value="********"/>
+			<column name="PASSWORD" value="********"/>
 			<column name="enabled" value="y"/>
 			<column name="email" value="thalabi@yahoo.com"/>
 			<column name="cell_phone" value="4162814760"/>

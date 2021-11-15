@@ -15,8 +15,8 @@
 
 			<column name="instrument_id" value="-1"/>
 			<column name="price" value="1"/>
-			<column name="price_timestamp" value="1958-09-27T00:00:00.000"/>
-			<column name="price_timestamp_from_source" value="true"/>
+			<column name="price_timestamp" valueDate="1958-09-27 00:00:00.000"/>
+			<column name="price_timestamp_from_source" valueBoolean="true"/>
 		</insert>
 
 		<insert tableName="price">
@@ -26,8 +26,8 @@
 
 			<column name="instrument_id" value="-2"/>
 			<column name="price" value="1"/>
-			<column name="price_timestamp" value="1958-09-27T00:00:00.000"/>
-			<column name="price_timestamp_from_source" value="true"/>
+			<column name="price_timestamp" valueDate="1958-09-27 00:00:00.000"/>
+			<column name="price_timestamp_from_source" valueBoolean="true"/>
 		</insert>
 	</changeSet>
 </databaseChangeLog>	

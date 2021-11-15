@@ -7,20 +7,17 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="holding_price_interday_v_h2" author="thalabi">
-	    <preConditions onFail="CONTINUE" onFailMessage="">
-	        <dbms type="h2" />
-	    </preConditions>
+    <changeSet id="holding_price_interday_v" author="thalabi">
         <comment>Create holding_price_interday_v</comment>
 
     	<createView viewName="holding_price_interday_v" replaceIfExists="true">
 			<![CDATA[
 with 
 latest_date as (
-	select max(date) date from exchange_rate where from_currency='USD' and to_currency='CAD'
+	select max("DATE") "DATE" from exchange_rate where from_currency='USD' and to_currency='CAD'
 ),
 rate_on_latest_date as (
-	select rate from exchange_rate er join latest_date on er.date=latest_date.date and er.from_currency='USD' and er.to_currency='CAD'
+	select rate from exchange_rate er join latest_date on er."DATE"=latest_date."DATE" and er.from_currency='USD' and er.to_currency='CAD'
 ),
 cad_and_usd_values as (
 	select po.position_snapshot, sum(po.quantity*pr.price) value from position po
@@ -37,17 +34,4 @@ select row_number() over (order by position_snapshot) id, position_snapshot, sum
 
     </changeSet>
 
-    <changeSet id="create-view-oracle" author="thalabi">
-	    <preConditions onFail="CONTINUE">
-	        <dbms type="oracle" />
-	    </preConditions>
-        <comment>Create holding_price_interday_v</comment>
-
-    	<createView viewName="holding_price_interday_v" replaceIfExists="true">
-			<![CDATA[
-select 1 from dual			
-			]]>    
-		</createView>
-
-    </changeSet>
 </databaseChangeLog>

@@ -7,9 +7,27 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="price_unique_constraint_1" author="thalabi">
+    <changeSet id="price_unique_constraint_1_h2" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
 
         <addUniqueConstraint columnNames="instrument_id,price_timestamp" constraintName="price_unique_1" tableName="price"/>
     
     </changeSet>
+
+    <!-- Create a unique index instead of a unique constraint as Oracle does not allow TIME/TIMESTAMP WITH TIME ZONE columns in unique constraint or pk -->
+    <changeSet id="price_unique_constraint_1_oracle" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="oracle" />
+	    </preConditions>
+
+		<createIndex indexName="price_unique_constraint_1_oracle" tableName="price"
+			unique="true">
+			<column name="instrument_id"/>
+			<column name="price_timestamp"/>
+		</createIndex>
+    
+    </changeSet>
+
 </databaseChangeLog>
