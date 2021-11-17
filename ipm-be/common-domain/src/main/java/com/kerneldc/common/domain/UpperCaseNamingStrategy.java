@@ -8,6 +8,9 @@ import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Add class name to spring.jpa.hibernate.naming.physical-strategy in application.properties
+ */
 @Slf4j
 public class UpperCaseNamingStrategy extends SpringPhysicalNamingStrategy {
 
