@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class H2ServerConfig {
 
-	@Value("${spring.datasource.password}")
+	@Value("${xxx.password}")
 	private static String dbPassword;
 	
 
