@@ -8,6 +8,7 @@ import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +22,7 @@ public class H2ServerConfig {
 	private static final String tcpPassword = String.valueOf(Math.random());
 
 	@Bean
+	@Profile("!test") // don't create server during tests
 	public void h2Server() throws SQLException {
 		var h2server = Server.createTcpServer("-tcpPort", h2TcpPort, "-tcpAllowOthers", "-tcpPassword", tcpPassword).start();
 		int h2serverPort = h2server.getPort();
