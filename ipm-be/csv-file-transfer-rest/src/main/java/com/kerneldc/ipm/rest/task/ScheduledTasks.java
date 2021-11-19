@@ -19,13 +19,11 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
-import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +37,6 @@ public class ScheduledTasks {
 	@Autowired
 	private Environment environment;
 	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
-	private PositionRepository positionRepository;
 	@Autowired
 	private HoldingPricingService holdingPricingService;
 	

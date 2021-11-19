@@ -35,6 +35,9 @@ public class EmailService {
 	private String resetPasswordEmailFrom;
 	@Value("${application.email.dailyMarketValueNotificationFrom}")
 	private String dailyMarketValueNotificationFrom;
+	@Value("${application.email.dailyMarketValueNotificationTo}")
+	private String dailyMarketValueNotificationTo;
+
 	private static final String RESET_PASSWORD_EMAIL_SUBJECT = "Reset password";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT = "Reset password confirmation";
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
@@ -83,12 +86,12 @@ public class EmailService {
 		LOGGER.info("Sent sms email to: {}", to);
 	}
 	
-	public void sendDailyMarketValueNotification(String to, LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws ApplicationException {
+	public void sendDailyMarketValueNotification(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 		try {
 			mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
-			mimeMessageHelper.setTo(InternetAddress.parse(to));
+			mimeMessageHelper.setTo(InternetAddress.parse(dailyMarketValueNotificationTo));
 			mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
 			mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues), true);
 			javaMailSender.send(mimeMessage);
@@ -103,7 +106,7 @@ public class EmailService {
 		 * var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot,
 		 * todaysMarketValue, percentChange, nMarketValues); LOGGER.debug(resultTest);
 		 */
-		LOGGER.info("Sent daily market value notification email to: {}", to);
+		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
 	}
 
 	private String processResetPasswordTemplate(int linkExpiryInHours, String resetPasswordUrl) throws IOException, TemplateException {

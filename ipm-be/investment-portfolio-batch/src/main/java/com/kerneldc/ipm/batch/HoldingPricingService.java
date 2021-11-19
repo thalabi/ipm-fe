@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class HoldingPricingService /*implements ApplicationRunner*/ {
-	
 	private static final String CASH_TICKER = "CASH";
 
 	private static final boolean OFFLINE_MODE = false;
@@ -59,7 +58,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private Map<Long, Price> priceCache = new HashMap<>();
 
 	public int priceHoldings() throws ApplicationException {
-		return priceHoldings(false); 
+		return priceHoldings(true); 
 	}
 	public int priceHoldings(boolean sendNotifications) throws ApplicationException {
         snapshotInstant = Instant.now();
@@ -107,7 +106,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			var yesterdaysMarketValue = nMarketValues.get(nMarketValues.size()-1).getMarketValue();
 			percentChange = todaysMarketValue.subtract(yesterdaysMarketValue).divide(yesterdaysMarketValue, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).floatValue();
 		}
-		emailService.sendDailyMarketValueNotification("tarif.halabi@gmail.com", todaysSnapshot, todaysMarketValue, percentChange, nMarketValues);
+		emailService.sendDailyMarketValueNotification(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues);
 	}
 
 	private void persistPositions(ArrayList<Position> positionList) {
