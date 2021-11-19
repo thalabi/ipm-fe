@@ -16,6 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class H2ServerConfig {
 
+	@Value("${spring.datasource.password}")
+	private static String dbPassword;
+	
+
 	@Value("${h2.server.port:9092}")
 	private String h2TcpPort;
 	
@@ -24,6 +28,11 @@ public class H2ServerConfig {
 	@Bean
 	@Profile("!test") // don't create server during tests
 	public void h2Server() throws SQLException {
+		
+		System.out.println("========================================================>"+dbPassword+"<==============================");
+
+		
+		
 		var h2server = Server.createTcpServer("-tcpPort", h2TcpPort, "-tcpAllowOthers", "-tcpPassword", tcpPassword).start();
 		int h2serverPort = h2server.getPort();
 		LOGGER.info("H2 database server started on port {}", h2serverPort);
