@@ -57,9 +57,6 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	
 	private Map<Long, Price> priceCache = new HashMap<>();
 
-	public int priceHoldings() throws ApplicationException {
-		return priceHoldings(true); 
-	}
 	public int priceHoldings(boolean sendNotifications) throws ApplicationException {
         snapshotInstant = Instant.now();
         

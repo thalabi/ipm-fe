@@ -24,7 +24,6 @@ import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
-import com.kerneldc.ipm.rest.controller.PriceHoldingResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +41,11 @@ public class InvestmentPortfolioConroller {
 	private final PositionRepository positionRepository;
 	
     @GetMapping("/priceHoldings")
-	public ResponseEntity<PriceHoldingResponse> priceHoldings() {
+	public ResponseEntity<PriceHoldingResponse> priceHoldings(Boolean sendEmail) {
     	LOGGER.info("Begin ...");
     	var priceHoldingResponse = new PriceHoldingResponse();
     	try {
-			var holdingCount = holdingPricingService.priceHoldings();
+			var holdingCount = holdingPricingService.priceHoldings(sendEmail);
 			LOGGER.info("Priced {} holdings.", holdingCount);
 	    	priceHoldingResponse.setMessage(StringUtils.EMPTY);
 	    	priceHoldingResponse.setTimestamp(LocalDateTime.now());

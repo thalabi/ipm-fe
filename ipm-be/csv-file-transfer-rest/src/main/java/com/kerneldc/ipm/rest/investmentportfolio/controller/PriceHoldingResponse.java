@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest.controller;
+package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
 import java.time.LocalDateTime;
 
