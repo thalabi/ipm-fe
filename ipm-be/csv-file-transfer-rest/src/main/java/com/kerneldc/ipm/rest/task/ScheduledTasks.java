@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
+import com.kerneldc.ipm.util.EmailService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +40,10 @@ public class ScheduledTasks {
 	
 	@Autowired
 	private HoldingPricingService holdingPricingService;
+	
+	@Autowired
+	private EmailService emailService;
+
 	
 	private long fixedDelayThroughReflection;
 	
@@ -99,13 +104,12 @@ public class ScheduledTasks {
 */
 	
 	@Scheduled(cron = "0 0 17 * * MON-FRI")
-	public void getHoldingPrices() {
+	public void getHoldingPrices() throws ApplicationException {
 		try {
-			holdingPricingService.priceHoldings(true);
-		} catch (ApplicationException e) {
-			// TODO Auto-generated catch block
-			// TODO email exception
-			e.printStackTrace();
+			holdingPricingService.priceHoldings(true, true);
+		} catch (ApplicationException applicationException) {
+			applicationException.printStackTrace();
+			emailService.sendDailyMarketValueFailure(applicationException);
 		}
 	}
 }

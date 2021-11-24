@@ -57,32 +57,56 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	
 	private Map<Long, Price> priceCache = new HashMap<>();
 
-	public int priceHoldings(boolean sendNotifications) throws ApplicationException {
+	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
         snapshotInstant = Instant.now();
+        var priceHoldingsExceptions = new ApplicationException();
         
         CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
         CASH_USD_PRICE = priceRepository.findById(-2l).orElseThrow();
 
 
 		if (! /* not */ OFFLINE_MODE) {
-			getAndPersistExchangeRates();
+			try {
+				getAndPersistExchangeRates();
+			} catch (ApplicationException e) {
+				var message = String.format("Enable to get and persist exchange rates: %s", e.getMessage());
+				LOGGER.warn(message);
+				priceHoldingsExceptions.addMessage(message);
+			}
 		}
 
         var holdingList = holdingRepository.findLatestAsOfDateHoldings();
         priceCache.clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
-        	positionList.add(getStockPrice(holding));
+        	try {
+				positionList.add(getStockPrice(holding));
+			} catch (ApplicationException e) {
+				LOGGER.warn(e.getMessage());
+				priceHoldingsExceptions.addMessage(e.getMessage());
+			}
         }
         persistPrices();
         persistPositions(positionList);
         if (sendNotifications) {
-        	sendPriceHoldingsNotifications();
+        	try {
+				sendPriceHoldingsNotifications(priceHoldingsExceptions);
+				if (batchProcessing) {
+					priceHoldingsExceptions = null; // in batch mode, clear exceptions raised so far as they are now included in the email sent
+				}
+			} catch (ApplicationException e) {
+				var message = String.format("Enable to send price holdings notification: %s", e.getMessage());
+				LOGGER.warn(message);
+				priceHoldingsExceptions.addMessage(message);
+			}
         }
-        return holdingList.size();
+        
+        if (priceHoldingsExceptions!= null && CollectionUtils.isNotEmpty(priceHoldingsExceptions.getMessageList())) {
+        	throw priceHoldingsExceptions;
+        }
 	}
 	
-	private void sendPriceHoldingsNotifications() throws ApplicationException {
+	private void sendPriceHoldingsNotifications(ApplicationException priceHoldingsExceptions) throws ApplicationException {
 		var nMarketValues =  holdingPriceInterdayVRepository.selectLastestNMarketValues(5);
 		for (HoldingPriceInterdayV holdingPriceInterdayV : nMarketValues) {
 			LOGGER.info("holdingPriceInterdayV: {}", holdingPriceInterdayV);
@@ -103,7 +127,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			var yesterdaysMarketValue = nMarketValues.get(nMarketValues.size()-1).getMarketValue();
 			percentChange = todaysMarketValue.subtract(yesterdaysMarketValue).divide(yesterdaysMarketValue, RoundingMode.HALF_UP).multiply(ONE_HUNDRED).floatValue();
 		}
-		emailService.sendDailyMarketValueNotification(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues);
+		emailService.sendDailyMarketValueNotification(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues, priceHoldingsExceptions);
 	}
 
 	private void persistPositions(ArrayList<Position> positionList) {
@@ -156,7 +180,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 					throw new IllegalArgumentException("Currency should be either CAD or USD");
 			}
 		} else {
-			if (instrument.getExchange().equals("CF")) {
+			if (instrument.getExchange().equals("CF")) { // CF -> Canadian Fund
 				return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
 			} else {
 				return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);

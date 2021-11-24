@@ -3,7 +3,6 @@ package com.kerneldc.ipm.util;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +21,7 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
 
 import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -44,6 +41,7 @@ public class EmailService {
 	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "resetPasswordEmail.ftlh";
 	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE = "resetPasswordConfirmationEmail.ftlh";
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE = "dailyMarketValueNotification.ftlh";
+	private static final String DAILY_MARKET_VALUE_FAILURE_TEMPLATE = "dailyMarketValueFailure.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
 	private int resetPasswordJwtExpiryInMinutes;
@@ -86,29 +84,41 @@ public class EmailService {
 		LOGGER.info("Sent sms email to: {}", to);
 	}
 	
-	public void sendDailyMarketValueNotification(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws ApplicationException {
+	public void sendDailyMarketValueNotification(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 		try {
 			mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
 			mimeMessageHelper.setTo(InternetAddress.parse(dailyMarketValueNotificationTo));
 			mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
-			mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues), true);
+			mimeMessageHelper.setText(processDailyMarketValueNotificationTemplate(todaysSnapshot, todaysMarketValue, percentChange, nMarketValues, priceHoldingsExceptions), true);
 			javaMailSender.send(mimeMessage);
-		} catch (MessagingException | ParseException | IOException | TemplateException e) {
+		} catch (MessagingException | IOException | TemplateException e) {
 			var message = "Exception while sending Daily Market Value Notification email."; 
 			LOGGER.error(message, e);
-			//return new PriceQuote(null, null, message + " (" + e.getMessage() + ")");
 			throw new ApplicationException(message + " (" + e.getMessage() + ")");
 			
 		}
-		/*
-		 * var resultTest = processDailyMarketValueNotificationTemplate(todaysSnapshot,
-		 * todaysMarketValue, percentChange, nMarketValues); LOGGER.debug(resultTest);
-		 */
 		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
 	}
-
+	public void sendDailyMarketValueFailure(ApplicationException priceHoldingsExceptions) throws ApplicationException {
+		var mimeMessage = javaMailSender.createMimeMessage();
+		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
+		try {
+			mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
+			mimeMessageHelper.setTo(InternetAddress.parse(dailyMarketValueNotificationTo));
+			mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
+			mimeMessageHelper.setText(processDailyMarketValueFailureTemplate(priceHoldingsExceptions), true);
+			javaMailSender.send(mimeMessage);
+		} catch (MessagingException | IOException | TemplateException e) {
+			var message = "Exception while sending Daily Market Value Failure email."; 
+			LOGGER.error(message, e);
+			throw new ApplicationException(message + " (" + e.getMessage() + ")");
+			
+		}
+		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
+	}
+	
 	private String processResetPasswordTemplate(int linkExpiryInHours, String resetPasswordUrl) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("linkExpiryInHours", linkExpiryInHours);
@@ -121,12 +131,18 @@ public class EmailService {
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE), templateModelMap);
 	}
 	
-	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
 		templateModelMap.put("todaysMarketValue", todaysMarketValue);
 		templateModelMap.put("percentChange", percentChange);
 		templateModelMap.put("nMarketValues", nMarketValues);
+		templateModelMap.put("priceHoldingsExceptions", priceHoldingsExceptions);
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
+	}
+	private String processDailyMarketValueFailureTemplate(ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
+		Map<String, Object> templateModelMap = new HashMap<>();
+		templateModelMap.put("priceHoldingsExceptions", priceHoldingsExceptions);
+		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_FAILURE_TEMPLATE), templateModelMap);
 	}
 }

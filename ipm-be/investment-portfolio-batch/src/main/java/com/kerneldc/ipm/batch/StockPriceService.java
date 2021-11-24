@@ -48,6 +48,11 @@ public class StockPriceService extends BaseAbstractPriceService {
 			throw new ApplicationException(message + " (" + e.getMessage() + ")");
 		}
 
+		if (stock == null) {
+			var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
+			LOGGER.warn(message);
+			throw new ApplicationException(message);
+		}
 		var quote =  stock.getQuote();
 		
 		return new PriceQuote(quote.getPrice(), TimeUtils.toOffsetDateTime(quote.getLastTradeTime()));

@@ -3,7 +3,24 @@
   <title>Daily market value notification</title>
 </head>
 <body>
-  <h3>Market value as of ${todaysSnapshot?datetime} is ${todaysMarketValue?string.currency}</h3>
+
+  <#if (priceHoldingsExceptions.messageList?size gt 0)>
+     <span style="font-style: underline;">The balance below is deficient as there are exceptions during pricing. See below:</span>
+	  <#list priceHoldingsExceptions.messageList as message>
+		  <ul style="font-style: italic;">
+		    <li>${message}</li>
+		  </ul>
+	  </#list>
+  </#if>
+
+
+  <h3>Market value as of ${todaysSnapshot?datetime} is
+	  <#if (priceHoldingsExceptions.messageList?size == 0)>
+	    ${todaysMarketValue?string.currency}
+	  <#else>
+	    <span style="opacity: 0.7;">${todaysMarketValue?string.currency}</span> <!-- use 'opacity' to greyout market value --> 
+	  </#if>
+  </h3>   
   
   Change of <b>
   <#if percentChange lt 0>

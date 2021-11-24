@@ -45,8 +45,7 @@ public class InvestmentPortfolioConroller {
     	LOGGER.info("Begin ...");
     	var priceHoldingResponse = new PriceHoldingResponse();
     	try {
-			var holdingCount = holdingPricingService.priceHoldings(sendEmail);
-			LOGGER.info("Priced {} holdings.", holdingCount);
+			holdingPricingService.priceHoldings(sendEmail, false);
 	    	priceHoldingResponse.setMessage(StringUtils.EMPTY);
 	    	priceHoldingResponse.setTimestamp(LocalDateTime.now());
 		} catch (ApplicationException e) {
@@ -136,7 +135,7 @@ public class InvestmentPortfolioConroller {
 //    	positionSnapshotSet.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
 
     	var positionSnapshotList = positionRepository.selectAllPositionSnapshots();
-    	positionSnapshotList.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
+    	//positionSnapshotList.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
        	LOGGER.info("End ...");
     	return ResponseEntity.ok(positionSnapshotList);
     }

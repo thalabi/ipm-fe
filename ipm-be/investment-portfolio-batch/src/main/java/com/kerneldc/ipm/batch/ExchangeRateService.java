@@ -1,6 +1,7 @@
 package com.kerneldc.ipm.batch;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +15,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExchangeRateService {
 
+	private static final String BANK_OF_CANADA_URL_TEMPLATE = "https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s"; 
 	private final ExchangeRateRepository exchangeRateRepository;
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
@@ -40,9 +43,8 @@ public class ExchangeRateService {
 	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
-		var response = callApi(workingBusinessDay, fromCurrency, toCurrency);
 		
-		var rate = parseRate(response.body());
+		var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
 
 		if (rate == null) {
 			LOGGER.warn("No exchange rate found for {} to {} on {}", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
@@ -76,23 +78,38 @@ public class ExchangeRateService {
 		return TimeUtils.toInstant(workingBusinessDay);
 	}
 	
-	private HttpResponse<String> callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {
+	private String callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {
 		var client = HttpClient.newHttpClient();
 		//var dateString = date.format(dateTimeFormatter);
 		var dateString = dateTimeFormatter.format(date);
-		var url = String.format("https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s", fromCurrency, toCurrency, dateString);
+		var url = String.format(BANK_OF_CANADA_URL_TEMPLATE, fromCurrency, toCurrency, dateString);
 		var request = HttpRequest.newBuilder(
 			       URI.create(url))
 			   .header("accept", "application/json")
 			   .build();
+		HttpResponse<String> httpResponse;
 		try {
-			return client.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			Thread.currentThread().interrupt();
-			var message = String.format("Exception converting %s to %s while contacting: %s", fromCurrency, toCurrency, url);
+			httpResponse = client.send(request, BodyHandlers.ofString());
+		} catch (ConnectException e) {
+			// ConnectException has a null message, so we catch it here and append 'Connect exception' to the message
+			var message = String.format("Exception converting %s to %s while contacting: %s. Connect exception.", fromCurrency, toCurrency, url);
 			LOGGER.error(message, e);
 			throw new ApplicationException(message);
+		} catch (IOException e) {
+			var message = String.format("Exception converting %s to %s while contacting: %s. %s", fromCurrency, toCurrency, url, e.getMessage());
+			LOGGER.error(message, e);
+			throw new ApplicationException(message);
+		} catch (InterruptedException e) {
+			LOGGER.error("Interrupted!", e);
+			Thread.currentThread().interrupt();
+			throw new ApplicationException(e.getMessage());
 		}
+		if (httpResponse.statusCode() != HttpStatus.OK.value()) {
+			var message = String.format("Exception converting %s to %s while contacting: %s. Http status code: %d", fromCurrency, toCurrency, url, httpResponse.statusCode()); 
+			LOGGER.error(message);
+			throw new ApplicationException(message);
+		}
+		return httpResponse.body();
 	}
 	
 	private Double parseRate(String jsonResponse) throws ApplicationException {
