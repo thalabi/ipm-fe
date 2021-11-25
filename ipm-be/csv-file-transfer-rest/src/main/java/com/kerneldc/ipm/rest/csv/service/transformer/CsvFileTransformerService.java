@@ -17,7 +17,6 @@ public class CsvFileTransformerService {
 
 	private final Collection<ICsvFileTransformer> csvFileTransformerCollection;
 	
-	@SuppressWarnings("preview")
 	public record CsvFileTransformerResult(BufferedReader csvBufferedReader, TransformerException transformerException) {}
 	
 	public CsvFileTransformerResult applyTransformers(IEntityEnum uploadTabelEnum, BufferedReader csvBufferedReader) {
