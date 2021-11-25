@@ -19,7 +19,6 @@ public class BeanTransformerService {
 
 	private final Collection<IBeanTransformer> beanTransformerCollection;
 	
-	@SuppressWarnings("preview")
 	public record BeanTransformerResult(List<? extends AbstractPersistableEntity> beanList, List<TransformerException> transformerExceptionList) {/*public BeanTransformerResult (){ this(null, null); }*/};
 	
 	public BeanTransformerResult applyTransformers(IEntityEnum uploadTabelEnum, List<? extends AbstractPersistableEntity> beanList) {

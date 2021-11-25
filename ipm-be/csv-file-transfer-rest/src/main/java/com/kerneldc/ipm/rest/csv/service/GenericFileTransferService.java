@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.ipm.domain.Holding;
+import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.rest.csv.controller.FileTransferResponse;
 import com.kerneldc.ipm.rest.csv.repository.EntityRepositoryFactory;
 import com.kerneldc.ipm.rest.csv.service.ProcessingStats.ProcessingStatsBuilder;
@@ -53,13 +55,11 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 	private final EntityRepositoryFactory entityRepositoryFactory;
 	private final BeanTransformerService beanTransformerService;
 
-	@SuppressWarnings("preview")
 	protected record CsvParseResults (List<String[]> inputCsvLineList, String[] columnNames, List<? extends AbstractPersistableEntity> beanList, boolean majorException, List<CsvException> csvParseExceptionList) {
 		public CsvParseResults withBeanList(List<? extends AbstractPersistableEntity> beanList) {
 			return new CsvParseResults(inputCsvLineList(), columnNames(), beanList, majorException(), csvParseExceptionList());
 		}
 	} 
-	@SuppressWarnings("preview")
     private record ExceptionsFileLine (long lineNumber, String exceptionMessage, String data) {public long getLineNumber() {return lineNumber;}}
 
 	private StopWatch stopWatch = StopWatch.create();
@@ -261,6 +261,18 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		LOGGER.debug("uploadTableEnum: {}", uploadTableEnum);
 		@SuppressWarnings("unchecked")
 		List<AbstractEntity> beans = (List<AbstractEntity>)repository.findAll();
+		
+		// TODO implement entity enrichment handler (s)
+		if (uploadTableEnum.equals(InvestmentPortfolioTableEnum.HOLDING)) {
+			for (AbstractEntity e: beans) {
+				Holding h = (Holding)e;
+				h.setTicker(h.getInstrument().getTicker());
+				h.setExchange(h.getInstrument().getExchange());
+				h.setAccountNumber(h.getPortfolio().getAccountNumber());
+				h.setInstitution(h.getPortfolio().getInstitution());
+			}
+		}
+		
 		LOGGER.debug("beans size: {}", beans.size());
 		var byteArrayOutputstream = new ByteArrayOutputStream();
 	    var outputStreamWriter = new OutputStreamWriter(byteArrayOutputstream);

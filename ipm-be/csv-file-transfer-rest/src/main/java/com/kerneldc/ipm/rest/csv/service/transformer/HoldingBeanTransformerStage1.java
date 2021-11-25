@@ -18,11 +18,9 @@ import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 
 	private final InstrumentRepository instrumentRepository;

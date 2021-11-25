@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.kerneldc.ipm.batch.ExchangeRateService;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
 import com.kerneldc.ipm.util.TimeUtils;
 
