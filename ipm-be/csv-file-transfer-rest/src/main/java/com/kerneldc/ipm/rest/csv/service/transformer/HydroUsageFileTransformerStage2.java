@@ -55,8 +55,8 @@ public class HydroUsageFileTransformerStage2 implements ICsvFileTransformer {
 	}
 
 	@Override
-	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStagesEnum transformationStagesEnum) {
+	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
 		return uploadTableEnum.equals(UploadTableEnum.HYDRO_USAGE)
-				&& transformationStagesEnum.equals(TransformationStagesEnum.STAGE_TWO);
+				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_TWO);
 	}
 }

@@ -22,7 +22,7 @@ public class CsvFileTransformerService {
 	public CsvFileTransformerResult applyTransformers(IEntityEnum uploadTabelEnum, BufferedReader csvBufferedReader) {
 		
 		for (ICsvFileTransformer transformer: csvFileTransformerCollection) {
-			for (TransformationStagesEnum stage : TransformationStagesEnum.values())
+			for (TransformationStageEnum stage : TransformationStageEnum.values())
 				if (transformer.canHandle(uploadTabelEnum, stage)) {
 					try {
 						LOGGER.info("Using {} to transform csv file for {} table.", transformer.getClass().getSimpleName(), uploadTabelEnum);

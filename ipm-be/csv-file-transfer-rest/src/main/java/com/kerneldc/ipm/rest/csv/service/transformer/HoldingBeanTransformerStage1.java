@@ -26,8 +26,7 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 	private final InstrumentRepository instrumentRepository;
 	private final PortfolioRepository portfolioRepository;
 	@Override
-	public BeanTransformerResult transform(BeanTransformerResult beanTransformerResult/*List<? extends AbstractPersistableEntity> beanList*/)
-			throws TransformerException {
+	public BeanTransformerResult transform(BeanTransformerResult beanTransformerResult) throws TransformerException {
 		var inputHoldingList = beanTransformerResult.beanList();
 		var transformerExceptionList = beanTransformerResult.transformerExceptionList();
 		
@@ -66,8 +65,8 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 	}
 
 	@Override
-	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStagesEnum transformationStagesEnum) {
+	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
 		return uploadTableEnum.equals(InvestmentPortfolioTableEnum.HOLDING)
-				&& transformationStagesEnum.equals(TransformationStagesEnum.STAGE_ONE);
+				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_ONE);
 	}
 }

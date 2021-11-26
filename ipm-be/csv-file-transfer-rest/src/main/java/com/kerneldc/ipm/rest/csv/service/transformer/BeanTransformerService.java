@@ -19,14 +19,14 @@ public class BeanTransformerService {
 
 	private final Collection<IBeanTransformer> beanTransformerCollection;
 	
-	public record BeanTransformerResult(List<? extends AbstractPersistableEntity> beanList, List<TransformerException> transformerExceptionList) {/*public BeanTransformerResult (){ this(null, null); }*/};
+	public record BeanTransformerResult(List<? extends AbstractPersistableEntity> beanList, List<TransformerException> transformerExceptionList) {};
 	
 	public BeanTransformerResult applyTransformers(IEntityEnum uploadTabelEnum, List<? extends AbstractPersistableEntity> beanList) {
 		
 		var beanTransformerResult = new BeanTransformerResult(beanList, new ArrayList<>());
 		
 		for (IBeanTransformer transformer: beanTransformerCollection) {
-			for (TransformationStagesEnum stage : TransformationStagesEnum.values())
+			for (TransformationStageEnum stage : TransformationStageEnum.values())
 				if (transformer.canHandle(uploadTabelEnum, stage)) {
 					try {
 						LOGGER.info("Using {} to transform bean of {} table.", transformer.getClass().getSimpleName(), uploadTabelEnum);

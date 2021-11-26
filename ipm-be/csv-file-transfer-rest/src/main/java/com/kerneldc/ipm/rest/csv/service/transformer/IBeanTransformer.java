@@ -7,5 +7,5 @@ public interface IBeanTransformer {
 
 	BeanTransformerResult transform(BeanTransformerResult beanTransformerResultList) throws TransformerException;
 	
-	boolean canHandle(IEntityEnum entityEnum, TransformationStagesEnum transformationStagesEnum);
+	boolean canHandle(IEntityEnum entityEnum, TransformationStageEnum transformationStageEnum);
 }

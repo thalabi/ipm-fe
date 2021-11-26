@@ -8,5 +8,5 @@ public interface ICsvFileTransformer {
 
 	BufferedReader transform(BufferedReader bufferedReader) throws TransformerException;
 	
-	boolean canHandle(IEntityEnum entityEnum, TransformationStagesEnum transformationStagesEnum);
+	boolean canHandle(IEntityEnum entityEnum, TransformationStageEnum transformationStageEnum);
 }
