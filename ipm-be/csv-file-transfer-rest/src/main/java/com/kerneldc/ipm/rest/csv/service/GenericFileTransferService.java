@@ -27,11 +27,10 @@ import org.springframework.stereotype.Service;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.domain.Holding;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.rest.csv.controller.FileTransferResponse;
 import com.kerneldc.ipm.rest.csv.repository.EntityRepositoryFactory;
 import com.kerneldc.ipm.rest.csv.service.ProcessingStats.ProcessingStatsBuilder;
+import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService;
 import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -48,12 +47,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class GenericFileTransferService /*implements IFileTransferService*/ {
-	private static final DateTimeFormatter EXCEPTIONS_FILE_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmssSSS");
+	private static final DateTimeFormatter EXCEPTIONS_FILE_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuuMMdd-HHmmssSSS");
 	public static final String EXCEPTIONS_FILE_PREFIX = "fileTransferController-csv-exceptions-"; 
 	public static final String EXCEPTIONS_FILE_SUFFIX = ".csv";
 	
 	private final EntityRepositoryFactory entityRepositoryFactory;
 	private final BeanTransformerService beanTransformerService;
+	private final BeanReferentialEntityEnrichmentService beanReferentialEntityEnrichmentService;
 
 	protected record CsvParseResults (List<String[]> inputCsvLineList, String[] columnNames, List<? extends AbstractPersistableEntity> beanList, boolean majorException, List<CsvException> csvParseExceptionList) {
 		public CsvParseResults withBeanList(List<? extends AbstractPersistableEntity> beanList) {
@@ -261,17 +261,9 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		LOGGER.debug("uploadTableEnum: {}", uploadTableEnum);
 		@SuppressWarnings("unchecked")
 		List<AbstractEntity> beans = (List<AbstractEntity>)repository.findAll();
-		
-		// TODO implement entity enrichment handler (s)
-		if (uploadTableEnum.equals(InvestmentPortfolioTableEnum.HOLDING)) {
-			for (AbstractEntity e: beans) {
-				Holding h = (Holding)e;
-				h.setTicker(h.getInstrument().getTicker());
-				h.setExchange(h.getInstrument().getExchange());
-				h.setAccountNumber(h.getPortfolio().getAccountNumber());
-				h.setInstitution(h.getPortfolio().getInstitution());
-			}
-		}
+
+		// TODO handle exception list in beanReferentialEntityEnrichmentResult
+		var beanReferentialEntityEnrichmentResult = beanReferentialEntityEnrichmentService.applyEnrichers(uploadTableEnum, beans);
 		
 		LOGGER.debug("beans size: {}", beans.size());
 		var byteArrayOutputstream = new ByteArrayOutputStream();
