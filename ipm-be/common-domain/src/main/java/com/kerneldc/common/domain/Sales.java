@@ -24,7 +24,7 @@ public class Sales extends AbstractPersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@CsvBindByName(column = "Transaction_date")
-	@CsvDate("M/d/yyyy H:mm")
+	@CsvDate("M/d/uuuu H:mm")
 	@Setter(AccessLevel.NONE)
 	private LocalDateTime transactionDate;
 	@CsvBindByName
@@ -46,10 +46,10 @@ public class Sales extends AbstractPersistableEntity {
 	@CsvBindByName
 	private String country;
 	@CsvBindByName(column = "Account_Created")
-	@CsvDate("M/d/yyyy H:mm")
+	@CsvDate("M/d/uuuu H:mm")
 	private LocalDateTime accountCreated;
 	@CsvBindByName(column = "Last_Login")
-	@CsvDate("M/d/yyyy H:mm")
+	@CsvDate("M/d/uuuu H:mm")
 	private LocalDateTime lastLogin;
 	@CsvBindByName
 	private Float latitude;

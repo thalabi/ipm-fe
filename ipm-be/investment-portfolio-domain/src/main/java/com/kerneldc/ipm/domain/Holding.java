@@ -27,7 +27,7 @@ public class Holding extends AbstractPersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@CsvBindByName(column = "as_of_date")
-	@CsvDate("yyyy-MM-dd'T'HH:mm:ssZ")
+	@CsvDate("uuuu-MM-dd'T'HH:mm:ss.SSSZ")
 	@Setter(AccessLevel.NONE)
 	private OffsetDateTime asOfDate;
 	@Setter(AccessLevel.NONE)
