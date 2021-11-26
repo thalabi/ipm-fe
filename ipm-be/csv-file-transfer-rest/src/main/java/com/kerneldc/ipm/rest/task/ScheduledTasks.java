@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ScheduledTasks {
 	
-	private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
 	private static final String CLEANUP_TEMP_FILES_METHOD_NAME = "cleanupTempFiles";
 	@Autowired
 	private Environment environment;
