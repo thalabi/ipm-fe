@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MutualFundPriceService extends BaseAbstractPriceService {
 
-	private static final String THE_GLOBE_AND_MAIL_BASE_URL = "https://www.theglobeandmail.comXXX/investing/markets/funds/";
+	private static final String THE_GLOBE_AND_MAIL_BASE_URL = "https://www.theglobeandmail.com/investing/markets/funds/";
 	public MutualFundPriceService(PriceRepository priceRepository) {
 		super(priceRepository);
 	}
