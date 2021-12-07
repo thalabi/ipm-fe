@@ -11,7 +11,7 @@ import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 
 public interface ExchangeRateRepository extends BaseTableRepository<ExchangeRate, Long> {
 	
-	List<ExchangeRate> findByDateAndFromCurrencyAndToCurrency(OffsetDateTime date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency);
+	List<ExchangeRate> findByAsOfDateAndFromCurrencyAndToCurrency(OffsetDateTime asOfDate, CurrencyEnum fromCurrency, CurrencyEnum toCurrency);
 	
 	@Override
 	default IEntityEnum canHandle() {

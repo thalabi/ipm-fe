@@ -10,10 +10,10 @@
     <changeSet id="exchange_rate_data" author="thalabi">
 		<insert tableName="exchange_rate">
 			<column name="id" valueComputed="exchange_rate_seq.nextval"/>
-			<column name="lk" value="2021-08-03_USD_CAD"/>
+			<column name="lk" value="2021-08-03 00:00:00.123+00|USD|CAD"/>
 			<column name="version" value="0"/>
 
-			<column name="DATE" valueDate="2021-08-03"/>
+			<column name="as_of_date" valueDate="2021-08-03T00:00:00.123+00"/>
 			<column name="from_currency" value="USD"/>
 			<column name="to_currency" value="CAD"/>
 			<column name="rate" value="1.2545"/>

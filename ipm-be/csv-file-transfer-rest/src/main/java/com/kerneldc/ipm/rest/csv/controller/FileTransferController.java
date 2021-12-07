@@ -69,7 +69,8 @@ public class FileTransferController {
     			return ResponseEntity.ok(new FileTransferResponse(exceptionMessage, null, null));
     		}
     		
-    		var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(), csvFileTransformerResult.csvBufferedReader(), truncateTable);
+			var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(),
+					csvFileTransformerResult.csvBufferedReader(), truncateTable);
     		LOGGER.info("End ...");
         	return ResponseEntity.ok(fileTransferResponse);
     	}

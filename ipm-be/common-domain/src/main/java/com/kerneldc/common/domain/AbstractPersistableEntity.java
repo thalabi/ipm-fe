@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,7 +17,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @MappedSuperclass
-//@XmlAccessorType(XmlAccessType.FIELD)
 @Getter @Setter
 public abstract class AbstractPersistableEntity extends AbstractEntity implements Serializable {
 	
@@ -38,9 +38,10 @@ public abstract class AbstractPersistableEntity extends AbstractEntity implement
 	@Column(name = "version")
 	private Long version;
 
-    protected String concatLogicalKeyParts(String... parts) {
-    	return String.join("_", parts);
-    }
-    
+	@Transient
+	private Long sourceCsvLineNumber;
+	@Transient
+	private String[] sourceCsvLine;
+	
     protected abstract void setLogicalKeyHolder();
 }

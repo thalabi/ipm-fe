@@ -16,7 +16,7 @@ public class ShortMonthEnumConverter implements AttributeConverter<ShortMonthEnu
 
 		Preconditions.checkArgument(attribute != null, "ShortMonthEnum value cannot be null");
 		
-        return attribute.getValue();
+        return ShortMonthEnum.getNumericValue(attribute);
 	}
 
 	@Override

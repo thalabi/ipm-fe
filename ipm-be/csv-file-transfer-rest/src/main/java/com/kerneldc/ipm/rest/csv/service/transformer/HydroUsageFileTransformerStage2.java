@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.enums.IEntityEnum;
@@ -40,7 +39,7 @@ public class HydroUsageFileTransformerStage2 implements ICsvFileTransformer {
         	//csvWriter.writeNext(lastCells);
         	
 		} catch (CsvValidationException | IOException e) {
-			throw new TransformerException(StringUtils.EMPTY, e);
+			throw new TransformerException(getTransformerName(), e);
     		
     	}
         
@@ -48,7 +47,7 @@ public class HydroUsageFileTransformerStage2 implements ICsvFileTransformer {
         try {
 			out.close();
 		} catch (IOException e) {
-			throw new TransformerException("Unable to close ByteArrayOutputStream", e);
+			throw new TransformerException(getTransformerName(),  "Unable to close ByteArrayOutputStream", e);
 		}
     	
     	return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteArray)));
@@ -58,5 +57,10 @@ public class HydroUsageFileTransformerStage2 implements ICsvFileTransformer {
 	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
 		return uploadTableEnum.equals(UploadTableEnum.HYDRO_USAGE)
 				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_TWO);
+	}
+
+	@Override
+	public String getTransformerName() {
+		return"HydroUsageFileTransformerStage2";
 	}
 }

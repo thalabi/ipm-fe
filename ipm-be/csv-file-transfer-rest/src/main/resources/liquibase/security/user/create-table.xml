@@ -39,8 +39,8 @@
             </column>
             <column name="reset_password_jwt_key" type="varchar(44)"/>
 
-            <column name="created" type="timestamp"/>
-            <column name="modified" type="timestamp"/>
+            <column name="created" type="timestamp(3) with time zone"/>
+            <column name="modified" type="timestamp(3) with time zone"/>
             
         </createTable>
     </changeSet>

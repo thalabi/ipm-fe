@@ -10,23 +10,23 @@
     <changeSet id="price_data" author="thalabi">
 		<insert tableName="price">
 			<column name="id" value="-1"/>
-			<column name="lk" value="-1_1958-09-27T00:00:00"/>
+			<column name="lk" value="-1|1958-09-27 00:00:00.000+0000"/>
 			<column name="version" value="0"/>
 
 			<column name="instrument_id" value="-1"/>
 			<column name="price" value="1"/>
-			<column name="price_timestamp" valueDate="1958-09-27 00:00:00.000"/>
+			<column name="price_timestamp" valueDate="1958-09-27T00:00:00.000"/>
 			<column name="price_timestamp_from_source" valueBoolean="true"/>
 		</insert>
 
 		<insert tableName="price">
 			<column name="id" value="-2"/>
-			<column name="lk" value="-2_1958-09-27T00:00:00"/>
+			<column name="lk" value="-2|1958-09-27 00:00:00.000+0000"/>
 			<column name="version" value="0"/>
 
 			<column name="instrument_id" value="-2"/>
 			<column name="price" value="1"/>
-			<column name="price_timestamp" valueDate="1958-09-27 00:00:00.000"/>
+			<column name="price_timestamp" valueDate="1958-09-27T00:00:00.000"/>
 			<column name="price_timestamp_from_source" valueBoolean="true"/>
 		</insert>
 	</changeSet>

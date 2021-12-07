@@ -38,7 +38,7 @@ public class ExchangeRateService {
 	private static final String BANK_OF_CANADA_URL_TEMPLATE = "https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s"; 
 	private final ExchangeRateRepository exchangeRateRepository;
 	
-	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
+	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 
 	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
 
@@ -49,12 +49,12 @@ public class ExchangeRateService {
 		if (rate == null) {
 			LOGGER.warn("No exchange rate found for {} to {} on {}", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
 		} else {
-			var exchangeRateList = exchangeRateRepository.findByDateAndFromCurrencyAndToCurrency(
+			var exchangeRateList = exchangeRateRepository.findByAsOfDateAndFromCurrencyAndToCurrency(
 					TimeUtils.toOffsetDateTime(workingBusinessDay), fromCurrency, toCurrency);
 			ExchangeRate exchangeRate;
 			if (CollectionUtils.isEmpty(exchangeRateList)) {
 				exchangeRate = new ExchangeRate();
-				exchangeRate.setDate(TimeUtils.toOffsetDateTime(workingBusinessDay));
+				exchangeRate.setAsOfDate(TimeUtils.toOffsetDateTime(workingBusinessDay));
 				exchangeRate.setFromCurrency(CurrencyEnum.USD);
 				exchangeRate.setToCurrency(CurrencyEnum.CAD);
 				exchangeRate.setToCurrency(CurrencyEnum.CAD);

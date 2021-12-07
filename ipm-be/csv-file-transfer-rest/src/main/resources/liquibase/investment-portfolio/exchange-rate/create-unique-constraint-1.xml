@@ -12,7 +12,7 @@
 	        <dbms type="h2" />
 	    </preConditions>
 
-        <addUniqueConstraint columnNames="date,from_currency,to_currency" constraintName="exchange_rate_unique_1" tableName="exchange_rate"/>
+        <addUniqueConstraint columnNames="as_of_date,from_currency,to_currency" constraintName="exchange_rate_unique_1" tableName="exchange_rate"/>
     
     </changeSet>
 
@@ -24,7 +24,7 @@
 
 		<createIndex indexName="exchange_rate_unique_1" tableName="exchange_rate"
 			unique="true">
-			<column name="DATE"/>
+			<column name="as_of_date"/>
 			<column name="from_currency"/>
 			<column name="to_currency"/>
 		</createIndex>

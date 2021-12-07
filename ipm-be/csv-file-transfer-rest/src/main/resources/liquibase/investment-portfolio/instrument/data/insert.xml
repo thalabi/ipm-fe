@@ -10,7 +10,7 @@
     <changeSet id="instrument_data" author="thalabi">
 		<insert tableName="instrument">
 			<column name="id" value="-1"/>
-			<column name="lk" value="CASH_CAD"/>
+			<column name="lk" value="CASH|CAD"/>
 			<column name="version" value="0"/>
 
 			<column name="ticker" value="CASH"/>
@@ -21,7 +21,7 @@
 
 		<insert tableName="instrument">
 			<column name="id" value="-2"/>
-			<column name="lk" value="CASH_USD"/>
+			<column name="lk" value="CASH|USD"/>
 			<column name="version" value="0"/>
 
 			<column name="ticker" value="CASH"/>

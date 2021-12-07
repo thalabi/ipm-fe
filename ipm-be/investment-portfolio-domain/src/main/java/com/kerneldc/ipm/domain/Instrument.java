@@ -6,6 +6,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
+import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.common.enums.CurrencyEnum;
 import com.opencsv.bean.CsvBindByName;
 
@@ -43,7 +44,7 @@ public class Instrument extends AbstractPersistableEntity {
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKey = concatLogicalKeyParts(ticker, exchange);
-		getLogicalKeyHolder().setLogicalKey(logicalKey);
+		var logicalKeyHolder = LogicalKeyHolder.build(ticker, exchange);
+		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

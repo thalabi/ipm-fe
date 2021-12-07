@@ -26,8 +26,8 @@
             </column> 
             <column name="description" type="varchar(256)"/> 
 
-            <column name="created" type="timestamp"/>
-            <column name="modified" type="timestamp"/>
+            <column name="created" type="timestamp(3) with time zone"/>
+            <column name="modified" type="timestamp(3) with time zone"/>
             
         </createTable>
     </changeSet>

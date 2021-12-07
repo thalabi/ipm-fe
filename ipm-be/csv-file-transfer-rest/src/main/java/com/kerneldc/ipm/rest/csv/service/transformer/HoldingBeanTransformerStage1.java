@@ -2,9 +2,11 @@ package com.kerneldc.ipm.rest.csv.service.transformer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Consumer;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
@@ -22,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class HoldingBeanTransformerStage1 implements IBeanTransformer {
-
 	private final InstrumentRepository instrumentRepository;
 	private final PortfolioRepository portfolioRepository;
 	@Override
@@ -35,27 +36,21 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 		for (AbstractPersistableEntity bean : inputHoldingList) {
 			var holding = SerializationUtils.clone((Holding) bean);
 
-			var exceptionMessage = new StringBuilder(String.format("Exception while transforming bean: [%s]", holding.toString()));
+			var exceptionMessageJoiner = new StringJoiner(". ", StringUtils.EMPTY, ".");
 			var exceptionsFound = false;
 			
-			List<Instrument> instrumentList = instrumentRepository.findByTickerAndExchange(holding.getTicker(), holding.getExchange());
-			if (CollectionUtils.isEmpty(instrumentList)) {
-				exceptionMessage.append(String.format(" Instrument not found with ticker: [%s] and exchange: [%s]", holding.getTicker(), holding.getExchange()));
-				exceptionsFound = true;
-			} else {
-				holding.setInstrument(instrumentList.get(0));
-			}
-			
-			List<Portfolio> portfolioList = portfolioRepository.findByinstitutionAndAccountNumber(holding.getInstitution(), holding.getAccountNumber());
-			if (CollectionUtils.isEmpty(portfolioList)) {
-				exceptionMessage.append(String.format(" Posrtfolio not found with instititution: [%s] and account number: [%s]", holding.getInstitution(), holding.getAccountNumber()));
-				exceptionsFound = true;
-			} else {
-				holding.setPortfolio(portfolioList.get(0));
-			}
+			Consumer<AbstractPersistableEntity> setInstrument = instrument -> holding.setInstrument((Instrument)instrument);
+			exceptionsFound = IBeanTransformer.lookupAndSetForeignEntity(instrumentRepository, "Instrument not found with ticker: [%s] and exchange: [%s]", exceptionMessageJoiner, exceptionsFound,
+					setInstrument,
+					holding.getTicker(), holding.getExchange());
+
+			Consumer<AbstractPersistableEntity> setPortfolio = portfolio -> holding.setPortfolio((Portfolio)portfolio);
+			exceptionsFound = IBeanTransformer.lookupAndSetForeignEntity(portfolioRepository, "Portfolio not found with instititution: [%s] and account number: [%s]", exceptionMessageJoiner, exceptionsFound,
+					setPortfolio,
+					holding.getInstitution(), holding.getAccountNumber());
 
 			if (exceptionsFound) {
-				transformerExceptionList.add(new TransformerException(exceptionMessage.toString()));
+				transformerExceptionList.add(new TransformerException(getTransformerName(), holding, exceptionMessageJoiner.toString()));
 			} else {
 				transformedHoldingList.add(holding);
 			}
@@ -68,5 +63,10 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
 		return uploadTableEnum.equals(InvestmentPortfolioTableEnum.HOLDING)
 				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_ONE);
+	}
+
+	@Override
+	public String getTransformerName() {
+		return"HoldingBeanTransformerStage1";
 	}
 }

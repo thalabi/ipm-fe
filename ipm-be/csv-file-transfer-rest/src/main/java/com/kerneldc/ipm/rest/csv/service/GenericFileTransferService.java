@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.comparators.FixedOrderComparator;
@@ -32,6 +31,8 @@ import com.kerneldc.ipm.rest.csv.repository.EntityRepositoryFactory;
 import com.kerneldc.ipm.rest.csv.service.ProcessingStats.ProcessingStatsBuilder;
 import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService;
 import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService;
+import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
+import com.kerneldc.ipm.rest.csv.service.transformer.TransformerException;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -47,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class GenericFileTransferService /*implements IFileTransferService*/ {
-	private static final DateTimeFormatter EXCEPTIONS_FILE_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuuMMdd-HHmmssSSS");
+	private static final DateTimeFormatter EXCEPTIONS_FILE_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuuMMdd-HHmmss.SSS");
 	public static final String EXCEPTIONS_FILE_PREFIX = "fileTransferController-csv-exceptions-"; 
 	public static final String EXCEPTIONS_FILE_SUFFIX = ".csv";
 	
@@ -60,44 +61,61 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 			return new CsvParseResults(inputCsvLineList(), columnNames(), beanList, majorException(), csvParseExceptionList());
 		}
 	} 
-    private record ExceptionsFileLine (long lineNumber, String exceptionMessage, String data) {public long getLineNumber() {return lineNumber;}}
+    //private record ExceptionsFileLine (long lineNumber, String exceptionMessage, String csvData) {public long getLineNumber() {return lineNumber;}}
+    private record ExceptionsFileLine (long lineNumber, String exceptionMessage, String csvData, String beanData, String transformerName) {
+    	public ExceptionsFileLine (long lineNumber, String exceptionMessage, String csvData, String beanData) {
+    		this(lineNumber, exceptionMessage, csvData, beanData, StringUtils.EMPTY);
+    	}
+    	public ExceptionsFileLine (long lineNumber, String exceptionMessage, String csvData) {
+    		this(lineNumber, exceptionMessage, csvData, StringUtils.EMPTY, StringUtils.EMPTY);
+    	}
+    	public long getLineNumber() {
+    		return lineNumber;
+    	}
+    }
 
 	private StopWatch stopWatch = StopWatch.create();
 
-	//@Transactional
 	public FileTransferResponse parseAndSave(IEntityEnum uploadTableEnum, String clientFilename, BufferedReader bufferedReader, Boolean truncateTable) throws IOException {
 		stopWatch.reset();
 		stopWatch.start();
 
 		var csvParseResults = parseFile(uploadTableEnum, bufferedReader);
-		var processingStats = gatherStats(csvParseResults);
+		var beanTransformerResult = beanTransformerService.applyTransformers(uploadTableEnum, csvParseResults.beanList);
+		csvParseResults = csvParseResults.withBeanList(beanTransformerResult.beanList());
+		var persistExceptionsFileLineList = persistBeans(uploadTableEnum, truncateTable, csvParseResults);
+
+		var processingStats = gatherStats(csvParseResults, beanTransformerResult, persistExceptionsFileLineList);
 		
-		var parseExceptionsFileLineList = transformToExceptionsFileLineList(csvParseResults.csvParseExceptionList);
+		var parseExceptionsFileLineList = transformCsvExceptionsToExceptionsFileLineList(csvParseResults.csvParseExceptionList());
+		var beanExceptionsFileLineList = transformBeanExceptionsToExceptionsFileLineList(beanTransformerResult.transformerExceptionList());
 		
 		var fileTransferResponseBuilder = FileTransferResponse.builder().processingStats(processingStats);
 
-		var beanTransformerResult = beanTransformerService.applyTransformers(uploadTableEnum, csvParseResults.beanList);
-		if (CollectionUtils.isNotEmpty(beanTransformerResult.transformerExceptionList())) {
-			// temp
-			beanTransformerResult.transformerExceptionList().forEach(transformerException -> {
-				LOGGER.error(transformerException.getMessage());
-			});
+//		if (CollectionUtils.isNotEmpty(beanTransformerResult.transformerExceptionList())) {
+//			// TODO handle exceptions
+//			beanTransformerResult.transformerExceptionList().forEach(transformerException -> {
+//				LOGGER.error("{}", transformerException.toString());
+//			});
 			// TODO refactor. this code should be in a service that 1) transforms csv 2) parse csv to beans 3) transform beans 4) persist beans
 //			var exception = beanTransformerResult.transformerException();
 //			var exceptionMessage = exception.getMessage() + (exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY);  
 //			return ResponseEntity.ok(new FileTransferResponse(exceptionMessage, null, null));
-		}
-
-		// temp, consider creating a withBeanList method in CsvParseResults record
-		csvParseResults = csvParseResults.withBeanList(beanTransformerResult.beanList());
+//		}
+		
+		//csvParseResults = csvParseResults.withBeanList(beanTransformerResult.beanList());
 		
 		
-		var persistExceptionsFileLineList = persistBeans(uploadTableEnum, truncateTable, csvParseResults);
+		//var persistExceptionsFileLineList = persistBeans(uploadTableEnum, truncateTable, csvParseResults);
+		
 		var exceptionsFileLineList = new ArrayList<>(parseExceptionsFileLineList);
-		if (CollectionUtils.isNotEmpty(persistExceptionsFileLineList)) {
-			exceptionsFileLineList.addAll(persistExceptionsFileLineList);
-			processingStats.incrementExceptionsCounts(persistExceptionsFileLineList.size());
-		}
+		exceptionsFileLineList.addAll(beanExceptionsFileLineList);
+		exceptionsFileLineList.addAll(persistExceptionsFileLineList);
+//		var exceptionsFileLineList = new ArrayList<>(parseExceptionsFileLineList);
+//		if (CollectionUtils.isNotEmpty(persistExceptionsFileLineList)) {
+//			exceptionsFileLineList.addAll(persistExceptionsFileLineList);
+//			//processingStats.incrementExceptionsCounts(persistExceptionsFileLineList.size());
+//		}
 
 		// test begin
 		var repository = entityRepositoryFactory.getRepository(uploadTableEnum);
@@ -132,13 +150,25 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		List<AbstractPersistableEntity> beans;
 		try {
 			beans = csvToBean.parse();
+			setSourceCsvLineNumber(beans, mappingStrategy.getInputCsvLineList());
 			csvParseResults = new CsvParseResults(mappingStrategy.getInputCsvLineList(), mappingStrategy.getColumnNames(), beans, false, csvToBean.getCapturedExceptions());
-			LOGGER.debug("split: {}", String.join(",", mappingStrategy.getColumnNames()));
+			
+			LOGGER.debug("column names: {}", String.join(",", mappingStrategy.getColumnNames()));
 		} catch (RuntimeException e) {
 			csvParseResults = new CsvParseResults(List.of(), new String[0], List.of(), true, List.of(captureMajorException(e)));
 		}
 		
 		return csvParseResults;
+	}
+
+	private void setSourceCsvLineNumber(List<AbstractPersistableEntity> beans, List<String[]> inputCsvLineList) {
+		for (AbstractPersistableEntity bean: beans) {
+			var i = inputCsvLineList.indexOf(bean.getSourceCsvLine());
+			if (i == -1) {
+				throw new IllegalStateException(String.format("CSV line: [%s] was not found in inputCsvLineList", String.join(",", bean.getSourceCsvLine())));
+			}
+			bean.setSourceCsvLineNumber(i + 2l);
+		}
 	}
 
 	private List<ExceptionsFileLine> persistBeans(IEntityEnum uploadTableEnum, Boolean truncateTable, CsvParseResults csvParseResults) {
@@ -155,16 +185,19 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		} catch (Exception e) {
 			LOGGER.error("Batch persist failed with: {}", StringUtils.isNotEmpty(e.getMessage()) ? e.getMessage() : e.getCause().getMessage());
 			LOGGER.error("Trying single row persist.");
-			var lineNumber = 0;
+			//var lineNumber = 0;
 			for (AbstractPersistableEntity bean : csvParseResults.beanList) {
-				lineNumber++;
+				//lineNumber++;
 				try {
 					repository.saveTransaction(bean);
 				} catch (Exception e1) {
-					LOGGER.info("Exception while saving row #{}: {}", lineNumber, bean);
+					//LOGGER.info("Exception while saving row #{}: {}", lineNumber, bean);
+					LOGGER.info("Exception while saving row #{}: {}", bean.getSourceCsvLineNumber(), bean);
 					var exceptionMessage = e1.getMessage() != null ? e1.getMessage() : e1.getCause().getMessage();
-					var csvLine = String.join(",", csvParseResults.inputCsvLineList.get(lineNumber-1));
-					persistExceptionsFileLineList.add(new ExceptionsFileLine(lineNumber, exceptionMessage, csvLine));
+//					var csvLine = String.join(",", csvParseResults.inputCsvLineList.get(lineNumber-1));
+//					persistExceptionsFileLineList.add(new ExceptionsFileLine(lineNumber, exceptionMessage, csvLine));
+					var csvData = String.join(", ", bean.getSourceCsvLine());
+					persistExceptionsFileLineList.add(new ExceptionsFileLine(bean.getSourceCsvLineNumber(), exceptionMessage, csvData, bean.toString()));
 				}
 			}
 		}
@@ -177,23 +210,33 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		return mappingStrategy;
 	}
 	
-	private List<ExceptionsFileLine> transformToExceptionsFileLineList(List<CsvException> csvParseExceptionList) {
+	private List<ExceptionsFileLine> transformCsvExceptionsToExceptionsFileLineList(List<CsvException> csvParseExceptionList) {
 		return csvParseExceptionList.stream().map(exception -> {
-			var exceptionMessage = exception.getMessage() != null ? exception.getMessage() : exception.getCause().getMessage();
-			var data = String.join(", ", exception.getLine());
+			var exceptionMessage = StringUtils.isNotEmpty(exception.getMessage()) ? exception.getMessage() : exception.getCause().getMessage();
+			var csvData = String.join(", ", exception.getLine());
 			
-			return new ExceptionsFileLine(exception.getLineNumber(), exceptionMessage, data);
-		}).collect(Collectors.toList());
+			return new ExceptionsFileLine(exception.getLineNumber(), exceptionMessage, csvData);
+		}).toList();
+	}
+	
+	private List<ExceptionsFileLine> transformBeanExceptionsToExceptionsFileLineList(List<TransformerException> transformerExceptionList) {
+		return transformerExceptionList.stream().map(exception -> {
+			var exceptionMessage = StringUtils.isNotEmpty(exception.getMessage()) ? exception.getMessage()
+					: exception.getCause().getMessage();
+			var csvData = String.join(", ", exception.getBean().getSourceCsvLine());
+			
+			return new ExceptionsFileLine(exception.getBean().getSourceCsvLineNumber(), exceptionMessage, csvData, exception.getBean().toString(), exception.getTransformerName());
+		}).toList();
 	}
 
-	private ProcessingStats gatherStats(CsvParseResults csvParseResults) {
+	private ProcessingStats gatherStats(CsvParseResults csvParseResults, BeanTransformerResult beanTransformerResult, List<ExceptionsFileLine> persistExceptionsFileLineList) {
 		ProcessingStatsBuilder builder = ProcessingStats.builder();
 		if (csvParseResults.majorException) {
-			builder.numberOfExceptions(csvParseResults.csvParseExceptionList.size());
+			builder.numberOfExceptions(csvParseResults.csvParseExceptionList().size());
 		} else {
 			builder
-				.numberOfLinesInFile(csvParseResults.inputCsvLineList.size())
-				.numberOfExceptions(csvParseResults.csvParseExceptionList.size());
+				.numberOfLinesInFile(csvParseResults.inputCsvLineList().size())
+				.numberOfExceptions(csvParseResults.csvParseExceptionList().size()+beanTransformerResult.transformerExceptionList().size()+persistExceptionsFileLineList.size());
 		}
 		return builder.build();
 	}
@@ -214,10 +257,12 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		}
 		exceptionLines.add(StringUtils.EMPTY);
 		
-		exceptionLines.add("Line #,Error Message,"+String.join(",", columnNames));
-		exceptionRecordList.stream().forEach(
-				exceptionRecord -> exceptionLines.add(String.join(",", Long.toString(exceptionRecord.lineNumber),
-						StringEscapeUtils.escapeCsv(exceptionRecord.exceptionMessage), exceptionRecord.data)));
+		exceptionLines.add("Line #,Error Message,"+String.join(",", columnNames)+",Bean,Transformer");
+		exceptionRecordList.stream()
+				.forEach(exceptionRecord -> exceptionLines.add(String.join(",",
+						Long.toString(exceptionRecord.lineNumber),
+						StringEscapeUtils.escapeCsv(exceptionRecord.exceptionMessage), exceptionRecord.csvData,
+						StringEscapeUtils.escapeCsv(exceptionRecord.beanData), exceptionRecord.transformerName)));
 		FileUtils.writeLines(exceptionsFile.toFile(), exceptionLines);		
 	}
 

@@ -13,6 +13,8 @@ import com.kerneldc.common.domain.LogicalKeyHolder;
 @NoRepositoryBean
 public interface BaseTableRepository<T extends AbstractPersistableEntity, ID extends Serializable> extends BaseEntityRepository<T, ID> {	
 
+	List<T> findByLogicalKeyHolder(LogicalKeyHolder logicalKeyHolder);
+	
 	Long deleteByLogicalKeyHolder(LogicalKeyHolder logicalKeyHolder);
 	
 	@Transactional

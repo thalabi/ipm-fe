@@ -21,7 +21,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="transaction_date" type="timestamp"/> 
+            <column name="transaction_date" type="timestamp(3)"/> 
             <column name="product" type="varchar(64)"/> 
             <column name="price" type="decimal"/> 
             <column name="payment_type" type="varchar(32)"/> 

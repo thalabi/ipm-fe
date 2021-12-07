@@ -1,11 +1,8 @@
 package com.kerneldc.common.domain;
 
-import java.util.Objects;
-
 import javax.persistence.Entity;
 import javax.persistence.SequenceGenerator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.rest.core.annotation.Description;
 
 import com.kerneldc.common.enums.ShortMonthEnum;
@@ -57,8 +54,7 @@ public class HydroUsage extends AbstractPersistableEntity {
 	}
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKey = concatLogicalKeyParts(Objects.toString(year, StringUtils.EMPTY),
-				(month != null ? String.valueOf(month.getValue()) : StringUtils.EMPTY));
-		getLogicalKeyHolder().setLogicalKey(logicalKey);
+		var logicalKeyHolder = LogicalKeyHolder.build(year, ShortMonthEnum.getNumericValue(month));
+		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

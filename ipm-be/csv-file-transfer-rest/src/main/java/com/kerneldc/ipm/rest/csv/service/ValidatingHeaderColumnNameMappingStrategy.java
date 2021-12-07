@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  * 1. validates that the file headers match (case insensitive and ignoring white space) to column names defined in bean
  * 2. captures column names
  * 3. captures input csv lines in synchronized inputCsvLineList
+ * 4. populates bean with the csv line
  */
 @Slf4j
 public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNameMappingStrategy<T> {
@@ -45,8 +47,11 @@ public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNa
 	@Override
 	public T populateNewBean(String[] line)	throws CsvBeanIntrospectionException, CsvFieldAssignmentException, CsvChainedException {
 		inputCsvLineList.add(line);
-		//LOGGER.debug("after InputCsvLineCollector.inputCsvLineList.size(): {}", inputCsvLineList.size());
-		return super.populateNewBean(line);
+		//LOGGER.debug("inputCsvLineList.size(): {}", inputCsvLineList.size());
+		var bean = super.populateNewBean(line);
+		((AbstractPersistableEntity)bean).setSourceCsvLine(line);
+		return bean;
+		//return super.populateNewBean(line);
 	}
 		
 	/**
@@ -62,7 +67,7 @@ public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNa
 			String fieldName = beanField.getField().getName();
 			String columnName = beanField.getField().getDeclaredAnnotation(CsvBindByName.class).column();
 			return StringUtils.isNotEmpty(columnName) ? columnName : fieldName;
-		}).collect(Collectors.toList());
+		}).toList();
 		LOGGER.debug("Expected headers: {}", String.join(", ", expectedHeaderNameList));
 
 		// convert lists to lower case and remove white space

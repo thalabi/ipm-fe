@@ -2,7 +2,6 @@ package com.kerneldc.ipm.domain;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -10,9 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.kerneldc.common.domain.AbstractPersistableEntity;
+import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
@@ -34,7 +32,8 @@ public class Price extends AbstractPersistableEntity {
 	@CsvBindByName
 	private BigDecimal price;
 	@CsvBindByName(column = "price_timestamp")
-	@CsvDate("uuuu-MM-dd'T'HH:mm:ss.SSSZ")
+	//@CsvDate(OFFSET_DATE_TIME_FORMAT)
+	@CsvDate(OFFSET_DATE_TIME_FORMAT)
 	@Setter(AccessLevel.NONE)
 	private OffsetDateTime priceTimestamp;
 	@CsvBindByName(column = "price_timestamp_from_source")
@@ -59,9 +58,7 @@ public class Price extends AbstractPersistableEntity {
 
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKey = concatLogicalKeyParts((instrument != null ? instrument.getId().toString() : StringUtils.EMPTY),
-				Objects.toString(priceTimestamp, StringUtils.EMPTY)
-				);
-		getLogicalKeyHolder().setLogicalKey(logicalKey);
+		var logicalKeyHolder = LogicalKeyHolder.build((instrument != null ? instrument.getId() : null), priceTimestamp);
+		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

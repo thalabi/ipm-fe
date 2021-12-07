@@ -20,7 +20,7 @@ class ExchangeRateServiceTest {
 		exchangeRateService =  new ExchangeRateService(exchangeRateRepository);
 	}
 	@Test
-	void TestGetWorkingBusinessDay_JanuaryFirst_Success () {
+	void testGetWorkingBusinessDay_JanuaryFirst_Success () {
 		
 		// Test January 1 case
 		var date1 = LocalDate.of(2021,1,1);
@@ -29,7 +29,7 @@ class ExchangeRateServiceTest {
 		assertThat(result1).isEqualTo(expectedResult1);
 	}
 	@Test
-	void TestGetWorkingBusinessDay_DecemberTwentyFifth_Success () {
+	void testGetWorkingBusinessDay_DecemberTwentyFifth_Success () {
 
 		// Test December 25 case
 		var date2 = LocalDate.of(2021,12,25);
@@ -38,7 +38,7 @@ class ExchangeRateServiceTest {
 		assertThat(result2).isEqualTo(expectedResult2);
 	}
 	@Test
-	void TestGetWorkingBusinessDay_Sunday_Success () {
+	void testGetWorkingBusinessDay_Sunday_Success () {
 
 		// Test Sunday case
 		var date3 = LocalDate.of(2021,10,10);
@@ -48,7 +48,7 @@ class ExchangeRateServiceTest {
 	}
 
 	@Test
-	void TestGetWorkingBusinessDay_Saturday_Success () {
+	void testGetWorkingBusinessDay_Saturday_Success () {
 
 		// Test Sunday case
 		var date3 = LocalDate.of(2021,10,9);
@@ -58,7 +58,7 @@ class ExchangeRateServiceTest {
 	}
 
 	@Test
-	void TestGetWorkingBusinessDay_JanuaryFirstOnMonday_Success () {
+	void testGetWorkingBusinessDay_JanuaryFirstOnMonday_Success () {
 
 		// Test Sunday case
 		var date3 = LocalDate.of(2018,1,1);

@@ -14,21 +14,21 @@
 			<![CDATA[
 with 
 latest_date as (
-	select max("DATE") "DATE" from exchange_rate where from_currency='USD' and to_currency='CAD'
+	select max(as_of_date) as_of_date from exchange_rate where from_currency='USD' and to_currency='CAD'
 ),
 rate_on_latest_date as (
-	select rate from exchange_rate er join latest_date on er."DATE"=latest_date."DATE" and er.from_currency='USD' and er.to_currency='CAD'
+	select rate from exchange_rate er join latest_date on er.as_of_date=latest_date.as_of_date and er.from_currency='USD' and er.to_currency='CAD'
 ),
 cad_and_usd_values as (
-	select po.position_snapshot, sum(po.quantity*pr.price) value from position po
+	select po.position_snapshot, sum(po.quantity*pr.price) market_value from position po
 	join instrument i on po.instrument_id = i.id
 	join price pr on po.price_id = pr.id where i.currency = 'CAD' group by po.position_snapshot
 	union all
-	select po.position_snapshot, sum(po.quantity*pr.price*(select rate from rate_on_latest_date)) value from position po
+	select po.position_snapshot, sum(po.quantity*pr.price*(select rate from rate_on_latest_date)) market_value from position po
 	join instrument i on po.instrument_id = i.id
 	join price pr on po.price_id = pr.id where i.currency = 'USD' group by po.position_snapshot
 )
-select row_number() over (order by position_snapshot) id, position_snapshot, sum(value) market_value from cad_and_usd_values group by position_snapshot order by position_snapshot
+select row_number() over (order by position_snapshot) id, position_snapshot, sum(market_value) market_value from cad_and_usd_values group by position_snapshot order by position_snapshot
 			]]>    
 		</createView>
 

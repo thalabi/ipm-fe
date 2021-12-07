@@ -1,7 +1,6 @@
 package com.kerneldc.ipm.domain;
 
 import java.time.OffsetDateTime;
-import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -9,9 +8,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.kerneldc.common.domain.AbstractPersistableEntity;
+import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
@@ -27,7 +25,7 @@ public class Holding extends AbstractPersistableEntity {
 	private static final long serialVersionUID = 1L;
 
 	@CsvBindByName(column = "as_of_date")
-	@CsvDate("uuuu-MM-dd'T'HH:mm:ss.SSSZ")
+	@CsvDate(OFFSET_DATE_TIME_FORMAT)
 	@Setter(AccessLevel.NONE)
 	private OffsetDateTime asOfDate;
 	@Setter(AccessLevel.NONE)
@@ -72,9 +70,9 @@ public class Holding extends AbstractPersistableEntity {
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKey = concatLogicalKeyParts(Objects.toString(asOfDate, StringUtils.EMPTY),
-				(instrument != null ? instrument.getId().toString() : StringUtils.EMPTY),
-				(portfolio != null ? portfolio.getId().toString() : StringUtils.EMPTY));
-		getLogicalKeyHolder().setLogicalKey(logicalKey);
+		var logicalKeyHolder = LogicalKeyHolder.build(asOfDate,
+				(instrument != null ? instrument.getId() : null),
+				(portfolio != null ? portfolio.getId() : null));
+		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

@@ -21,7 +21,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="DATE" type="timestamp(0) with time zone"/> 
+            <column name="as_of_date" type="timestamp(3) with time zone"/> 
             <column name="from_currency" type="varchar(3)"/>
             <column name="to_currency" type="varchar(3)"/>
             <column name="rate" type="decimal(10,4)"/> 

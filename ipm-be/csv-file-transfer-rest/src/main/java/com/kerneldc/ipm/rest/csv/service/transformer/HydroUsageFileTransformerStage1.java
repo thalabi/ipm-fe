@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.enums.IEntityEnum;
@@ -33,28 +32,30 @@ public class HydroUsageFileTransformerStage1 implements ICsvFileTransformer {
 				var csvWriter = new CSVWriter(new OutputStreamWriter(out));) {
         	// read first line and extract year
             var cells = csvReader.readNext();
+
         	if (cells.length == 0) {
-        		throw new TransformerException("First line is empty");
+        		throw new TransformerException(getTransformerName(), "First line is empty");
         	}
     		LOGGER.debug("Line: {}", String.join(", ", cells));
         	var p = Pattern.compile(".*Usage for the period of (\\d{4})"); // Add '.*' at the beginning of regex. There is a bug in the received file where the first line is prefixed by a non printable character
         	var m = p.matcher(cells[0]);
         	
         	if (! /* not */ m.matches()) {
-        		throw new TransformerException("Header does not match expected pattern \'Usage for the period of yyyy\'");
+        		throw new TransformerException(getTransformerName(), "Header does not match expected pattern \'Usage for the period of yyyy\'");
         	}
         	var year = m.group(1);
         	LOGGER.debug("year: {}", year);
 
         	// read header 'Months	HighTemp	LowTemp	Off-Peak	Mid-Peak	On-Peak' and replace with 'Year Month	HighTemp	LowTemp	Off-Peak	Mid-Peak	On-Peak' 
         	cells = csvReader.readNext();
+
         	LOGGER.debug("Line: {}", String.join(", ", cells));
         	if (cells.length == 0) {
-        		throw new TransformerException("Second line is empty");
+        		throw new TransformerException(getTransformerName(), "Second line is empty");
         	}
         	// check that second line is equal to 'Months,HighTemp,LowTemp,Off-Peak,Mid-Peak,On-Peak'
         	if (! /* not */ String.join(",", cells).equals(EXPECTED_SECOND_HEADER_LINE)) {
-        		throw new TransformerException("Second does not match \'"+EXPECTED_SECOND_HEADER_LINE+"\'");
+        		throw new TransformerException(getTransformerName(), "Second line does not match \'"+EXPECTED_SECOND_HEADER_LINE+"\'");
         	}
         	
         	// write the new header as 'Year,Month,HighTemp,LowTemp,Off-Peak,Mid-Peak,On-Peak'
@@ -82,7 +83,7 @@ public class HydroUsageFileTransformerStage1 implements ICsvFileTransformer {
 			}
         	
 		} catch (CsvValidationException | IOException e) {
-			throw new TransformerException(StringUtils.EMPTY, e);
+			throw new TransformerException(getTransformerName(), e);
     		
     	}
         
@@ -90,7 +91,7 @@ public class HydroUsageFileTransformerStage1 implements ICsvFileTransformer {
         try {
 			out.close();
 		} catch (IOException e) {
-			throw new TransformerException("Unable to close ByteArrayOutputStream", e);
+			throw new TransformerException(getTransformerName(), "Unable to close ByteArrayOutputStream", e);
 		}
         
         LOGGER.debug("Transformed data: {}", new String(byteArray));
@@ -101,5 +102,10 @@ public class HydroUsageFileTransformerStage1 implements ICsvFileTransformer {
 	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
 		return uploadTableEnum.equals(UploadTableEnum.HYDRO_USAGE)
 				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_ONE);
+	}
+
+	@Override
+	public String getTransformerName() {
+		return"HydroUsageFileTransformerStage1";
 	}
 }

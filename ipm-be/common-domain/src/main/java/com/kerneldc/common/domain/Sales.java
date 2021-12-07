@@ -85,9 +85,8 @@ public class Sales extends AbstractPersistableEntity {
 
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKey = concatLogicalKeyParts(Objects.toString(transactionDate, StringUtils.EMPTY), product,
-				Objects.toString(price, StringUtils.EMPTY), paymentType, name);
-		getLogicalKeyHolder().setLogicalKey(logicalKey);
+		var logicalKeyHolder = LogicalKeyHolder.build(Objects.toString(transactionDate, StringUtils.EMPTY), product, price, paymentType, name);
+		setLogicalKeyHolder(logicalKeyHolder);
 	}
 
 }

@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.kerneldc.ipm.rest.TestUtil;
-import com.kerneldc.ipm.rest.controller.SecurityController;
 import com.kerneldc.ipm.rest.security.CustomUserDetails;
 import com.kerneldc.ipm.rest.security.JwtUtil;
 import com.kerneldc.ipm.rest.security.service.CustomUserDetailsService;

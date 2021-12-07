@@ -9,4 +9,6 @@ public interface ICsvFileTransformer {
 	BufferedReader transform(BufferedReader bufferedReader) throws TransformerException;
 	
 	boolean canHandle(IEntityEnum entityEnum, TransformationStageEnum transformationStageEnum);
+
+	String getTransformerName();
 }

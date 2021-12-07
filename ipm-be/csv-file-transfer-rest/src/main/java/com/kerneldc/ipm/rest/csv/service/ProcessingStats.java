@@ -10,8 +10,8 @@ public class ProcessingStats {
 	private Integer numberOfLinesInFile;
 	private Integer numberOfExceptions;
 	private String elapsedTime;
-	
-	public void incrementExceptionsCounts(int count) {
-		numberOfExceptions += count;
-	}
+//	
+//	public void incrementExceptionsCounts(int count) {
+//		numberOfExceptions += count;
+//	}
 }
