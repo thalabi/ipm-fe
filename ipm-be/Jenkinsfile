@@ -23,6 +23,11 @@ pipeline {
                 mvn clean package
                 '''
             }
+			post {
+		        always {
+		            junit 'build/reports/**/*.xml'
+		        }
+			}
 		}
 
         stage ('Deploy') {
@@ -40,9 +45,4 @@ pipeline {
         }
 
     }
-	post {
-        always {
-            junit 'build/reports/**/*.xml'
-        }
-	}
 }
