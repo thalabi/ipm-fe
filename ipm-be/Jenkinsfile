@@ -24,7 +24,7 @@ pipeline {
                 '''
             }
 		}
-		
+
         stage ('Deploy') {
 			when {
 			    not {
@@ -38,5 +38,11 @@ pipeline {
                 '''
             }
         }
+
     }
+	post {
+        always {
+            junit 'build/reports/**/*.xml'
+        }
+	}
 }
