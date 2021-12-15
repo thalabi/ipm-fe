@@ -13,7 +13,7 @@ public class CorsConfig implements WebMvcConfigurer, RepositoryRestConfigurer {
     @Value("${application.security.corsFilter.corsUrlsToAllow}")
     private String[] corsUrlsToAllow;
 
-    @Value("${application.security.corsFilter.corsMaxAgeInSecs}")
+    @Value("${application.security.corsFilter.corsMaxAgeInSecs:3600}")
     private long corsMaxAgeInSecs;
 
     // configure application
