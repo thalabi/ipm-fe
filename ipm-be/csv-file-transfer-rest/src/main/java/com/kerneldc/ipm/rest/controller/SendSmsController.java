@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import javax.mail.MessagingException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +43,7 @@ public class SendSmsController {
 				smsService.sendSecurityCode(cellPhone);
 		    	pingResponse.setMessage("Message sent successfully");
 			} catch (MessagingException | IOException | TemplateException e) {
-				var errorMessage = String.format("Error emailing sms message: %s", e.getMessage() + (e.getCause() != null ? ", "+e.getCause().getMessage() : StringUtils.EMPTY));
+				var errorMessage = String.format("Error emailing sms message: %s", ExceptionUtils.getRootCauseMessage(e));
 				LOGGER.error(errorMessage);
 				e.printStackTrace();
 		    	pingResponse.setMessage(errorMessage);

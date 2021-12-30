@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Service;
@@ -193,7 +194,7 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 				} catch (Exception e1) {
 					//LOGGER.info("Exception while saving row #{}: {}", lineNumber, bean);
 					LOGGER.info("Exception while saving row #{}: {}", bean.getSourceCsvLineNumber(), bean);
-					var exceptionMessage = e1.getMessage() != null ? e1.getMessage() : e1.getCause().getMessage();
+					var exceptionMessage = ExceptionUtils.getRootCauseMessage(e1);
 //					var csvLine = String.join(",", csvParseResults.inputCsvLineList.get(lineNumber-1));
 //					persistExceptionsFileLineList.add(new ExceptionsFileLine(lineNumber, exceptionMessage, csvLine));
 					var csvData = String.join(", ", bean.getSourceCsvLine());
