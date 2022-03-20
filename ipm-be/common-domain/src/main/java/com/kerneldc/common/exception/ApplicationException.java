@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ApplicationException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	private List<String> messageList = new ArrayList<>();
+	private final List<String> messageList = new ArrayList<>();
 
 	public ApplicationException() {
 	}
