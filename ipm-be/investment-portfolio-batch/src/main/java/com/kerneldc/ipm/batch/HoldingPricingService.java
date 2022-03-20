@@ -69,7 +69,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			try {
 				getAndPersistExchangeRates();
 			} catch (ApplicationException e) {
-				var message = String.format("Enable to get and persist exchange rates: %s", e.getMessage());
+				var message = String.format("Unable to get and persist exchange rates: %s", e.getMessage());
 				LOGGER.warn(message);
 				priceHoldingsExceptions.addMessage(message);
 			}
@@ -95,7 +95,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 					priceHoldingsExceptions = null; // in batch mode, clear exceptions raised so far as they are now included in the email sent
 				}
 			} catch (ApplicationException e) {
-				var message = String.format("Enable to send price holdings notification: %s", e.getMessage());
+				var message = String.format("Unable to send price holdings notification: %s", e.getMessage());
 				LOGGER.warn(message);
 				priceHoldingsExceptions.addMessage(message);
 			}
