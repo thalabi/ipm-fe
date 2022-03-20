@@ -32,6 +32,10 @@ public class TimeUtils {
 	public static LocalDateTime toLocalDateTime(Instant instant) {
 		return instant == null ? null : LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
+
+	public static LocalDateTime toLocalDateTime(Date date) {
+		return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+	}
 	
 	public static Instant toInstant(LocalDate localDate) {
 		return localDate == null ? null : localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
