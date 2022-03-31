@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.kerneldc</groupId>
 		<artifactId>ipm-be-project</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>investment-portfolio-batch</artifactId>
 
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.kerneldc</groupId>
 			<artifactId>investment-portfolio-domain</artifactId>
-			<version>${project.version}</version>
+			<version>${revision}</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.yahoofinance-api</groupId>

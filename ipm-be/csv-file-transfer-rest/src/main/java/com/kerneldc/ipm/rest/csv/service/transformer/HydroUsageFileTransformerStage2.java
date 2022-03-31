@@ -29,11 +29,9 @@ public class HydroUsageFileTransformerStage2 implements ICsvFileTransformer {
 				var csvWriter = new CSVWriter(new OutputStreamWriter(out));) {
         	
 			String[] cells;
-			var lastCells = new String[0];
 			while ((cells = csvReader.readNext()) != null) {
         		LOGGER.debug("Line: {}", String.join(", ", cells));
             	csvWriter.writeNext(cells);
-            	lastCells = cells;
 			}
 			// write last line again to cause a duplicate logical key
         	//csvWriter.writeNext(lastCells);
