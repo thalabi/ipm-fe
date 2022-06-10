@@ -10,16 +10,19 @@
 		<version>2.6.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	
-	<properties>
-		<revision>2.0.0-SNAPSHOT</revision>
-		<java.version>17</java.version>
-		<repo-url>http://localhost:8081</repo-url>
-	</properties>
 
 	<artifactId>ipm-be-project</artifactId>
-	<version>${revision}</version>
+	<version>${parentProjectVersion}</version>
 	<packaging>pom</packaging>
+	
+	<properties>
+		<parentProjectVersion>2.0.0-SNAPSHOT</parentProjectVersion>
+		<java.version>17</java.version>
+		<repo-url>http://localhost:8081</repo-url>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<timestamp>${maven.build.timestamp}</timestamp>
+	</properties>
+
 	<modules>
 		<module>common-domain</module>
 		<module>csv-file-transfer-rest</module>
