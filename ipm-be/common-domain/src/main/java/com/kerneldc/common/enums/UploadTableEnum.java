@@ -11,7 +11,7 @@ public enum UploadTableEnum implements IEntityEnum {
 	SALES(Sales.class),
 	BIO_STATS(BioStats.class),
 	AREA_CODE(AreaCode.class, new String[] {"CODE","LOCATION","COUNTRY"}),
-	HYDRO_USAGE(HydroUsage.class, new String[] {"YEAR","MONTHS","MID-PEAK","OFF-PEAK","ON-PEAK","HIGHTEMP","LOWTEMP"}),
+	HYDRO_USAGE(HydroUsage.class, new String[] {"YEAR","MONTH","MID-PEAK","OFF-PEAK","ON-PEAK","HIGHTEMP","LOWTEMP"}),
 	//INSTRUMENT(Instrument.class, new String[] {"TICKER","EXCHANGE","CURRENCY"}),
 	//PORTFOLIO(Portfolio.class, new String[] {"INSTITUTION","ACCOUNT_NUMBER","CURRENCY"}),
 	//HOLDING(Holding.class, new String[] {"AS_OF_DATE","TICKER","EXCHANGE","QUANTITY","INSTITUTION","ACCOUNT_NUMBER"})

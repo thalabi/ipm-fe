@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	To disable debug logging when running tests
+-->
+<configuration
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 	xsi:noNamespaceSchemaLocation="logback.xsd">
+ 	
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework" level="INFO"/>
+    
+    <logger name="com.kerneldc.ipm.rest.csv.service.transformer.csv.HydroUsageFileTransformerStage1" level="debug"/>
+    
+</configuration>

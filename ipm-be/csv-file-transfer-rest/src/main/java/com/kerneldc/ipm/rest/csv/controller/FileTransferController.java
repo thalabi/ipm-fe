@@ -1,8 +1,6 @@
 package com.kerneldc.ipm.rest.csv.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -11,7 +9,6 @@ import javax.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +23,6 @@ import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.common.enums.UploadTableEnum;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
-import com.kerneldc.ipm.rest.csv.service.transformer.CsvFileTransformerService;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
@@ -40,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FileTransferController {
 	
 	private final GenericFileTransferService genericFileTransferService;
-	private final CsvFileTransformerService csvFileTransformerService;
+//	private final CsvFileTransformerService csvFileTransformerService;
 	
     @GetMapping("/getTableList")
 	public ResponseEntity<TableListResponse> getTableList() {
@@ -60,20 +56,22 @@ public class FileTransferController {
     	LOGGER.info("truncateTable: {}", truncateTable);
 
     	var tableEnum = tableEnumFromString(tableName);
-    	try (var bufferedReader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));) {
+//    	try (var bufferedReader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));) {
     		
-    		var csvFileTransformerResult = csvFileTransformerService.applyTransformers(tableEnum, bufferedReader);
-    		if (csvFileTransformerResult.transformerException() != null) {
-    			var exception = csvFileTransformerResult.transformerException();
-    			var exceptionMessage = exception.getMessage() + (exception.getCause() != null ? exception.getCause().getMessage() : StringUtils.EMPTY);  
-    			return ResponseEntity.ok(new FileTransferResponse(exceptionMessage, null, null));
-    		}
+//    		var csvFileTransformerResult = csvFileTransformerService.applyTransformers(tableEnum, bufferedReader);
+//    		if (csvFileTransformerResult.transformerException() != null) {
+//    			var exception = csvFileTransformerResult.transformerException();
+//    			var exceptionMessage = NestedExceptionUtils.getMostSpecificCause(exception).getMessage();
+//    			return ResponseEntity.ok(new FileTransferResponse(exceptionMessage, null, null));
+//    		}
     		
+//			var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(),
+//					csvFileTransformerResult.csvBufferedReader(), truncateTable);
 			var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(),
-					csvFileTransformerResult.csvBufferedReader(), truncateTable);
+					csvFile.getInputStream(), truncateTable);
     		LOGGER.info("End ...");
         	return ResponseEntity.ok(fileTransferResponse);
-    	}
+//    	}
     }
 
     @GetMapping("/downloadExceptionsFile")
@@ -88,7 +86,7 @@ public class FileTransferController {
     }
 
 	@GetMapping("/downloadFile")
-	public ResponseEntity<byte[]> downloadFile(String tableName) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+	public ResponseEntity<byte[]> downloadFile(String tableName) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IllegalArgumentException, NoSuchFieldException, SecurityException {
     	LOGGER.info("Begin ...");
     	var fileBytes = genericFileTransferService.readAndWrite(tableEnumFromString(tableName));
 		

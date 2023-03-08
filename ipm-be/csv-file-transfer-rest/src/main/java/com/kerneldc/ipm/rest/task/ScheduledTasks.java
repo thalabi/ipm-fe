@@ -69,21 +69,35 @@ public class ScheduledTasks {
 
 	@Scheduled(initialDelay = 0, fixedDelayString = "${application.task.tempFilesCleanup.intervalInMilliseconds}")
 	public void cleanupTempFiles() {
-    	File tempDir = new File(FileUtils.getTempDirectoryPath());
-    	IOFileFilter wildcardFileFilter = new WildcardFileFilter(GenericFileTransferService.EXCEPTIONS_FILE_PREFIX+"*"+GenericFileTransferService.EXCEPTIONS_FILE_SUFFIX);
-    	IOFileFilter ageFileFilter = new AgeFileFilter(System.currentTimeMillis() - fixedDelayThroughReflection-1); // files created before last cleanup
-    	Collection<File> deleteFileList = FileUtils.listFiles(tempDir, new AndFileFilter(wildcardFileFilter, ageFileFilter), null);
-    	LOGGER.info("Scanning for temp files to delete ...");
-    	deleteFileList.stream().forEach(fileToDelete -> {    		
-    		LOGGER.info("Deleteing csv exception file: {}", fileToDelete);
-    		FileUtils.deleteQuietly(fileToDelete);
-    	});
+		deleteExceptionFiles();
+		deleteTransformerWorkFiles();
 
-    	LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime nextCleanup = now.plus(fixedDelayThroughReflection, ChronoUnit.MILLIS);
 		LOGGER.info("Next temp directory file cleanup at: {}", nextCleanup.format(TIMESTAMP_FORMAT));
 	}
-	
+	private void deleteExceptionFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		IOFileFilter wildcardFileFilter = new WildcardFileFilter(GenericFileTransferService.EXCEPTIONS_FILE_PREFIX+"*"+GenericFileTransferService.EXCEPTIONS_FILE_SUFFIX);
+		IOFileFilter ageFileFilter = new AgeFileFilter(System.currentTimeMillis() - fixedDelayThroughReflection-1); // files created before last cleanup
+		Collection<File> deleteFileList = FileUtils.listFiles(tempDir, new AndFileFilter(wildcardFileFilter, ageFileFilter), null);
+		LOGGER.info("Scanning for exception files to delete ...");
+		deleteFileList.stream().forEach(fileToDelete -> {    		
+			LOGGER.info("Deleteing exception file: {}", fileToDelete);
+			FileUtils.deleteQuietly(fileToDelete);
+		});
+	}
+	private void deleteTransformerWorkFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		IOFileFilter wildcardFileFilter = new WildcardFileFilter(GenericFileTransferService.TEMP_FILES_PREFIX+"*.tmp");
+		IOFileFilter ageFileFilter = new AgeFileFilter(System.currentTimeMillis() - fixedDelayThroughReflection-1); // files created before last cleanup
+		Collection<File> deleteFileList = FileUtils.listFiles(tempDir, new AndFileFilter(wildcardFileFilter, ageFileFilter), null);
+		LOGGER.info("Scanning for transformer work files to delete ...");
+		deleteFileList.stream().forEach(fileToDelete -> {    		
+			LOGGER.info("Deleteing transformer work file: {}", fileToDelete);
+			FileUtils.deleteQuietly(fileToDelete);
+		});
+	}
 /*
 	@Scheduled(initialDelay = 0, fixedDelayString = "${application.task.purgePositionSnapshots.intervalInMilliseconds}")
 	@Transactional

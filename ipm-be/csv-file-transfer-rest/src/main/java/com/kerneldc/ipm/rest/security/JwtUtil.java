@@ -4,6 +4,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class JwtUtil {
 
 	private static final String CUSTOM_USER_DETAILS = "customUserDetails";
 
-    private int jwtExpirynMinutes;
+    private int jwtExpiryInMinutes;
     private int resetPasswordJwtExpiryInMinutes;
 	
 	private SecretKeyProvider secretKeyProvider;
@@ -32,14 +33,15 @@ public class JwtUtil {
 	private Key secretKey;
 
 	public JwtUtil(
-			@Value("${application.security.jwt.token.jwtExpirynMinutes:600}" /* default of 10 hours */) int jwtExpirynMinutes,
+			@Value("${application.security.jwt.token.jwtExpiryInMinutes:600}" /* default of 10 hours */) int jwtExpiryInMinutes,
 			@Value("${application.security.jwt.token.resetPasswordJwtExpiryInMinutes:60}" /* default of 1 hour */) int resetPasswordJwtExpiryInMinutes,
 			SecretKeyProvider secretKeyProvider) {
-		this.jwtExpirynMinutes = jwtExpirynMinutes;
+		this.jwtExpiryInMinutes = jwtExpiryInMinutes;
 		this.resetPasswordJwtExpiryInMinutes = resetPasswordJwtExpiryInMinutes;
 		this.secretKeyProvider = secretKeyProvider;
 
 		secretKey = secretKeyProvider.getAuthenticationJwtKey();
+		LOGGER.debug("JWT expiry in minutes: {}", this.jwtExpiryInMinutes);
 		LOGGER.debug("Using this secret key for generating JWT token. Secret key: {}", secretKey.getEncoded());
 
 		objectMapper = new ObjectMapper();
@@ -63,8 +65,8 @@ public class JwtUtil {
 //	}
 
 	public String generateToken(CustomUserDetails customUserDetails) {
-		Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirynMinutes*60*1000);
+		var now = new Date();
+        var expiryDate = generateExpiryDate(now);
         
         Claims claims = Jwts.claims();
         claims.put(CUSTOM_USER_DETAILS, customUserDetails);
@@ -76,25 +78,42 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
 	}
-
-	public boolean validateToken(String token) {
+	private Date generateExpiryDate(Date now) {
+        return new Date(now.getTime() + jwtExpiryInMinutes*60*1000);
+	}
+	private Date generateExpiryDate() {
+		var now = new Date();
+		var expiryDate = generateExpiryDate(now);
+		LOGGER.debug("now: {}, expiryDate: {}", now, expiryDate);
+		return expiryDate;
+	}
+	
+	public String validateAndExtendToken(String token) {
         try {
-        	Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            
-//            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-//            LOGGER.info("token expiration: {}", claims.getExpiration());
-            return true;
+            LOGGER.debug("token: {}", token);
+        	//Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            var jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build();
+            Claims claims = jwtParser.parseClaimsJws(token).getBody();
+            LOGGER.info("token expiration: {}", claims.getExpiration());
+            claims.setExpiration(generateExpiryDate());
+            LOGGER.info("token new expiration: {}", claims.getExpiration());
+            var newToken = Jwts.builder()
+    				.setClaims(claims)
+                    .signWith(secretKey)
+                    .compact();
+            LOGGER.debug("newToken: {}", newToken);
+            return newToken;
             
         } catch (MalformedJwtException ex) {
         	LOGGER.error("JWT is inavlid. Token: {}", token);
         } catch (ExpiredJwtException ex) {
-        	LOGGER.error("JWT has expired. Token: {}", token);
+        	LOGGER.warn("JWT has expired. Token: {}", token);
         } catch (UnsupportedJwtException ex) {
         	LOGGER.error("Unsupported JWT. Token: {}", token);
         } catch (SignatureException  ex) {
         	LOGGER.error("JWT signature validation failed. Token: {}", token);
         }
-        return false;
+        return StringUtils.EMPTY;
     }
 	
 	public CustomUserDetails getCustomUserDetailsFromJwt(String token) {

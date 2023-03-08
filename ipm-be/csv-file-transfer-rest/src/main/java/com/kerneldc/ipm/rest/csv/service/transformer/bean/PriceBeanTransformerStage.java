@@ -1,6 +1,5 @@
-package com.kerneldc.ipm.rest.csv.service.transformer;
+package com.kerneldc.ipm.rest.csv.service.transformer.bean;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -16,7 +15,10 @@ import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.repository.InstrumentRepository;
-import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
+import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
+import com.kerneldc.ipm.rest.csv.service.transformer.TransformationStageEnum;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.BeanTransformerException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,11 +28,14 @@ public class PriceBeanTransformerStage implements IBeanTransformer {
 
 	private final InstrumentRepository instrumentRepository;
 	@Override
-	public BeanTransformerResult transform(BeanTransformerResult beanTransformerResult) throws TransformerException {
-		var inputPriceList = beanTransformerResult.beanList();
-		var transformerExceptionList = beanTransformerResult.transformerExceptionList();
+	public void transform(FileProcessingContext context) throws AbortFileProcessingException {
 		
-		List<Price> transformedPriceList = new ArrayList<>();
+		//var context = FileProcessingContext.get();
+		var inputPriceList = context.getBeans();
+		//var transformerExceptionList = beanTransformerResult.beanTransformerExceptionList();
+		
+		//List<Price> transformedPriceList = new ArrayList<>();
+		context.getBeans().clear();
 		
 		for (AbstractPersistableEntity bean : inputPriceList) {
 			var price = SerializationUtils.clone((Price) bean);
@@ -47,13 +52,13 @@ public class PriceBeanTransformerStage implements IBeanTransformer {
 			}
 			
 			if (exceptionsFound) {
-				transformerExceptionList.add(new TransformerException(getTransformerName(), price, exceptionMessageJoiner.toString()));
+				context.getBeanTransformerExceptionList().add(new BeanTransformerException(getTransformerName(), price, exceptionMessageJoiner.toString()));
 			} else {
-				transformedPriceList.add(price);
+				//transformedPriceList.add(price);
+				context.getBeans().add(price);
+
 			}
 		}
-		
-		return new BeanTransformerResult(transformedPriceList, transformerExceptionList);
 	}
 
 	@Override
@@ -64,6 +69,6 @@ public class PriceBeanTransformerStage implements IBeanTransformer {
 
 	@Override
 	public String getTransformerName() {
-		return"PriceBeanTransformerStage";
+		return"PriceBeanTransformerStage1";
 	}
 }

@@ -1,7 +1,6 @@
 package com.kerneldc.ipm.rest.csv.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * A CSV mapping strategy that:
  * 1. validates that the file headers match (case insensitive and ignoring white space) to column names defined in bean
  * 2. captures column names
- * 3. captures input csv lines in synchronized inputCsvLineList
+ * 3. // captures input csv lines in synchronized inputCsvLineList
  * 4. populates bean with the csv line
  */
 @Slf4j
@@ -34,7 +33,7 @@ public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNa
 
 	private String[] columnNames;
 
-	private final List<String[]> inputCsvLineList = Collections.synchronizedList(new ArrayList<>());
+	//private final List<String[]> inputCsvLineList = Collections.synchronizedList(new ArrayList<>());
 	
 	@Override
 	public void captureHeader(CSVReader reader) throws IOException, CsvRequiredFieldEmptyException {
@@ -46,7 +45,7 @@ public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNa
 	
 	@Override
 	public T populateNewBean(String[] line)	throws CsvBeanIntrospectionException, CsvFieldAssignmentException, CsvChainedException {
-		inputCsvLineList.add(line);
+		//inputCsvLineList.add(line);
 		//LOGGER.debug("inputCsvLineList.size(): {}", inputCsvLineList.size());
 		var bean = super.populateNewBean(line);
 		((AbstractPersistableEntity)bean).setSourceCsvLine(line);
@@ -88,7 +87,7 @@ public class ValidatingHeaderColumnNameMappingStrategy<T> extends HeaderColumnNa
 		return columnNames;
 	}
 
-	public List<String[]> getInputCsvLineList() {
-		return inputCsvLineList;
-	}
+//	public List<String[]> getInputCsvLineList() {
+//		return inputCsvLineList;
+//	}
 }

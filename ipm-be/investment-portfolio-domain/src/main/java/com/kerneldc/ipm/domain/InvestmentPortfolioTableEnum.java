@@ -11,7 +11,7 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	POSITION(Position.class, false, new String[] {"TICKER", "EXCHANGE", "ACCOUNT_NUMBER", "INSTITUTION", "PRICE_TIMESTAMP", "POSITION_TIMESTAMP", "QUANTITY"}),
 	EXCHANGE_RATE(ExchangeRate.class, false, new String[] {"AS_OF_DATE","FROM_CURRENCY","TO_CURRENCY", "RATE"}),
 	HOLDING_PRICE_INTERDAY_V(HoldingPriceInterdayV.class, true, new String[] {"POSITION_SNAPSHOT","MARKET_VALUE"}),
-	PRICE(Price.class, false, new String[] {"TICKER", "EXCHANGE", "PRICE", "PRICE_TIMESTAMP", "PRICE_TIMESTAMP_FROM_SOURCE"}),
+	PRICE(Price.class, false, new String[] {"TICKER", "EXCHANGE", "PRICE", "PRICE_TIMESTAMP", "PRICE_TIMESTAMP_FROM_SOURCE"/*, "SOURCECSVLINENUMBER"*/}),
 	INSTRUMENT_BY_ACCOUNT_V(InstrumentByAccountV.class, true, new String[] {"TICKER_EXCHANGE", "INSTRUMENT_NAME", "QUANTITY", "ACCOUNT_NUMBER", "ACCOUNT_NAME"})
 	;
 

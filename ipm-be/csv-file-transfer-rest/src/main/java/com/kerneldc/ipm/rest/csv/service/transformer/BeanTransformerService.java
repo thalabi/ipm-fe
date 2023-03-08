@@ -1,13 +1,11 @@
 package com.kerneldc.ipm.rest.csv.service.transformer;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.kerneldc.common.domain.AbstractPersistableEntity;
-import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.ipm.rest.csv.service.transformer.bean.IBeanTransformer;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,25 +17,30 @@ public class BeanTransformerService {
 
 	private final Collection<IBeanTransformer> beanTransformerCollection;
 	
-	public record BeanTransformerResult(List<? extends AbstractPersistableEntity> beanList, List<TransformerException> transformerExceptionList) {};
+//	public record BeanTransformerResult(List<? extends AbstractPersistableEntity> beanList, List<BeanTransformerException> beanTransformerExceptionList) {
+//		public BeanTransformerResult() {
+//			this(List.of(), List.of());
+//		}
+//	};
 	
-	public BeanTransformerResult applyTransformers(IEntityEnum uploadTabelEnum, List<? extends AbstractPersistableEntity> beanList) {
+	public void applyTransformers(FileProcessingContext context/*IEntityEnum uploadTabelEnum, List<? extends AbstractPersistableEntity> beanList*/) throws AbortFileProcessingException {
 		
-		var beanTransformerResult = new BeanTransformerResult(beanList, new ArrayList<>());
+		//var context = FileProcessingContext.get();
+		
+		//var beanTransformerResult = new BeanTransformerResult(context.getBeans(), new ArrayList<>());
 		
 		for (IBeanTransformer transformer: beanTransformerCollection) {
 			for (TransformationStageEnum stage : TransformationStageEnum.values())
-				if (transformer.canHandle(uploadTabelEnum, stage)) {
-					try {
-						LOGGER.info("Using {} to transform bean of {} table.", transformer.getClass().getSimpleName(), uploadTabelEnum);
-						beanTransformerResult = transformer.transform(beanTransformerResult);
-					} catch (TransformerException e) {
-						beanTransformerResult.transformerExceptionList().add(e);
-						beanTransformerResult = new BeanTransformerResult(beanTransformerResult.beanList(), beanTransformerResult.transformerExceptionList());
-					}
+				if (transformer.canHandle(context.getUploadTableEnum(), stage)) {
+//					try {
+						LOGGER.info("Using {} to transform bean of {} table.", transformer.getClass().getSimpleName(), context.getUploadTableEnum());
+						transformer.transform(context);
+//					} catch (BeanTransformerException e) {
+//						beanTransformerResult.transformerExceptionList().add(e);
+//						beanTransformerResult = new BeanTransformerResult(beanTransformerResult.beanList(), beanTransformerResult.transformerExceptionList());
+//					}
 				}
 		}
-		return beanTransformerResult;
 	}
 
 }

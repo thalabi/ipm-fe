@@ -12,6 +12,8 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +40,8 @@ public abstract class AbstractPersistableEntity extends AbstractEntity implement
 	@Column(name = "version")
 	private Long version;
 
+	@CsvBindByName
+	@CsvIgnore(profiles = "csvWrite") // ignore column sourceCsvLineNumber when writing out csv file (when profile is set to csvWrite)
 	@Transient
 	private Long sourceCsvLineNumber;
 	@Transient

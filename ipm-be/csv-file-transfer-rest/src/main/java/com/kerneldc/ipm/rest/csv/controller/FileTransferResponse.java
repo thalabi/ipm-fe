@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class FileTransferResponse {
 
-	private String transformerExceptionMessage;
+	//private String transformerExceptionMessage;
 	@JsonUnwrapped
 	private ProcessingStats processingStats;
 	private String exceptionsFileName;

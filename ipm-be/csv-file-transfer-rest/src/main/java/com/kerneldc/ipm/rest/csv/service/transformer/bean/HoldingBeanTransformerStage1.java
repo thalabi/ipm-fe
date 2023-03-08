@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest.csv.service.transformer;
+package com.kerneldc.ipm.rest.csv.service.transformer.bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,10 @@ import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
-import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
+import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
+import com.kerneldc.ipm.rest.csv.service.transformer.TransformationStageEnum;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.BeanTransformerException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,36 +30,34 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 	private final InstrumentRepository instrumentRepository;
 	private final PortfolioRepository portfolioRepository;
 	@Override
-	public BeanTransformerResult transform(BeanTransformerResult beanTransformerResult) throws TransformerException {
-		var inputHoldingList = beanTransformerResult.beanList();
-		var transformerExceptionList = beanTransformerResult.transformerExceptionList();
+	public void transform(FileProcessingContext context) throws AbortFileProcessingException {
 		
-		List<Holding> transformedHoldingList = new ArrayList<>();
+		var inputHoldingList = context.getBeans();
+		
+		List<AbstractPersistableEntity> transformedHoldingList = new ArrayList<>();
 		
 		for (AbstractPersistableEntity bean : inputHoldingList) {
 			var holding = SerializationUtils.clone((Holding) bean);
 
 			var exceptionMessageJoiner = new StringJoiner(". ", StringUtils.EMPTY, ".");
-			var exceptionsFound = false;
 			
 			Consumer<AbstractPersistableEntity> setInstrument = instrument -> holding.setInstrument((Instrument)instrument);
-			exceptionsFound = IBeanTransformer.lookupAndSetForeignEntity(instrumentRepository, "Instrument not found with ticker: [%s] and exchange: [%s]", exceptionMessageJoiner, exceptionsFound,
-					setInstrument,
-					holding.getTicker(), holding.getExchange());
+			var instrumentNotFound = IBeanTransformer.lookupAndSetForeignEntity(instrumentRepository,
+					"Instrument not found with ticker: [%s] and exchange: [%s]", exceptionMessageJoiner,
+					setInstrument, holding.getTicker(), holding.getExchange());
 
 			Consumer<AbstractPersistableEntity> setPortfolio = portfolio -> holding.setPortfolio((Portfolio)portfolio);
-			exceptionsFound = IBeanTransformer.lookupAndSetForeignEntity(portfolioRepository, "Portfolio not found with instititution: [%s] and account number: [%s]", exceptionMessageJoiner, exceptionsFound,
-					setPortfolio,
-					holding.getInstitution(), holding.getAccountNumber());
+			var portfolioNotFound = IBeanTransformer.lookupAndSetForeignEntity(portfolioRepository,
+					"Portfolio not found with instititution: [%s] and account number: [%s]", exceptionMessageJoiner,
+					setPortfolio, holding.getInstitution(), holding.getAccountNumber());
 
-			if (exceptionsFound) {
-				transformerExceptionList.add(new TransformerException(getTransformerName(), holding, exceptionMessageJoiner.toString()));
+			if (instrumentNotFound || portfolioNotFound) {
+				context.getBeanTransformerExceptionList().add(new BeanTransformerException(getTransformerName(), holding, exceptionMessageJoiner.toString()));
 			} else {
 				transformedHoldingList.add(holding);
 			}
 		}
-		
-		return new BeanTransformerResult(transformedHoldingList, transformerExceptionList);
+		context.setBeans(transformedHoldingList);
 	}
 
 	@Override

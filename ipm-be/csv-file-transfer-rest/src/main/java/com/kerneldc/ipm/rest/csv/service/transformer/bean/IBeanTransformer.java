@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.rest.csv.service.transformer;
+package com.kerneldc.ipm.rest.csv.service.transformer.bean;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,11 +11,13 @@ import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
+import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
+import com.kerneldc.ipm.rest.csv.service.transformer.TransformationStageEnum;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
 
 public interface IBeanTransformer {
 
-	BeanTransformerResult transform(BeanTransformerResult beanTransformerResultList) throws TransformerException;
+	void transform(FileProcessingContext context) throws AbortFileProcessingException;
 	
 	boolean canHandle(IEntityEnum entityEnum, TransformationStageEnum transformationStageEnum);
 	
@@ -23,10 +25,10 @@ public interface IBeanTransformer {
 	
 	static boolean lookupAndSetForeignEntity(BaseTableRepository<? extends AbstractPersistableEntity, ? extends Serializable> repository,
 			String exceptionMessageTemplate,
-			StringJoiner exceptionMessageJoiner, boolean exceptionsFound,
+			StringJoiner exceptionMessageJoiner,
 			Consumer<AbstractPersistableEntity> setForeignEntity,
 			Object...entityKeys) {
-		
+		boolean exceptionsFound = false;
 		List<? extends AbstractPersistableEntity> entityList = repository.findByLogicalKeyHolder(LogicalKeyHolder.build(entityKeys));
 		if (CollectionUtils.isEmpty(entityList)) {
 			exceptionMessageJoiner.add(String.format(exceptionMessageTemplate, entityKeys));

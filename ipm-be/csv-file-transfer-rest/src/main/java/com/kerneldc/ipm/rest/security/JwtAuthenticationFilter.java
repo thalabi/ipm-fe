@@ -32,9 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		LOGGER.debug("url: {}", request.getRequestURL() + "?" + request.getQueryString());
 		String token = getTokenFromRequest(request);
 		LOGGER.debug("token: {}", token);
-		if (StringUtils.isNotEmpty(token) && jwtUtil.validateToken(token)) {
+		String newToken;
+		HttpServletResponse newResponse = (HttpServletResponse) response;
+		if (StringUtils.isNotEmpty(token) && StringUtils.isNotEmpty(newToken= jwtUtil.validateAndExtendToken(token))) {
+			LOGGER.debug("new token: {}", newToken);
+			newResponse.setHeader("jwtToken", newToken);
 			
-			CustomUserDetails customUserDetails = jwtUtil.getCustomUserDetailsFromJwt(token);
+			CustomUserDetails customUserDetails = jwtUtil.getCustomUserDetailsFromJwt(newToken);
 			LOGGER.debug("customUserDetails: {}", customUserDetails);
 			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
 					new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

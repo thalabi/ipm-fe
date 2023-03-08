@@ -1,34 +1,36 @@
-package com.kerneldc.ipm.rest.csv.service.transformer;
+package com.kerneldc.ipm.rest.csv.service.transformer.exception;
 
 import java.util.StringJoiner;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
+import com.kerneldc.ipm.rest.csv.service.transformer.bean.IBeanTransformer;
 
 import lombok.Getter;
 import lombok.Setter;
 
 
-public class TransformerException extends Exception {
+/**
+ * Transformer exception used to capture bean transformers {@link IBeanTransformer} exceptions
+ *
+ */
+public class BeanTransformerException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	@Getter @Setter
 	private String transformerName;
 
-//	@Getter @Setter
-//	private long lineNumber;
-
 	@Getter @Setter
 	private AbstractPersistableEntity bean;
 
-	//public TransformerException(String transformerName, long lineNumber, String bean, String message) {
-	public TransformerException(String transformerName, AbstractPersistableEntity bean, String message) {
+	//public BeanTransformerException(String transformerName, long lineNumber, String bean, String message) {
+	public BeanTransformerException(String transformerName, AbstractPersistableEntity bean, String message) {
 		super(message);
 		this.transformerName = transformerName;
 //		this.lineNumber = lineNumber;
 		this.bean = bean;
 	}
 
-	public TransformerException(String transformerName, AbstractPersistableEntity bean, String message, Throwable cause) {
+	public BeanTransformerException(String transformerName, AbstractPersistableEntity bean, String message, Throwable cause) {
 		super(message, cause);
 		this.transformerName = transformerName;
 //		this.lineNumber = lineNumber;
@@ -36,21 +38,21 @@ public class TransformerException extends Exception {
 	}
 
 
-	public TransformerException(String transformerName, String message, Throwable cause) {
+	public BeanTransformerException(String transformerName, String message, Throwable cause) {
 		super(message, cause);
 		this.transformerName = transformerName;
 //		this.lineNumber = -1;
 		this.bean = null;
 	}
 
-	public TransformerException(String transformerName, Throwable cause) {
+	public BeanTransformerException(String transformerName, Throwable cause) {
 		super(cause);
 		this.transformerName = transformerName;
 //		this.lineNumber = -1;
 		this.bean = null;
 	}
 
-	public TransformerException(String transformerName, String message) {
+	public BeanTransformerException(String transformerName, String message) {
 		super(message);
 		this.transformerName = transformerName;
 //		this.lineNumber = -1;

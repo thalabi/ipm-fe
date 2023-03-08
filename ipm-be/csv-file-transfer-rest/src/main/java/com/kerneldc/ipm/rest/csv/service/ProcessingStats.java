@@ -7,11 +7,7 @@ import lombok.Data;
 @Builder
 public class ProcessingStats {
 
-	private Integer numberOfLinesInFile;
+	private Long numberOfLinesInFile;
 	private Integer numberOfExceptions;
 	private String elapsedTime;
-//	
-//	public void incrementExceptionsCounts(int count) {
-//		numberOfExceptions += count;
-//	}
 }

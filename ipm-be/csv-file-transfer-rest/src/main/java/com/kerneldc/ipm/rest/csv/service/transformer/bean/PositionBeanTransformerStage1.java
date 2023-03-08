@@ -1,6 +1,5 @@
-package com.kerneldc.ipm.rest.csv.service.transformer;
+package com.kerneldc.ipm.rest.csv.service.transformer.bean;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -20,7 +19,10 @@ import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
-import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService.BeanTransformerResult;
+import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
+import com.kerneldc.ipm.rest.csv.service.transformer.TransformationStageEnum;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
+import com.kerneldc.ipm.rest.csv.service.transformer.exception.BeanTransformerException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,11 +34,14 @@ public class PositionBeanTransformerStage1 implements IBeanTransformer {
 	private final PortfolioRepository portfolioRepository;
 	private final PriceRepository priceRepository;
 	@Override
-	public BeanTransformerResult transform(BeanTransformerResult beanTransformerResult) throws TransformerException {
-		var inputHoldingList = beanTransformerResult.beanList();
-		var transformerExceptionList = beanTransformerResult.transformerExceptionList();
+	public void transform(FileProcessingContext context) throws AbortFileProcessingException{
 		
-		List<Position> transformedHoldingList = new ArrayList<>();
+		//var context = FileProcessingContext.get();
+		var inputHoldingList = context.getBeans();
+		//var transformerExceptionList = beanTransformerResult.beanTransformerExceptionList();
+		
+		//List<Position> transformedHoldingList = new ArrayList<>();
+		context.getBeans().clear();
 		
 		for (AbstractPersistableEntity bean : inputHoldingList) {
 			var position = SerializationUtils.clone((Position) bean);
@@ -73,13 +78,12 @@ public class PositionBeanTransformerStage1 implements IBeanTransformer {
 			
 			
 			if (exceptionsFound) {
-				transformerExceptionList.add(new TransformerException(getTransformerName(), position, exceptionMessageJoiner.toString()));
+				context.getBeanTransformerExceptionList().add(new BeanTransformerException(getTransformerName(), position, exceptionMessageJoiner.toString()));
 			} else {
-				transformedHoldingList.add(position);
+				//transformedHoldingList.add(position);
+				context.getBeans().add(position);;
 			}
 		}
-		
-		return new BeanTransformerResult(transformedHoldingList, transformerExceptionList);
 	}
 
 	@Override
