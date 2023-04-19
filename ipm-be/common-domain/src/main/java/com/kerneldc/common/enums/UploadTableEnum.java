@@ -1,5 +1,7 @@
 package com.kerneldc.common.enums;
 
+import java.util.Arrays;
+
 import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.AreaCode;
@@ -25,7 +27,9 @@ public enum UploadTableEnum implements IEntityEnum {
 	}
 	UploadTableEnum(Class<? extends AbstractPersistableEntity> entity, String[] writeColumnOrder) {
 		this.entity = entity;
-		this.writeColumnOrder = writeColumnOrder;
+		// tag SOURCECSVLINENUMBER to the end of the writeColumnOrder
+		this.writeColumnOrder = Arrays.copyOf(writeColumnOrder, writeColumnOrder.length+1);
+		this.writeColumnOrder[this.writeColumnOrder.length-1] = "SOURCECSVLINENUMBER";  
 	}
 	
 	@Override

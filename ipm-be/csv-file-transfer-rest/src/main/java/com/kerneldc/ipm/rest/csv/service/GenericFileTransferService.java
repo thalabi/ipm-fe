@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -17,9 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.comparators.FixedOrderComparator;
-import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -383,6 +380,7 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		var byteArrayOutputstream = new ByteArrayOutputStream();
 	    var outputStreamWriter = new OutputStreamWriter(byteArrayOutputstream);
 		var beanToCsvBuilder = new StatefulBeanToCsvBuilder<AbstractEntity>(outputStreamWriter);
+		beanToCsvBuilder.withProfile("csvWrite"); // so that sourceCsvLineNumber column is ignored. Not written to csv file.
 		
 		if (ArrayUtils.isNotEmpty(uploadTableEnum.getWriteColumnOrder())) {
 			LOGGER.info("Table has writeColumnOrder defined. Defining a mappingStrategy");
@@ -390,16 +388,16 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		    mappingStrategy.setType(uploadTableEnum.getEntity());
 		    
 		    // so that sourceCsvLineNumber column is ignored. Not written to csv file.
-		    MultiValuedMap<Class<?>, Field> ignoreFields = new ArrayListValuedHashMap<>(1, 1);
-		    ignoreFields.put(AbstractPersistableEntity.class, AbstractPersistableEntity.class.getDeclaredField(CsvFileTransformerService.SOURCE_CSV_LINE_NUMBER));
-		    mappingStrategy.ignoreFields(ignoreFields);
-		    mappingStrategy.setProfile("csvWrite"); // this is still needed even though ignoreFields is set above
+		    //MultiValuedMap<Class<?>, Field> ignoreFields = new ArrayListValuedHashMap<>(1, 1);
+		    //ignoreFields.put(AbstractPersistableEntity.class, AbstractPersistableEntity.class.getDeclaredField(CsvFileTransformerService.SOURCE_CSV_LINE_NUMBER));
+		    //mappingStrategy.ignoreFields(ignoreFields);
+		    //mappingStrategy.setProfile("csvWrite"); // this is still needed even though ignoreFields is set above
 		    
 		    mappingStrategy.setColumnOrderOnWrite(new FixedOrderComparator<>(uploadTableEnum.getWriteColumnOrder()));
 		    beanToCsvBuilder.withMappingStrategy(mappingStrategy);
+		    //beanToCsvBuilder.withProfile("csvWrite"); // so that sourceCsvLineNumber column is ignored. Not written to csv file.
 		} else {
 			LOGGER.info("Table does not have a writeColumnOrder defined.");
-			beanToCsvBuilder.withProfile("csvWrite"); // so that sourceCsvLineNumber column is ignored. Not written to csv file.
 		}
 		
 		var beanToCsv = beanToCsvBuilder.build(); 

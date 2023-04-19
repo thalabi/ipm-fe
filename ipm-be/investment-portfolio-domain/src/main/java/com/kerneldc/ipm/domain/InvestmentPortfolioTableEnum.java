@@ -1,5 +1,7 @@
 package com.kerneldc.ipm.domain;
 
+import java.util.Arrays;
+
 import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
@@ -26,7 +28,9 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	InvestmentPortfolioTableEnum(Class<? extends AbstractEntity> entity, boolean immutable, String[] writeColumnOrder) {
 		this.entity = entity;
 		this.immutable = immutable;
-		this.writeColumnOrder = writeColumnOrder;
+		// tag SOURCECSVLINENUMBER to the end of the writeColumnOrder
+		this.writeColumnOrder = Arrays.copyOf(writeColumnOrder, writeColumnOrder.length+1);
+		this.writeColumnOrder[this.writeColumnOrder.length-1] = "SOURCECSVLINENUMBER";  
 	}
 	
 	@Override
