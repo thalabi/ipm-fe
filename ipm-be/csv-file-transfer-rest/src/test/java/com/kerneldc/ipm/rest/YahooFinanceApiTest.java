@@ -9,7 +9,6 @@ import yahoofinance.YahooFinance;
 
 class YahooFinanceApiTest {
 
-	@Disabled("Disabled until Yahoo Finance service is up.")
 	@Test
 	void testStockPrice() throws IOException {
 		var stock = YahooFinance.get("BCE" + ".TO");
