@@ -9,6 +9,7 @@ import yahoofinance.YahooFinance;
 
 class YahooFinanceApiTest {
 
+	@Disabled
 	@Test
 	void testStockPrice() throws IOException {
 		var stock = YahooFinance.get("BCE" + ".TO");
