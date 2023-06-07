@@ -7,28 +7,6 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<include file="liquibase/security/user/create-table.xml"/>
-	<include file="liquibase/security/user/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/security/user/create-unique-constraint-1.xml"/>
-	<include file="liquibase/security/user/create-unique-constraint-2.xml"/>
-	<include file="liquibase/security/user/data/insert.xml"/>
-	
-	<include file="liquibase/security/group/create-table.xml"/>
-	<include file="liquibase/security/group/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/security/group/create-unique-constraint-1.xml"/>
-	<include file="liquibase/security/group/data/insert.xml"/>
-	
-	<include file="liquibase/security/permission/create-table.xml"/>
-	<include file="liquibase/security/permission/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/security/permission/create-unique-constraint-1.xml"/>
-	<include file="liquibase/security/permission/data/insert.xml"/>
-  
-	<include file="liquibase/security/user_group/create-table.xml"/>
-	<include file="liquibase/security/user_group/data/insert.xml"/>
-
-	<include file="liquibase/security/group_permission/create-table.xml"/>
-	<include file="liquibase/security/group_permission/data/insert.xml"/>
-
 	<include file="liquibase/fileTransfer/sales/create-table.xml"/>
 	<include file="liquibase/fileTransfer/sales/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/fileTransfer/sales/create-unique-constraint-1.xml"/>

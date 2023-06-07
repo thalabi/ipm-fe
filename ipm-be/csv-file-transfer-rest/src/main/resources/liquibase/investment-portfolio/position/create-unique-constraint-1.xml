@@ -7,9 +7,12 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="position_unique_constraint_1_h2" author="thalabi">
+    <changeSet id="position_unique_constraint_1_h2_postgres" author="thalabi">
 	    <preConditions onFail="CONTINUE" onFailMessage="">
-	        <dbms type="h2" />
+	    	<or>
+	        	<dbms type="h2" />
+	        	<dbms type="postg" />
+	        </or>
 	    </preConditions>
 
         <addUniqueConstraint columnNames="position_snapshot,instrument_id,portfolio_id" constraintName="position_unique_1" tableName="position"/>

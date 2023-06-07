@@ -1,1 +1,0 @@
-https://www.browserling.com/tools/bcrypt
