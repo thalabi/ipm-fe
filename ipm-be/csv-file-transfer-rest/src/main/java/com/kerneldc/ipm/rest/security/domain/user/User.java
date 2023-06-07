@@ -20,7 +20,6 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.converter.HashingConverter;
-import com.kerneldc.common.domain.converter.HmacSHA256KeyConverter;
 import com.kerneldc.ipm.rest.security.domain.group.Group;
 import com.kerneldc.ipm.rest.security.domain.permission.Permission;
 
@@ -58,7 +57,7 @@ public class User extends AbstractPersistableEntity {
     private String lastName;
     private String email;
     private String cellPhone;
-    @Convert(converter = HmacSHA256KeyConverter.class)
+    //@Convert(converter = HmacSHA256KeyConverter.class)
     private Key resetPasswordJwtKey;
 
     @ManyToMany

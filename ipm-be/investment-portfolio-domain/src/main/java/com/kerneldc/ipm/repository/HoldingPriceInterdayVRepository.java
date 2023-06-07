@@ -17,7 +17,8 @@ public interface HoldingPriceInterdayVRepository extends BaseViewRepository<Hold
 			        where hpiv.position_snapshot in (
 			                select max(hpiv1.position_snapshot) from holding_price_interday_v hpiv1 group by cast (hpiv1.position_snapshot as date))
 			        order by position_snapshot desc limit :nPositionSnapshots
-			       ) order by position_snapshot
+			       ) as t
+			       order by position_snapshot
 			"""
 			, nativeQuery = true)
 	List<HoldingPriceInterdayV> selectLastestNMarketValues(int nPositionSnapshots);

@@ -1,11 +1,19 @@
 package com.kerneldc.ipm.batch;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.TimeUtils;
@@ -18,13 +26,29 @@ import yahoofinance.YahooFinance;
 @Slf4j
 public class StockPriceService extends BaseAbstractPriceService {
 
-	public StockPriceService(PriceRepository priceRepository) {
+	private enum STOCK_PRICE_SERVICE { YAHOO, ALPAVANTAGE };
+	private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.ALPAVANTAGE;
+	
+	private static final String ALPHAVANTAGE_URL_TEMPLATE =  "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=%s&symbol=%s";
+	
+	private String alphavantageApiKey;
+	
+	
+	private Table<String, String, Float> fallbackPriceLookupTable = HashBasedTable.create();
+	public StockPriceService(PriceRepository priceRepository, String alphavantageApiKey) {
 		super(priceRepository);
+		this.alphavantageApiKey = alphavantageApiKey;
+		
+		fallbackPriceLookupTable.put("SENS", "CNSX", 0.005f);
 	}
 
 	@Override
 	public PriceQuote quote(Instrument instrument) throws ApplicationException {
-		return yahooFinanceQuoteService(instrument);
+		if (ENABLED_STOCK_PRICE_SERVICE == STOCK_PRICE_SERVICE.YAHOO) {
+			return yahooFinanceQuoteService(instrument);
+		} else {
+			return alphaVantageQuoteService(instrument);
+		}
 	}
 
 	private PriceQuote yahooFinanceQuoteService(Instrument instrument) throws ApplicationException {
@@ -57,5 +81,75 @@ public class StockPriceService extends BaseAbstractPriceService {
 		
 		return new PriceQuote(quote.getPrice(), TimeUtils.toOffsetDateTime(quote.getLastTradeTime()));
 	}
+	
+	private static final int MAX_RETRIES = 2;
+	protected PriceQuote alphaVantageQuoteService(Instrument instrument) throws ApplicationException {
+		var ticker = instrument.getTicker();
+		var exchange = instrument.getExchange();
+		
+		var alphavantageSymbol = ticker;
+		if (Arrays.asList("TSE","CNSX").contains(exchange)) {
+			alphavantageSymbol = ticker.replace(".", "-") + ".TO";
+		}
+		var urlString = String.format(ALPHAVANTAGE_URL_TEMPLATE, alphavantageApiKey, alphavantageSymbol);
+		
+		GlobalQuote quote = null;
+		try {
+			var url = new URL(urlString);
+			
+			for (int tries = 1; tries <= MAX_RETRIES; tries++) {
+				var objectMapper = new ObjectMapper();
+				objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
+				
+				var jsonNode = objectMapper.readTree(url);
+				
+				var globalQuoteJson = jsonNode.get("Global Quote");
+				if (globalQuoteJson != null && globalQuoteJson.isContainerNode()) { 
+					objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+					quote = objectMapper.treeToValue(jsonNode, GlobalQuote.class);
+					//System.out.println(quote);
+					break; // success, don't retry
+				} else {
+					if (tries == MAX_RETRIES) {
+						throw new ApplicationException(String.format("Requesting quote from Alpha Vantage using url [%s] returned [%s]", url, jsonNode));
+					}
+					var noteJson = jsonNode.get("Note"); 
+					if (noteJson != null && noteJson.isValueNode()) {
+						var noteText = noteJson.textValue();
+						var wait = noteText.contains("call frequency");
+						if (wait) {
+							LOGGER.info("Sleeping one minute before requesting qoute from Alpha Vantage ...");
+							Thread.sleep(60*1000);
+							continue;
+						}
+					}
+				}
+				LOGGER.error("Alpha Vantage returned: [{}]", jsonNode);
+				throw new ApplicationException(String.format("Requesting quote from Alpha Vantage using url [%s] returned [%s]", url, jsonNode));
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ApplicationException(String.format("Exception requesting quote from Alpha Vantage for [%s]", urlString), e);
+		} catch (InterruptedException e) {
+			LOGGER.warn("Interrupted!", e);
+		    // Restore interrupted state...
+		    Thread.currentThread().interrupt();
 
+		}
+		
+		if (quote == null || quote.getPrice() == null) {
+			var fallbackPrice = fallbackPriceLookupTable.get(instrument.getTicker(), instrument.getExchange());
+			if (fallbackPrice != null) {
+				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
+				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());
+			} else {
+				var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
+				LOGGER.warn(message);
+				throw new ApplicationException(message);
+			}
+		} else {
+			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())), TimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
+		}
+	}
 }

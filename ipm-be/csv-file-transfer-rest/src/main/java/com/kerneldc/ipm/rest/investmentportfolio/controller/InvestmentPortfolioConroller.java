@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("investmentPortfolioConroller")
+@RequestMapping("/protected/investmentPortfolioConroller")
 @RequiredArgsConstructor
 @Slf4j
 public class InvestmentPortfolioConroller {

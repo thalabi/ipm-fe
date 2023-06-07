@@ -8,47 +8,41 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+//@Component
 @Slf4j
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter /*extends OncePerRequestFilter*/ {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+//	@Autowired
+//	private JwtUtil jwtUtil;
 
-	@Override
+	//@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		LOGGER.debug("Begin ...");
-        LOGGER.debug("authenticated: {}", SecurityContextHolder.getContext().getAuthentication() == null ? null : SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
-		LOGGER.debug("url: {}", request.getRequestURL() + "?" + request.getQueryString());
-		String token = getTokenFromRequest(request);
-		LOGGER.debug("token: {}", token);
-		String newToken;
-		HttpServletResponse newResponse = (HttpServletResponse) response;
-		if (StringUtils.isNotEmpty(token) && StringUtils.isNotEmpty(newToken= jwtUtil.validateAndExtendToken(token))) {
-			LOGGER.debug("new token: {}", newToken);
-			newResponse.setHeader("jwtToken", newToken);
-			
-			CustomUserDetails customUserDetails = jwtUtil.getCustomUserDetailsFromJwt(newToken);
-			LOGGER.debug("customUserDetails: {}", customUserDetails);
-			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-					new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-			usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-			
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            
-            LOGGER.debug("authenticated: {}", SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
-		} 
-		LOGGER.debug("End ...");
+//        LOGGER.debug("authenticated: {}", SecurityContextHolder.getContext().getAuthentication() == null ? null : SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
+//		LOGGER.debug("url: {}", request.getRequestURL() + "?" + request.getQueryString());
+//		String token = getTokenFromRequest(request);
+//		LOGGER.debug("token: {}", token);
+//		String newToken;
+//		HttpServletResponse newResponse = (HttpServletResponse) response;
+//		if (StringUtils.isNotEmpty(token) && StringUtils.isNotEmpty(newToken= jwtUtil.validateAndExtendToken(token))) {
+//			LOGGER.debug("new token: {}", newToken);
+//			newResponse.setHeader("jwtToken", newToken);
+//			
+//			CustomUserDetails customUserDetails = jwtUtil.getCustomUserDetailsFromJwt(newToken);
+//			LOGGER.debug("customUserDetails: {}", customUserDetails);
+//			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+//					new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+//			usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//			
+//            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//            
+//            LOGGER.debug("authenticated: {}", SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
+//		} 
+//		LOGGER.debug("End ...");
         filterChain.doFilter(request, response);
 	}
 

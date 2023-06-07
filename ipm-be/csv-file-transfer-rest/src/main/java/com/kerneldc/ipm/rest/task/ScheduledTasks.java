@@ -117,7 +117,7 @@ public class ScheduledTasks {
 	}
 */
 	
-	@Scheduled(cron = "0 0 17 * * MON-FRI")
+	@Scheduled(cron = "0 0 19 * * MON-FRI")
 	public void getHoldingPrices() throws ApplicationException {
 		try {
 			holdingPricingService.priceHoldings(true, true);

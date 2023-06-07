@@ -22,7 +22,7 @@ public abstract class BaseAbstractPriceService {
 
 	private final PriceRepository priceRepository;
 
-	record PriceQuote(BigDecimal lastPrice, OffsetDateTime tradeTime) {}
+	protected record PriceQuote(BigDecimal lastPrice, OffsetDateTime tradeTime) {}
 
 	public Price getSecurityPrice(Instant snapshotInstant, Instrument instrument, Map<Long, Price> priceCache) throws ApplicationException {
 		var price = priceCache.get(instrument.getId());

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -130,18 +131,19 @@ public class SalesFileTransformerStage1 implements ICsvFileTransformer {
 		return validateHeader(cells);
 	}
 
-	private List<String> validateHeader(String[] cells) throws CsvTransformerException {
-		var headerNameSet = new HashSet<String>(Arrays.asList(CsvFileTransformerService.SOURCE_CSV_LINE_NUMBER, "Transaction_date","Product","Price","Payment_Type","Name","City","State","Country","Account_Created","Last_Login","Latitude","Longitude","US Zip"));
-		if (cells.length != headerNameSet.size()) {
-			throw new CsvTransformerException(getTransformerName(), cells, 0, String.format(headerValidateMessageTemplate1, cells.length, headerNameSet.size()));
+	private List<String> validateHeader(String[] headerNameArray) throws CsvTransformerException {
+		var headerNameSet = new HashSet<String>(Arrays.asList(CsvFileTransformerService.SOURCE_CSV_LINE_NUMBER.toLowerCase(), "transaction_date","product","price","payment_type","name","city","state","country","account_created","last_login","latitude","longitude","us zip"));
+		if (headerNameArray.length != headerNameSet.size()) {
+			throw new CsvTransformerException(getTransformerName(), headerNameArray, 0, String.format(headerValidateMessageTemplate1, headerNameArray.length, headerNameSet.size()));
 		}
-		var actualHeaderNameSet = new HashSet<String>(Arrays.asList(cells));
+		var actualHeaderNameSet = Arrays.asList(headerNameArray).stream().map(headerName -> headerName.toLowerCase()).collect(Collectors.toSet());
 		var headerNameSetCopy = new HashSet<String>(headerNameSet);
 		headerNameSetCopy.removeAll(actualHeaderNameSet);
 		if (CollectionUtils.isNotEmpty(headerNameSetCopy)) {
-			throw new CsvTransformerException(getTransformerName(), cells, 0, String.format(headerValidateMessageTemplate2, String.join(", ", cells), String.join(", ", headerNameSet)));
+			LOGGER.error("Removing set [{}] from set [{}] resulted in [{}]", actualHeaderNameSet, headerNameSet, headerNameSetCopy);
+			throw new CsvTransformerException(getTransformerName(), headerNameArray, 0, String.format(headerValidateMessageTemplate2, String.join(", ", headerNameArray), String.join(", ", headerNameSet)));
 		}
-		return Arrays.asList(cells);
+		return Arrays.asList(headerNameArray);
 	}
 
 	@Override

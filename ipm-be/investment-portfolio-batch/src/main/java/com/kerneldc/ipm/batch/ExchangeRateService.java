@@ -57,7 +57,6 @@ public class ExchangeRateService {
 				exchangeRate.setAsOfDate(TimeUtils.toOffsetDateTime(workingBusinessDay));
 				exchangeRate.setFromCurrency(CurrencyEnum.USD);
 				exchangeRate.setToCurrency(CurrencyEnum.CAD);
-				exchangeRate.setToCurrency(CurrencyEnum.CAD);
 			} else {
 				exchangeRate = exchangeRateList.get(0);
 			}

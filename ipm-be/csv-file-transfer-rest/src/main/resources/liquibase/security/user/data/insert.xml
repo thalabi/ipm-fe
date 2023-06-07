@@ -7,7 +7,11 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="user_data" author="thalabi">
+    <changeSet id="user_data_h2" author="thalabi">
+    	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
+    
 		<insert tableName="USER">
 			<column name="id" valueComputed="user_seq.nextval"/>
 			<column name="lk" value="thalabi"/>
@@ -22,6 +26,35 @@
 
 		<insert tableName="USER">
 			<column name="id" valueComputed="user_seq.nextval"/>
+			<column name="lk" value="thalabi-viewer"/>
+			<column name="version" value="0"/>
+
+			<column name="username" value="thalabi-viewer"/>
+			<column name="PASSWORD" value="********"/>
+			<column name="enabled" value="y"/>
+			<column name="email" value="thalabi@yahoo.com"/>
+			<column name="cell_phone" value="4162814760"/>
+		</insert>
+	</changeSet>
+    <changeSet id="user_data_postgres" author="thalabi">
+    	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgres" />
+	    </preConditions>
+    
+		<insert tableName="USER">
+			<column name="id" valueComputed="nextval('user_seq')"/>
+			<column name="lk" value="thalabi"/>
+			<column name="version" value="0"/>
+
+			<column name="username" value="thalabi"/>
+			<column name="PASSWORD" value="$2a$10$tzWGr/8jAV3238e4L7O2.eNdlJ0s15QNb7ZKNXGFqCGcOPbde/Zv6"/>
+			<column name="enabled" value="y"/>
+			<column name="email" value="tarif.halabi@gmail.com"/>
+			<column name="cell_phone" value="4162005175"/>
+		</insert>
+
+		<insert tableName="USER">
+			<column name="id" valueComputed="nextval('user_seq')"/>
 			<column name="lk" value="thalabi-viewer"/>
 			<column name="version" value="0"/>
 

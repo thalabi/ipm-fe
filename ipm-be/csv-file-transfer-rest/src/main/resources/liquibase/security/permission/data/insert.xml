@@ -7,9 +7,11 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="permission_data" author="thalabi">
+    <changeSet id="permission_data_h2" author="thalabi">
+		<preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
 
-		<!-- flight_log -->
 		<insert tableName="permission">
 			<column name="id" valueComputed="permission_seq.nextval"/>
 			<column name="lk" value="flight_log read"/>
@@ -19,6 +21,27 @@
 		</insert>
 		<insert tableName="permission">
 			<column name="id" valueComputed="permission_seq.nextval"/>
+			<column name="lk" value="flight_log write"/>
+			<column name="version" value="0"/>
+
+			<column name="name" value="flight_log write"/>
+		</insert>
+
+	</changeSet>
+    <changeSet id="permission_data_postgres" author="thalabi">
+		<preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgres" />
+	    </preConditions>
+
+		<insert tableName="permission">
+			<column name="id" valueComputed="nextval('permission_seq')"/>
+			<column name="lk" value="flight_log read"/>
+			<column name="version" value="0"/>
+
+			<column name="name" value="flight_log read"/>
+		</insert>
+		<insert tableName="permission">
+			<column name="id" valueComputed="nextval('permission_seq')"/>
 			<column name="lk" value="flight_log write"/>
 			<column name="version" value="0"/>
 

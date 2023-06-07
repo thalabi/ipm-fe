@@ -22,6 +22,10 @@ public class TimeUtils {
 		return date == null ? null : toOffsetDateTime(date.toInstant());
 	}
 
+	public static OffsetDateTime toOffsetDateTime(LocalDate localDate) {
+		return localDate == null ? null : toOffsetDateTime(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+	
 	public static OffsetDateTime toOffsetDateTime(Calendar calendar) {
 		return calendar == null ? null : toOffsetDateTime(calendar.toInstant());
 	}

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("fileTransferController")
+@RequestMapping("/protected/fileTransferController")
 @RequiredArgsConstructor
 @Slf4j
 public class FileTransferController {

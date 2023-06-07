@@ -1,51 +1,32 @@
 package com.kerneldc.ipm.rest.controller;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
-import javax.mail.MessagingException;
-import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.rest.security.CustomUserDetails;
-import com.kerneldc.ipm.rest.security.ForgotPasswordRequest;
-import com.kerneldc.ipm.rest.security.JwtUtil;
-import com.kerneldc.ipm.rest.security.LoginRequest;
-import com.kerneldc.ipm.rest.security.LoginResponse;
-import com.kerneldc.ipm.rest.security.ResetPasswordRequest;
-import com.kerneldc.ipm.rest.security.service.SecurityService;
-
-import freemarker.template.TemplateException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("securityController")
+//@RequestMapping("securityController")
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityController {
 
-    private final AuthenticationManager authenticationManager;
-	private final JwtUtil jwtUtil;
-	private final SecurityService securityService;
+    //private final AuthenticationManager authenticationManager;
+//	private final JwtUtil jwtUtil;
+//	private final SecurityService securityService;
 
-    @GetMapping("/ping")
+    @GetMapping("/protected/securityController/ping")
 	public ResponseEntity<PingResponse> ping() {
     	LOGGER.info("Begin ...");
     	PingResponse pingResponse = new PingResponse();
@@ -55,71 +36,38 @@ public class SecurityController {
     	return ResponseEntity.ok(pingResponse);
     }
 
-    @PostMapping("/authenticate")
-	public ResponseEntity<LoginResponse> auhenticate(@Valid @RequestBody LoginRequest loginRequest) {
-		LOGGER.debug("Begin ...");
-		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
-		try {
-			Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-			
-			LOGGER.debug("authentication: {}", authentication);
-			
-			CustomUserDetails customUserDetails = (CustomUserDetails)authentication.getPrincipal();
-			customUserDetails.setPassword("********");
-			
-			String token = jwtUtil.generateToken(customUserDetails);
-			
-			LoginResponse loginResponse = new LoginResponse(customUserDetails, token);
-			
-			LOGGER.debug("End ...");
-			return ResponseEntity.ok(loginResponse);
+	private record UserInfo(String username, String firstName, String lastName, String email, List<String> roles, List<String> backEndAuthorities) {};
 
-		} catch (AuthenticationException ex) {
-			LOGGER.error(ex.getMessage());
-			LOGGER.debug("End ...");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	@GetMapping(path = "/protected/securityController/getUserInfo")
+	public UserInfo getUserInfo() {
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Jwt) {
+			
+			var jwtAuthenticationToken= (JwtAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+			LOGGER.info("jwtAuthenticationToken: {}" ,jwtAuthenticationToken);
+			LOGGER.info("jwtAuthenticationToken.name: {}" ,jwtAuthenticationToken.getName());
+			
+			var jwt = (Jwt)jwtAuthenticationToken.getPrincipal();
+			LOGGER.info("jwt id: {}, claims: {}", jwt.getId(), jwt.getClaims());
+			for (Entry<String, Object> entry : jwt.getClaims().entrySet()) {
+				LOGGER.info("jwt, {} = {}", entry.getKey(), entry.getValue());
+				
+			}
+			Map<String, List<String>> realmAccess = jwt.getClaim("realm_access");
+			var roles = realmAccess.get("roles");
+			roles.sort(null);
+
+			var authorities = jwtAuthenticationToken.getAuthorities();
+			var backEndAuthorities = authorities.stream().map(auth -> auth.getAuthority()).collect(Collectors.toList());
+			backEndAuthorities.sort(null);
+			
+			var userInfo = new UserInfo(jwt.getClaims().get("preferred_username").toString(),
+					jwt.getClaims().get("given_name").toString(), jwt.getClaims().get("family_name").toString(),
+					jwt.getClaims().get("email").toString(), roles, backEndAuthorities);
+			LOGGER.info("userInfo: {}", userInfo);
+			
+			return userInfo;
+		} else {
+			return new UserInfo("", "","","", List.of(""), List.of(""));
 		}
-		
 	}
-
-    @PostMapping("/forgotPassword")
-	public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
-		LOGGER.debug("Begin ...");
-		LOGGER.debug("forgotPasswordRequest: {}", forgotPasswordRequest);
-		try {
-			securityService.processForgotPasswordRequest(forgotPasswordRequest.getEmail(), forgotPasswordRequest.getBaseUrl());
-		} catch (EntityNotFoundException e) {
-			LOGGER.warn(e.getMessage());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		} catch (NoSuchAlgorithmException | MessagingException | IOException | TemplateException e) {
-			LOGGER.error("Exception calling processForgotPasswordRequest with email: {} and baseUrl: {}",  forgotPasswordRequest.getEmail(), forgotPasswordRequest.getBaseUrl(), e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		LOGGER.debug("End ...");
-		return ResponseEntity.ok(null);
-    }
-
-    @PostMapping("/resetPassword")
-	public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-		LOGGER.debug("Begin ...");
-		LOGGER.debug("resetPasswordRequest: {}", resetPasswordRequest);
-		try {
-			securityService.processResetPasswordRequest(resetPasswordRequest.getResetPasswordJwt(), resetPasswordRequest.getNewPassword(), resetPasswordRequest.getBaseUrl());
-		} catch (ExpiredJwtException e) {
-			LOGGER.warn(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This reset password link has expired. Please request another password reset.");
-		} catch (SignatureException e) {
-			LOGGER.warn(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This is not the latest reset password link. Please check your mailbox for the latest reset password email.");
-		} catch (ApplicationException e) {
-			LOGGER.warn(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		} catch (Exception e) {
-			LOGGER.error("Exception calling processResetPasswordRequest with resetPasswordJwt: {}, newPassword: ********, baseUrl: {}",  resetPasswordRequest.getResetPasswordJwt(), resetPasswordRequest.getBaseUrl(), e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-		LOGGER.debug("End ...");
-		return ResponseEntity.ok(null);
-    }
-
 }

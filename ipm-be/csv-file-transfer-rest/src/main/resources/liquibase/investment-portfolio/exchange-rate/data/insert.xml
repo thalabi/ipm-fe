@@ -7,9 +7,27 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="exchange_rate_data" author="thalabi">
+    <changeSet id="exchange_rate_data_h2" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
 		<insert tableName="exchange_rate">
 			<column name="id" valueComputed="exchange_rate_seq.nextval"/>
+			<column name="lk" value="2021-08-03 00:00:00.123+00|USD|CAD"/>
+			<column name="version" value="0"/>
+
+			<column name="as_of_date" valueDate="2021-08-03T00:00:00.123+00"/>
+			<column name="from_currency" value="USD"/>
+			<column name="to_currency" value="CAD"/>
+			<column name="rate" value="1.2545"/>
+		</insert>
+	</changeSet>
+    <changeSet id="exchange_rate_data_postgres" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postg" />
+	    </preConditions>
+		<insert tableName="exchange_rate">
+			<column name="id" valueComputed="nextval('exchange_rate_seq')"/>
 			<column name="lk" value="2021-08-03 00:00:00.123+00|USD|CAD"/>
 			<column name="version" value="0"/>
 

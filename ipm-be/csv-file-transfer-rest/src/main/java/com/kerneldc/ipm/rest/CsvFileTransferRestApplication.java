@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication//(scanBasePackages = "com.kerneldc")
 @EntityScan (basePackages = {"com.kerneldc"})
-public class CvsFileTransferRestApplication {
+public class CsvFileTransferRestApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CvsFileTransferRestApplication.class, args);
+		SpringApplication.run(CsvFileTransferRestApplication.class, args);
 	}
 
 }

@@ -7,7 +7,10 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="group_permission_data" author="thalabi">
+    <changeSet id="group_permission_data_h2" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
 
 		<!-- flight_log -->
 		<insert tableName="group_permission">
@@ -20,6 +23,26 @@
 		</insert>
 		<insert tableName="group_permission">
 			<column name="group_id" valueComputed="(select id from &quot;GROUP&quot; where name='flightlog admin')"/>
+			<column name="permission_id" valueComputed="(select id from permission where name='flight_log write')"/>
+		</insert>
+		
+	</changeSet>	
+    <changeSet id="group_permission_data_postgres" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgres" />
+	    </preConditions>
+
+		<!-- flight_log -->
+		<insert tableName="group_permission">
+			<column name="group_id" valueComputed="(select id from GROUP where name='flightlog viewer')"/>
+			<column name="permission_id" valueComputed="(select id from permission where name='flight_log read')"/>
+		</insert>
+		<insert tableName="group_permission">
+			<column name="group_id" valueComputed="(select id from GROUP where name='flightlog admin')"/>
+			<column name="permission_id" valueComputed="(select id from permission where name='flight_log read')"/>
+		</insert>
+		<insert tableName="group_permission">
+			<column name="group_id" valueComputed="(select id from GROUP where name='flightlog admin')"/>
 			<column name="permission_id" valueComputed="(select id from permission where name='flight_log write')"/>
 		</insert>
 		

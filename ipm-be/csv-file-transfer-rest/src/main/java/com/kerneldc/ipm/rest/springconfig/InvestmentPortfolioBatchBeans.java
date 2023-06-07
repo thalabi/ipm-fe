@@ -24,6 +24,8 @@ import com.kerneldc.ipm.util.SmsService;
 @EnableScheduling
 public class InvestmentPortfolioBatchBeans {
 
+	@Value("alphavantage.api.key")
+	private String alphavantageApiKey;
 	@Bean
 	public SmsService getSmsService(freemarker.template.Configuration freeMarkerConfiguration, EmailService emailService, AreaCodeRepository areaCodeRepository) {
 		return new SmsService(freeMarkerConfiguration, emailService, areaCodeRepository);
@@ -38,6 +40,6 @@ public class InvestmentPortfolioBatchBeans {
 			ExchangeRateRepository exchangeRateRepository, HoldingPriceInterdayVRepository holdingPriceInterdayVRepository,
 			EmailService emailService) {
 		return new HoldingPricingService(holdingRepository, positionRepository, priceRepository, holdingPriceInterdayVRepository,
-				new ExchangeRateService(exchangeRateRepository), new MutualFundPriceService(priceRepository), new StockPriceService(priceRepository), emailService);
+				new ExchangeRateService(exchangeRateRepository), new MutualFundPriceService(priceRepository), new StockPriceService(priceRepository, alphavantageApiKey), emailService);
 	}
 }

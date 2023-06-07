@@ -55,7 +55,7 @@ public class Sales extends AbstractPersistableEntity {
 	private Float latitude;
 	@CsvBindByName
 	private Float longitude;	
-	@CsvBindByName
+	@CsvBindByName(column = "us zip")
 	private String usZip;
 	
 	public void setTransactionDate(LocalDateTime transactionDate) {

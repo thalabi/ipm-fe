@@ -7,9 +7,13 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="group_data" author="thalabi">
+    <changeSet id="group_data_h2" author="thalabi">
+    	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="h2" />
+	    </preConditions>
+    
 		<insert tableName="GROUP">
-			<column name="id" valueComputed="group_seq.nextval"/>
+		    <column name="id" valueComputed="group_seq.nextval"/>
 			<column name="lk" value="flightlog viewer"/>
 			<column name="version" value="0"/>
 
@@ -17,6 +21,26 @@
 		</insert>
 		<insert tableName="GROUP">
 			<column name="id" valueComputed="group_seq.nextval"/>
+			<column name="lk" value="flightlog admin"/>
+			<column name="version" value="0"/>
+
+			<column name="name" value="flightlog admin"/>
+		</insert>
+	</changeSet>
+    <changeSet id="group_data_postgres" author="thalabi">
+    	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgres" />
+	    </preConditions>
+    
+		<insert tableName="GROUP">
+			<column name="id" valueComputed="nextval('group_seq')"/>
+			<column name="lk" value="flightlog viewer"/>
+			<column name="version" value="0"/>
+
+			<column name="name" value="flightlog viewer"/>
+		</insert>
+		<insert tableName="GROUP">
+			<column name="id" valueComputed="nextval('group_seq')"/>
 			<column name="lk" value="flightlog admin"/>
 			<column name="version" value="0"/>
 

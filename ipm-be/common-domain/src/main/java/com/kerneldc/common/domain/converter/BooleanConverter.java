@@ -1,9 +1,9 @@
 package com.kerneldc.common.domain.converter;
 
 import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 
-@Converter(autoApply = true)
+// Disable for postgres
+//@Converter(autoApply = true)
 public class BooleanConverter implements AttributeConverter<Boolean, Character> {
 
 	@Override
