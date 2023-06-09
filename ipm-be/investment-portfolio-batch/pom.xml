@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.kerneldc</groupId>
 			<artifactId>investment-portfolio-domain</artifactId>
-			<version>${parentProjectVersion}</version>
+			<version>3.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.yahoofinance-api</groupId>
