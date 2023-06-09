@@ -26,7 +26,7 @@ import com.kerneldc.ipm.util.SmsService;
 @EnableScheduling
 public class InvestmentPortfolioBatchBeans {
 
-	@Value("alphavantage.api.key")
+	@Value("${alphavantage.api.key}")
 	private String alphavantageApiKey;
 	@Bean
 	public SmsService getSmsService(freemarker.template.Configuration freeMarkerConfiguration, EmailService emailService, AreaCodeRepository areaCodeRepository) {
