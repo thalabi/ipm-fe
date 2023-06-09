@@ -135,4 +135,11 @@
 	  	<tag>HEAD</tag>
 	</scm>
 	
+	<repositories>
+	    <repository>
+	      <id>kerneldc-nexus</id>
+	      <url>${repo-url}/repository</url>
+	    </repository>
+	</repositories>
+		
 </project>
