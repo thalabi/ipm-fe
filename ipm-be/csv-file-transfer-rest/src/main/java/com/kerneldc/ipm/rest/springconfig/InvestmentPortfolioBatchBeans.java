@@ -1,7 +1,5 @@
 package com.kerneldc.ipm.rest.springconfig;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,11 +42,4 @@ public class InvestmentPortfolioBatchBeans {
 		return new HoldingPricingService(holdingRepository, positionRepository, priceRepository, holdingPriceInterdayVRepository,
 				new ExchangeRateService(exchangeRateRepository), new MutualFundPriceService(priceRepository), new StockPriceService(priceRepository, alphavantageApiKey), emailService);
 	}
-	
-	// TODO this is just for debugging. remove.
-	@PostConstruct
-	public void init() {
-		System.out.println("alphavantage.api.key="+alphavantageApiKey);
-	}
-	
 }
