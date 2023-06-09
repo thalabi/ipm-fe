@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.kerneldc</groupId>
 		<artifactId>ipm-be-project</artifactId>
-		<version>${parentProjectVersion}</version>
+		<version>3.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>investment-portfolio-domain</artifactId>
 
@@ -13,7 +13,7 @@
 		<dependency>
 			<groupId>com.kerneldc</groupId>
 			<artifactId>common-domain</artifactId>
-			<version>${parentProjectVersion}</version>
+			<version>3.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

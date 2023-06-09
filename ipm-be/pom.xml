@@ -12,7 +12,7 @@
 	</parent>
 
 	<artifactId>ipm-be-project</artifactId>
-	<version>${parentProjectVersion}</version>
+	<version>3.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<properties>
