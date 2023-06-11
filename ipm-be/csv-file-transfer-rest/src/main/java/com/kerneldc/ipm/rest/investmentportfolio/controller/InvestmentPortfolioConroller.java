@@ -63,9 +63,9 @@ public class InvestmentPortfolioConroller {
     	LOGGER.info("Begin ...");
     	var holdingDetailList = holdingRepository.findByPortfolioId(portfolioId);
     	LOGGER.info("holdingDetailList: {}", holdingDetailList);
-    	holdingDetailList.stream().forEach(holdingDetail -> {
-    		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), holdingDetail.getExchange(), holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity());
-    	});
+    	holdingDetailList.stream().forEach(holdingDetail ->
+    		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), holdingDetail.getExchange(), holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity())
+    	);
     	Map<String, List<HoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
     	LOGGER.info("End ...");
     	return ResponseEntity.ok(namedHoldingDetailList);
@@ -99,7 +99,6 @@ public class InvestmentPortfolioConroller {
     	LOGGER.info("Begin ...");
     	var portfolioId = saveHoldingRequest.getPortfolioId();
     	var instrumentId = saveHoldingRequest.getInstrumentId();
-    	//var holdingList = holdingRepository.findByPortfolioIdAndInstrumentIdAndAsOfDate(portfolioId, instrumentId, saveHoldingRequest.getAsOfDate());
     	var holdingOptional = holdingRepository.findById(saveHoldingRequest.getId());
     	if (holdingOptional.isEmpty()) {
         	LOGGER.warn("Looking up holding with addHoldingRequest: {}, found holding does not exist", saveHoldingRequest);
@@ -127,15 +126,7 @@ public class InvestmentPortfolioConroller {
 	public ResponseEntity<List<PositionSnapshot>> getDistinctPositionSnapshots() {
     	LOGGER.info("Begin ...");
     	
-//    	var positionList = positionRepository.findAll();
-//
-//		var positionSnapshotSet = positionList.stream()
-//				.map(position -> PositionSnapshotVO.builder().positionSnapshot(position.getPositionSnapshot()).build())
-//				.collect(Collectors.toCollection(TreeSet::new));
-//    	positionSnapshotSet.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
-
     	var positionSnapshotList = positionRepository.selectAllPositionSnapshots();
-    	//positionSnapshotList.forEach(positionSnapshot -> LOGGER.info("positionSnapshot.getPositionSnapshot(): {}", positionSnapshot.getPositionSnapshot()));
        	LOGGER.info("End ...");
     	return ResponseEntity.ok(positionSnapshotList);
     }
