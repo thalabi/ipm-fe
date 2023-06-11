@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 public class FreeMarkerConfig {
 
 	@Bean
-    public FreeMarkerConfigurationFactoryBean getFreeMarkerConfigurationFactoryBean() throws IOException, TemplateException {
+    public freemarker.template.Configuration getFreeMarkerConfiguration() throws IOException, TemplateException {
         FreeMarkerConfigurationFactoryBean fmConfigFactoryBean = new FreeMarkerConfigurationFactoryBean();
-        var freeMarkerConfigConfig = fmConfigFactoryBean.createConfiguration();
-        freeMarkerConfigConfig.setLocale(Locale.getDefault());
+        var freeMarkerConfig = fmConfigFactoryBean.createConfiguration();
         LOGGER.info("FreeMarker: Setting locale to {}", Locale.getDefault());
-        return fmConfigFactoryBean;
+        freeMarkerConfig.setLocale(Locale.getDefault());
+        return freeMarkerConfig;
     }}
