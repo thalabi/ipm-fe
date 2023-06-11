@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.kerneldc.common.repository.AreaCodeRepository;
 import com.kerneldc.ipm.batch.ExchangeRateService;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.batch.MutualFundPriceService;
@@ -17,7 +16,6 @@ import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.EmailService;
-import com.kerneldc.ipm.util.SmsService;
 
 
 @Configuration
@@ -27,12 +25,8 @@ public class InvestmentPortfolioBatchBeans {
 	@Value("${alphavantage.api.key}")
 	private String alphavantageApiKey;
 	@Bean
-	public SmsService getSmsService(freemarker.template.Configuration freeMarkerConfiguration, EmailService emailService, AreaCodeRepository areaCodeRepository) {
-		return new SmsService(freeMarkerConfiguration, emailService, areaCodeRepository);
-	}
-	@Bean
-	public EmailService getEmailService(JavaMailSender emailSender, freemarker.template.Configuration freeMarkerConfiguration, @Value("${application.security.jwt.token.resetPasswordJwtExpiryInMinutes:60}" /* default of 1 hour */) int resetPasswordJwtExpiryInMinutes) {
-		return new EmailService(emailSender, freeMarkerConfiguration, resetPasswordJwtExpiryInMinutes);
+	public EmailService getEmailService(JavaMailSender emailSender, freemarker.template.Configuration freeMarkerConfiguration) {
+		return new EmailService(emailSender, freeMarkerConfiguration);
 	}
 	@Bean
 	public HoldingPricingService getHoldingPricingService(HoldingRepository holdingRepository,

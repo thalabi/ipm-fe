@@ -28,50 +28,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmailService {
 
-	@Value("${application.email.resetPasswordEmailFrom}")
-	private String resetPasswordEmailFrom;
 	@Value("${application.email.dailyMarketValueNotificationFrom}")
 	private String dailyMarketValueNotificationFrom;
 	@Value("${application.email.dailyMarketValueNotificationTo}")
 	private String dailyMarketValueNotificationTo;
 
-	private static final String RESET_PASSWORD_EMAIL_SUBJECT = "Reset password";
-	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT = "Reset password confirmation";
+	@Value("${dailyMarketValueNotification.template.upArrowUrl}")
+	private String upArrowUrl;
+	@Value("${dailyMarketValueNotification.template.downArrowUrl}")
+	private String downArrowUrl;
+
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
-	private static final String RESET_PASSWORD_EMAIL_TEMPLATE = "resetPasswordEmail.ftlh";
-	private static final String RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE = "resetPasswordConfirmationEmail.ftlh";
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE = "dailyMarketValueNotification.ftlh";
 	private static final String DAILY_MARKET_VALUE_FAILURE_TEMPLATE = "dailyMarketValueFailure.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
-	private int resetPasswordJwtExpiryInMinutes;
 	
-	public EmailService(JavaMailSender emailSender, Configuration freeMarkerConfiguration, @Value("${application.security.jwt.token.resetPasswordJwtExpiryInMinutes:60}" /* default of 1 hour */) int resetPasswordJwtExpiryInMinutes) {
+	public EmailService(JavaMailSender emailSender, Configuration freeMarkerConfiguration) {
 		this.javaMailSender = emailSender;
 		this.freeMarkerConfiguration = freeMarkerConfiguration;
-		this.resetPasswordJwtExpiryInMinutes = resetPasswordJwtExpiryInMinutes;
-	}
-
-	public void sendPasswordResetEmail(String to, String resetPasswordUrl) throws MessagingException, IOException, TemplateException {
-		var mimeMessage = javaMailSender.createMimeMessage();
-		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		mimeMessageHelper.setFrom(resetPasswordEmailFrom);
-		mimeMessageHelper.setTo(to);
-		mimeMessageHelper.setSubject(RESET_PASSWORD_EMAIL_SUBJECT);
-		mimeMessageHelper.setText(processResetPasswordTemplate(resetPasswordJwtExpiryInMinutes/60, resetPasswordUrl), true);
-		javaMailSender.send(mimeMessage);
-		LOGGER.info("Sent password reset email to: {}", to);
-	}
-	
-	public void sendPasswordResetConfirmationEmail(String to, String loginUrl) throws MessagingException, IOException, TemplateException {
-		var mimeMessage = javaMailSender.createMimeMessage();
-		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		mimeMessageHelper.setFrom(resetPasswordEmailFrom);
-		mimeMessageHelper.setTo(to);
-		mimeMessageHelper.setSubject(RESET_PASSWORD_CONFIRMATION_EMAIL_SUBJECT);
-		mimeMessageHelper.setText(processResetPasswordConfirmationTemplate(loginUrl), true);
-		javaMailSender.send(mimeMessage);
-		LOGGER.info("Sent password reset confirmation email to: {}", to);
 	}
 
 	public void sendSmsEmail(String from, String to, String smsMessage) throws MessagingException, IOException, TemplateException {
@@ -119,18 +94,6 @@ public class EmailService {
 		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
 	}
 	
-	private String processResetPasswordTemplate(int linkExpiryInHours, String resetPasswordUrl) throws IOException, TemplateException {
-		Map<String, Object> templateModelMap = new HashMap<>();
-		templateModelMap.put("linkExpiryInHours", linkExpiryInHours);
-		templateModelMap.put("resetPasswordUrl", resetPasswordUrl);
-		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(RESET_PASSWORD_EMAIL_TEMPLATE), templateModelMap);
-	}
-	private String processResetPasswordConfirmationTemplate(String loginUrl) throws IOException, TemplateException {
-		Map<String, Object> templateModelMap = new HashMap<>();
-		templateModelMap.put("loginUrl", loginUrl);
-		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(RESET_PASSWORD_CONFIRMATION_EMAIL_TEMPLATE), templateModelMap);
-	}
-	
 	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
@@ -138,6 +101,9 @@ public class EmailService {
 		templateModelMap.put("percentChange", percentChange);
 		templateModelMap.put("nMarketValues", nMarketValues);
 		templateModelMap.put("priceHoldingsExceptions", priceHoldingsExceptions);
+		templateModelMap.put("upArrowUrl", upArrowUrl);
+		templateModelMap.put("downArrowUrl", downArrowUrl);
+
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
 	private String processDailyMarketValueFailureTemplate(ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {

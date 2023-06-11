@@ -24,9 +24,9 @@
   
   Change of <b>
   <#if percentChange lt 0>
-  <span style="color: red;"><img src="https://ipm.kerneldc.com/assets/arrow-down-right-red.png" style="vertical-align: middle;" alt="Down arrow">${percentChange}%</span>
+  <span style="color: red;"><img src="${downArrowUrl}" style="vertical-align: middle;" alt="Down arrow">${percentChange}%</span>
   <#else>
-  <span style="color: green;"><img src="https://ipm.kerneldc.com/assets/arrow-up-right-green.png" style="vertical-align: middle;" alt="Up arrow">${percentChange}%</span>
+  <span style="color: green;"><img src="${upArrowUrl}" style="vertical-align: middle;" alt="Up arrow">${percentChange}%</span>
   </#if>
   </b>
   
