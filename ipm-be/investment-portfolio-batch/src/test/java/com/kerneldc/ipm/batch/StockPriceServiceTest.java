@@ -19,7 +19,7 @@ class StockPriceServiceTest {
 	@BeforeAll
 	public static void beforeAll() {
 		String apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
-		System.out.println(apiKey);
+		System.out.println("Using ALPHAVANTAGE_API_KEY: " + apiKey);
 		stockPriceService = new StockPriceService(null, apiKey);
 	}
 
