@@ -18,6 +18,9 @@ class StockPriceServiceTest {
 
 	@BeforeAll
 	public static void beforeAll() {
+		//
+		// Make user ALPHAVANTAGE_API_KEY is defined in Eclipse and Jenkins
+		//
 		String apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
 		System.out.println("Using ALPHAVANTAGE_API_KEY: " + apiKey);
 		stockPriceService = new StockPriceService(null, apiKey);
