@@ -43,7 +43,8 @@ pipeline {
                 '''
             }
         }
-
+    }
+    
     post {
         changed {
             mail to: "tarif.halabi@gmail.com",
@@ -52,5 +53,4 @@ pipeline {
         }
     }
 
-    }
 }
