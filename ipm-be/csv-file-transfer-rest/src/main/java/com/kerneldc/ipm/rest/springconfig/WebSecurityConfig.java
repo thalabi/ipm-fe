@@ -1,6 +1,5 @@
 package com.kerneldc.ipm.rest.springconfig;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,11 +22,8 @@ public class WebSecurityConfig {
 	@Value("${application.security.disableSecurity:false}")
 	private boolean disableSecurity;
     
-	@Autowired
-	private KeycloakJwtRolesConverter keycloakJwtRolesConverter;
-	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, KeycloakJwtRolesConverter keycloakJwtRolesConverter) throws Exception {
 
 		DelegatingJwtGrantedAuthoritiesConverter authoritiesConverter =
 				// Using the delegating converter multiple converters can be combined
