@@ -5,8 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+
+import com.google.common.base.Preconditions;
 
 public class TimeUtils {
 
@@ -47,5 +50,13 @@ public class TimeUtils {
 
 	public static Date toDate(LocalDateTime localDateTime) {
 		return localDateTime == null ? null :  Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+	
+	public static int compareDatePart(OffsetDateTime date1, OffsetDateTime date2) {
+		Preconditions.checkArgument(date1 != null, "date1 must not be null");
+		Preconditions.checkArgument(date2 != null, "date2 must not be null");
+		var date1Date = date1.toInstant().truncatedTo(ChronoUnit.DAYS);
+		var date2Date = date2.toInstant().truncatedTo(ChronoUnit.DAYS);
+		return date1Date.compareTo(date2Date);
 	}
 }

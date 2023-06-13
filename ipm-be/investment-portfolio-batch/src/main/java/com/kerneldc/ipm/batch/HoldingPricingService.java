@@ -28,6 +28,7 @@ import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.EmailService;
+import com.kerneldc.ipm.util.TimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private final EmailService emailService;
 	
 	private Instant snapshotInstant;
+	private OffsetDateTime now;
 	
 	private Price CASH_CAD_PRICE;
 	private Price CASH_USD_PRICE;
@@ -59,6 +61,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
         snapshotInstant = Instant.now();
+        now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
         var priceHoldingsExceptions = new ApplicationException();
         
         CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
@@ -79,8 +82,17 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         priceCache.clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
+        	Position position = null;
         	try {
-				positionList.add(getStockPrice(holding));
+        		position = getStockPrice(holding);
+				positionList.add(position);
+
+				if (TimeUtils.compareDatePart(position.getPositionSnapshot(), now) == -1) {
+					var exceptionMessage = String.format("Stale price retrieved for %s:%s. Date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPositionSnapshot());
+					LOGGER.warn(exceptionMessage);
+					priceHoldingsExceptions.addMessage(exceptionMessage);
+				}
+				
 			} catch (ApplicationException e) {
 				LOGGER.warn(e.getMessage());
 				priceHoldingsExceptions.addMessage(e.getMessage());
