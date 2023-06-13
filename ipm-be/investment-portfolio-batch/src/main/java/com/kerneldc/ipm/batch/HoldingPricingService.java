@@ -115,6 +115,9 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	}
 
 	private ApplicationException checkStalePrice(Position position, ApplicationException priceHoldingsExceptions) {
+		if (StringUtils.equals(position.getInstrument().getTicker(), CASH_TICKER)) {
+			return priceHoldingsExceptions;
+		}
 		if (TimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
 			var exceptionMessage = String.format("Stale price retrieved for ticker: %s and exchange: %s. Price date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPrice().getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
 			if (! /* not */ priceHoldingsExceptions.getMessageList().contains(exceptionMessage)) {
