@@ -46,8 +46,8 @@ pipeline {
     }
     
     post {
-        changed {
-        emailext body: 'test body', subject: 'test', to: 'tarif.halabi@gmail.com'
+        always {
+        	emailext body: 'test body', subject: 'test', to: 'tarif.halabi@gmail.com'
         }
     }
 
