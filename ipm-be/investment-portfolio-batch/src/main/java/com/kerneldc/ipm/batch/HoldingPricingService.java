@@ -88,7 +88,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 				positionList.add(position);
 
 				if (TimeUtils.compareDatePart(position.getPositionSnapshot(), now) == -1) {
-					var exceptionMessage = String.format("Stale price retrieved for %s:%s. Date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPositionSnapshot());
+					var exceptionMessage = String.format("Stale price retrieved for ticker: %s and exchange: %s. Date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPositionSnapshot());
 					LOGGER.warn(exceptionMessage);
 					priceHoldingsExceptions.addMessage(exceptionMessage);
 				}
