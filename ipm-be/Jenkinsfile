@@ -47,11 +47,7 @@ pipeline {
     
     post {
         changed {
-            emailext (
-            	to: 'tarif.halabi@gmail.com',
-				subject: '$DEFAULT_SUBJECT',
-                body: '$DEFAULT_CONTENT'
-            );
+        emailext body: 'test body', subject: 'test', to: 'tarif.halabi@gmail.com'
         }
     }
 
