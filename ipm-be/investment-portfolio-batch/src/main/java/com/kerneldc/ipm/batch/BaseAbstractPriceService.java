@@ -52,7 +52,7 @@ public abstract class BaseAbstractPriceService {
 			} else {
 				price.setPrice(priceQuote.lastPrice);
 			}
-			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp());
+			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, instrument.getExchange(), price.getPrice(), price.getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
 			priceCache.put(instrument.getId(), price);
 		} else {
 			LOGGER.info("Found {} {} in price cache", ticker, exchange);

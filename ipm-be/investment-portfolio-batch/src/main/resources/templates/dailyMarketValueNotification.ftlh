@@ -5,7 +5,7 @@
 <body>
 
   <#if (priceHoldingsExceptions.messageList?size gt 0)>
-     <span style="font-style: underline;">The balance below is deficient as there are exceptions during pricing. See below:</span>
+     <span style="font-style: underline;">The balance below is not accurate as there are exceptions during pricing. See below:</span>
 	  <#list priceHoldingsExceptions.messageList as message>
 		  <ul style="font-style: italic;">
 		    <li>${message}</li>

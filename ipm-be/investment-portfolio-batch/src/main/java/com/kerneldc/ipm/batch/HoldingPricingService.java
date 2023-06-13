@@ -40,8 +40,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private static final String CASH_TICKER = "CASH";
 
 	private static final boolean OFFLINE_MODE = false;
-	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");  
-
+	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
 	private final PriceRepository priceRepository;
@@ -87,11 +86,8 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         		position = getStockPrice(holding);
 				positionList.add(position);
 
-				if (TimeUtils.compareDatePart(position.getPositionSnapshot(), now) == -1) {
-					var exceptionMessage = String.format("Stale price retrieved for ticker: %s and exchange: %s. Date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPositionSnapshot());
-					LOGGER.warn(exceptionMessage);
-					priceHoldingsExceptions.addMessage(exceptionMessage);
-				}
+				// Check that the price is not stale ie is as of today.
+				priceHoldingsExceptions = checkStalePrice(position, priceHoldingsExceptions);
 				
 			} catch (ApplicationException e) {
 				LOGGER.warn(e.getMessage());
@@ -116,6 +112,17 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         if (priceHoldingsExceptions!= null && CollectionUtils.isNotEmpty(priceHoldingsExceptions.getMessageList())) {
         	throw priceHoldingsExceptions;
         }
+	}
+
+	private ApplicationException checkStalePrice(Position position, ApplicationException priceHoldingsExceptions) {
+		if (TimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
+			var exceptionMessage = String.format("Stale price retrieved for ticker: %s and exchange: %s. Price date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPrice().getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
+			if (! /* not */ priceHoldingsExceptions.getMessageList().contains(exceptionMessage)) {
+				LOGGER.warn(exceptionMessage);
+				priceHoldingsExceptions.addMessage(exceptionMessage);
+			}
+		}
+		return priceHoldingsExceptions;
 	}
 	
 	private void sendPriceHoldingsNotifications(ApplicationException priceHoldingsExceptions) throws ApplicationException {
