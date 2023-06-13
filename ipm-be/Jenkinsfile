@@ -46,7 +46,7 @@ pipeline {
     }
     
     post {
-        always {
+        changed {
         	emailext (
             	to: '$DEFAULT_RECIPIENTS',
 				subject: '$DEFAULT_SUBJECT',
