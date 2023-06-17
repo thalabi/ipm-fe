@@ -11,22 +11,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RestController
-//@RequestMapping("securityController")
+@RestController()
+@RequestMapping("/protected/securityController")
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityController {
 
-    //private final AuthenticationManager authenticationManager;
-//	private final JwtUtil jwtUtil;
-//	private final SecurityService securityService;
-
-    @GetMapping("/protected/securityController/ping")
+    @GetMapping("/ping")
 	public ResponseEntity<PingResponse> ping() {
     	LOGGER.info("Begin ...");
     	PingResponse pingResponse = new PingResponse();
@@ -38,7 +35,7 @@ public class SecurityController {
 
 	private record UserInfo(String username, String firstName, String lastName, String email, List<String> roles, List<String> backEndAuthorities) {};
 
-	@GetMapping(path = "/protected/securityController/getUserInfo")
+	@GetMapping("/getUserInfo")
 	public UserInfo getUserInfo() {
 		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Jwt) {
 			

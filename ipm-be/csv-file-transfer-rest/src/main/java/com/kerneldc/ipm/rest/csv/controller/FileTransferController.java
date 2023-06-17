@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 public class FileTransferController {
 	
 	private final GenericFileTransferService genericFileTransferService;
-//	private final CsvFileTransformerService csvFileTransformerService;
 	
     @GetMapping("/getTableList")
 	public ResponseEntity<TableListResponse> getTableList() {
@@ -56,22 +55,10 @@ public class FileTransferController {
     	LOGGER.info("truncateTable: {}", truncateTable);
 
     	var tableEnum = tableEnumFromString(tableName);
-//    	try (var bufferedReader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));) {
-    		
-//    		var csvFileTransformerResult = csvFileTransformerService.applyTransformers(tableEnum, bufferedReader);
-//    		if (csvFileTransformerResult.transformerException() != null) {
-//    			var exception = csvFileTransformerResult.transformerException();
-//    			var exceptionMessage = NestedExceptionUtils.getMostSpecificCause(exception).getMessage();
-//    			return ResponseEntity.ok(new FileTransferResponse(exceptionMessage, null, null));
-//    		}
-    		
-//			var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(),
-//					csvFileTransformerResult.csvBufferedReader(), truncateTable);
 			var fileTransferResponse = genericFileTransferService.parseAndSave(tableEnum, csvFile.getOriginalFilename(),
 					csvFile.getInputStream(), truncateTable);
     		LOGGER.info("End ...");
         	return ResponseEntity.ok(fileTransferResponse);
-//    	}
     }
 
     @GetMapping("/downloadExceptionsFile")
