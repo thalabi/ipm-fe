@@ -1,12 +1,10 @@
 package com.kerneldc.ipm.rest.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -22,16 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityController {
-
-    @GetMapping("/ping")
-	public ResponseEntity<PingResponse> ping() {
-    	LOGGER.info("Begin ...");
-    	PingResponse pingResponse = new PingResponse();
-    	pingResponse.setMessage("pong");
-    	pingResponse.setTimestamp(LocalDateTime.now());
-    	LOGGER.info("End ...");
-    	return ResponseEntity.ok(pingResponse);
-    }
 
 	private record UserInfo(String username, String firstName, String lastName, String email, List<String> roles, List<String> backEndAuthorities) {};
 

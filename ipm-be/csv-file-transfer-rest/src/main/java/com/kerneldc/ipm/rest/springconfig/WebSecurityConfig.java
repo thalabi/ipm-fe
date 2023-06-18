@@ -56,7 +56,7 @@ public class WebSecurityConfig {
 			httpSecurity.authorizeRequests().anyRequest().permitAll();
 		} else {
 			httpSecurity.authorizeRequests()
-			.mvcMatchers("/appInfoController/*", "/actuator/*").permitAll()
+			.mvcMatchers("/appInfoController/*", "/pingController/*", "/actuator/*").permitAll()
 			.anyRequest().authenticated();
 		}
 		
