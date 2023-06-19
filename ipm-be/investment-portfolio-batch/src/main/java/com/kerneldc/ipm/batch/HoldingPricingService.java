@@ -16,8 +16,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.kerneldc.common.enums.CurrencyEnum;
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
 import com.kerneldc.ipm.domain.Instrument;
@@ -192,22 +192,40 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		if (OFFLINE_MODE) {
 			return CASH_CAD_PRICE;
 		}
-		if (StringUtils.equals(instrument.getTicker(), CASH_TICKER)) {
+
+		switch (instrument.getType()) {
+		case CASH:
 			switch (instrument.getCurrency()) {
-				case CAD:
-					return CASH_CAD_PRICE;
-				case USD:
-					return CASH_USD_PRICE;
-				default:
-					throw new IllegalArgumentException("Currency should be either CAD or USD");
+			case CAD:
+				return CASH_CAD_PRICE;
+			case USD:
+				return CASH_USD_PRICE;
+			default:
+				throw new IllegalArgumentException("Currency should be either CAD or USD");
 			}
-		} else {
-			if (instrument.getExchange().equals("CF")) { // CF -> Canadian Fund
-				return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-			} else {
-				return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-			}
+		case STOCK, ETF:
+			return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
+		case MUTUAL_FUND:
+			return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
+		default:
+			throw new IllegalArgumentException("Supported instruments types are CASH, STOCK & MUTUAL_FUND");
 		}
+//		if (StringUtils.equals(instrument.getTicker(), CASH_TICKER)) {
+//			switch (instrument.getCurrency()) {
+//				case CAD:
+//					return CASH_CAD_PRICE;
+//				case USD:
+//					return CASH_USD_PRICE;
+//				default:
+//					throw new IllegalArgumentException("Currency should be either CAD or USD");
+//			}
+//		} else {
+//			if (instrument.getExchange().equals("CF")) { // CF -> Canadian Fund
+//				return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
+//			} else {
+//				return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
+//			}
+//		}
 	}
 	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {/*public BeanTransformerResult (){ this(null, null); }*/};
 	@Transactional

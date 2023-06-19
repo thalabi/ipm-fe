@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="add-instrument-type-1" author="thalabi">
+        <addColumn tableName="instrument">
+	        <column name="type" type="varchar(255)"/>  
+    	</addColumn> 
+    </changeSet>
+    
+    <changeSet id="add-instrument-type-2" author="thalabi">
+		<sql>
+		<![CDATA[
+		update instrument set type='CASH' where ticker='CASH';
+		update instrument set type='MUTUAL_FUND' where exchange='CF';
+		update instrument set type='ETF' where ticker in ('CHB', 'XBB', 'ILTB', 'XHY');
+		update instrument set type='STOCK' where ticker!='CASH' and exchange!='CF' and ticker not in ('CHB', 'XBB', 'ILTB', 'XHY'); 
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			update instrument set type='';
+			</sql>
+		</rollback>
+    </changeSet>
+    
+    <changeSet id="add-instrument-type-3" author="thalabi">
+        <addNotNullConstraint tableName="instrument" columnName="type"/> 
+    </changeSet>    
+    
+</databaseChangeLog>

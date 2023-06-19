@@ -53,4 +53,6 @@
 	<include file="liquibase/investment-portfolio/holding-price-interday-v/create-view.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-by-account-v/create-view.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument/add-instrument-type.xml"/>
+	
 </databaseChangeLog>

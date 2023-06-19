@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.kerneldc.common.BaseTableRepository;
-import com.kerneldc.common.enums.CurrencyEnum;
 import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.ExchangeRate;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 

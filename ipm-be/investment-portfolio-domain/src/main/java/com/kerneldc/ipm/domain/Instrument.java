@@ -7,7 +7,6 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.common.enums.CurrencyEnum;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
@@ -21,6 +20,9 @@ public class Instrument extends AbstractPersistableEntity {
 	
 	private static final long serialVersionUID = 1L;
 
+	@Enumerated(EnumType.STRING)
+	@CsvBindByName
+	private InstrumentTypeEnum type; 
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
 	private String ticker;

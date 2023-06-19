@@ -1,4 +1,4 @@
-package com.kerneldc.common.enums;
+package com.kerneldc.ipm.domain;
 
 public enum CurrencyEnum {
 

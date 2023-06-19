@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.common.enums.CurrencyEnum;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
