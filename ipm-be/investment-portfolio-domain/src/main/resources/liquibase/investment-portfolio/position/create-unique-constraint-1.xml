@@ -34,4 +34,14 @@
     
     </changeSet>
 
+<!-- fix wrong name for postgress dbms type above. Used postg, should be postgresql -->
+    <changeSet id="position_unique_constraint_1_postgresql" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
+
+        <addUniqueConstraint columnNames="position_snapshot,instrument_id,portfolio_id" constraintName="position_unique_1" tableName="position"/>
+    
+    </changeSet>
+
 </databaseChangeLog>

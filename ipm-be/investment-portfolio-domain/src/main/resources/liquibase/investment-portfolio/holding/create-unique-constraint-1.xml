@@ -7,31 +7,41 @@
 		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="exchange_rate_unique_constraint_1_h2_postgres" author="thalabi">
+    <changeSet id="holding_unique_constraint_1_h2_postgres" author="thalabi">
 	    <preConditions onFail="CONTINUE" onFailMessage="">
 	    	<or>
-		        <dbms type="h2" />
-		        <dbms type="postg" />
+	        	<dbms type="h2" />
+	        	<dbms type="postg" />
 	        </or>
 	    </preConditions>
 
-        <addUniqueConstraint columnNames="as_of_date,from_currency,to_currency" constraintName="exchange_rate_unique_1" tableName="exchange_rate"/>
+        <addUniqueConstraint columnNames="as_of_date,instrument_id,portfolio_id" constraintName="holding_unique_1" tableName="holding"/>
     
     </changeSet>
-
+    
     <!-- Create a unique index instead of a unique constraint as Oracle does not allow TIME/TIMESTAMP WITH TIME ZONE columns in unique constraint or pk -->
-    <changeSet id="exchange_rate_unique_constraint_1_oracle" author="thalabi">
+    <changeSet id="holding_unique_constraint_1_oracle" author="thalabi">
 	    <preConditions onFail="CONTINUE" onFailMessage="">
 	        <dbms type="oracle" />
 	    </preConditions>
 
-		<createIndex indexName="exchange_rate_unique_1" tableName="exchange_rate"
+		<createIndex indexName="holding_unique_1" tableName="holding"
 			unique="true">
 			<column name="as_of_date"/>
-			<column name="from_currency"/>
-			<column name="to_currency"/>
+			<column name="instrument_id"/>
+			<column name="portfolio_id"/>
 		</createIndex>
     
     </changeSet>
+    
+<!-- fix wrong name for postgress dbms type above. Used postg, should be postgresql -->
+    <changeSet id="holding_unique_constraint_1_postgresql" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
 
+        <addUniqueConstraint columnNames="as_of_date,instrument_id,portfolio_id" constraintName="holding_unique_1" tableName="holding"/>
+    
+    </changeSet>
+    
 </databaseChangeLog>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="populate-inst-mutual-fund-h2-oracle" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <or>
+	        <dbms type="h2" />
+	        <dbms type="oracle" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into inst_mutual_fund (id, lk, version, instrument_id, company)
+			select inst_mutual_fund_seq.nexval, lk, 0, id, 'Covington Fund II Inc' from instrument where type='MUTUAL_FUND';
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_mutual_fund;
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+
+    <changeSet id="populate-inst-mutual-fund-postgresql" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into inst_mutual_fund (id, lk, version, instrument_id, company)
+			select nextval('inst_mutual_fund_seq'), lk, 0, id, 'Covington Fund II Inc' from instrument where type='MUTUAL_FUND';
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_mutual_fund;
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+    
+</databaseChangeLog>

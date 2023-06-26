@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="populate-inst-stock_h2" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <or>
+	        <dbms type="h2" />
+	        <dbms type="oracle" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into inst_stock (id, lk, version, instrument_id, exchange)
+			select inst_stock_seq.nexval, lk, 0, id, exchange from instrument where type='STOCK';
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_stock;
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+
+    <changeSet id="populate-inst-stock_postgres" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into inst_stock (id, lk, version, instrument_id, exchange)
+			select nextval('inst_stock_seq'), lk, 0, id, exchange from instrument where type='STOCK';
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_stock;
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+    
+</databaseChangeLog>

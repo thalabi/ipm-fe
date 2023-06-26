@@ -83,7 +83,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         for (Holding holding : holdingList) {
         	Position position = null;
         	try {
-        		position = getStockPrice(holding);
+        		position = getHoldingPrice(holding);
 				positionList.add(position);
 
 				// Check that the price is not stale ie is as of today.
@@ -157,7 +157,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		LOGGER.info("Saved {} position records", savedPositionList.size());
 	}
 
-	private Position getStockPrice(Holding holding) throws ApplicationException {
+	private Position getHoldingPrice(Holding holding) throws ApplicationException {
 		var instrument = holding.getInstrument();
 		var price = getPrice(instrument);
 
