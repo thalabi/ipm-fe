@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.domain;
+package com.kerneldc.ipm.domain.instrumentdetail;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -8,36 +8,38 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.IInstrumentDetail;
+import com.kerneldc.ipm.domain.Instrument;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "inst_mutual_fund")
-@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_mutual_fund_seq", allocationSize = 1)
+@Entity(name = "inst_etf")
+@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_rtf_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentMutualFund extends AbstractPersistableEntity {
+public class InstrumentEtf extends AbstractPersistableEntity implements IInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "instrument_id")
     private Instrument instrument;
 	
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
-	private String company;
+	private String exchange;
 
 
-	public void setCompany(String company) {
-		this.company = company;
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
 		setLogicalKeyHolder();
 	}
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(instrument.getTicker(), company);
+		var logicalKeyHolder = LogicalKeyHolder.build(instrument.getTicker(), exchange);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

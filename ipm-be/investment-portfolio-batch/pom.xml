@@ -16,6 +16,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.kerneldc</groupId>
+			<artifactId>common-services</artifactId>
+			<version>${parentProjectVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.kerneldc</groupId>
 			<artifactId>investment-portfolio-domain</artifactId>
 			<version>${parentProjectVersion}</version>
 		</dependency>

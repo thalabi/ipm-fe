@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.batch;
+package com.kerneldc.ipm.batch.pricing;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -8,6 +8,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -16,17 +18,21 @@ import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.repository.PriceRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class MutualFundPriceService extends BaseAbstractPriceService {
+public class MutualFundPriceService implements ITradingInstrumentPricingService {
 
 	private static final String THE_GLOBE_AND_MAIL_BASE_URL = "https://www.theglobeandmail.com/investing/markets/funds/";
+	
+	private final PriceRepository priceRepository;
+	
 	public MutualFundPriceService(PriceRepository priceRepository) {
-		super(priceRepository);
+		this.priceRepository = priceRepository;
 	}
 
 	@Override
@@ -82,6 +88,15 @@ public class MutualFundPriceService extends BaseAbstractPriceService {
 		}
 
 		return new PriceQuote(lastPrice, tradeTime);
+	}
+	@Override
+	public Collection<InstrumentTypeEnum> canHandle() {
+		return List.of(InstrumentTypeEnum.MUTUAL_FUND);
+	}
+
+	@Override
+	public PriceRepository priceRepository() {
+		return priceRepository;
 	}
 
 }

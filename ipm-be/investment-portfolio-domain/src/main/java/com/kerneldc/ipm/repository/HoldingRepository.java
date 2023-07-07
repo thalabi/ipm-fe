@@ -1,8 +1,10 @@
 package com.kerneldc.ipm.repository;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,13 +17,18 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 
 	// TODO figure out a way to globally define a formatter
 	List<Holding> findByPortfolioIdAndInstrumentIdAndAsOfDate(Long portfolioId, Long instrumentId, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) OffsetDateTime asOfDate);
-	
+
 	@Query(value = """
-			select * from holding h2 where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (
+			select h2.id
+			from holding h2
+			where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (
 					select max(as_of_date) as_of_date, instrument_id, portfolio_id from holding h group by instrument_id, portfolio_id
 			)
 			""", nativeQuery = true)
-	List<Holding> findLatestAsOfDateHoldings();
+	List<Long> findLatestAsOfDateHoldingIds();
+
+	@EntityGraph(attributePaths = { "instrument", "portfolio" })
+	List<Holding> findByIdIn(Collection<Long> ids);
 	
 	@Query(value = """
 			with
@@ -37,7 +44,7 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			where h.portfolio_id = :portfolioId order by h.instrument_id, h.as_of_date
 			"""
 			, nativeQuery = true)
-	List<HoldingDetail> findByPortfolioId(Long portfolioId);
+	List<IHoldingDetail> findByPortfolioId(Long portfolioId);
 
 	@Override
 	default IEntityEnum canHandle() {

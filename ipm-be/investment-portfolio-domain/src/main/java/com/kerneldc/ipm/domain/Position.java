@@ -29,17 +29,17 @@ public class Position extends AbstractPersistableEntity {
 	@Setter(AccessLevel.NONE)
 	private OffsetDateTime positionSnapshot;
 	@Setter(AccessLevel.NONE)
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "instrument_id")
 	private Instrument instrument;
 	@Setter(AccessLevel.NONE)
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
 	@CsvBindByName
 	private Float quantity;
 	
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "price_id")
 	private Price price;
 

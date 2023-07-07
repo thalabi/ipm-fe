@@ -6,21 +6,30 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.batch.pricing.IPricingService;
+import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactory;
+import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactoryHelper;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
+import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.repository.HoldingPriceInterdayVRepository;
@@ -30,54 +39,70 @@ import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.EmailService;
 import com.kerneldc.ipm.util.TimeUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class HoldingPricingService /*implements ApplicationRunner*/ {
-	private static final String CASH_TICKER = "CASH";
 
-	private static final boolean OFFLINE_MODE = false;
 	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
+	private final EntityRepositoryFactory entityRepositoryFactory;
+	private final EntityRepositoryFactoryHelper entityRepositoryFactoryHelper;
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
 	private final PriceRepository priceRepository;
 	private final HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	private final ExchangeRateService exchangeRateService;
-	private final MutualFundPriceService mutualFundPriceService;
-	private final StockPriceService stockPriceService;
 	private final EmailService emailService;
 	
 	private Instant snapshotInstant;
 	private OffsetDateTime now;
 	
-	private Price CASH_CAD_PRICE;
-	private Price CASH_USD_PRICE;
-	
 	private Map<Long, Price> priceCache = new HashMap<>();
+	
+	private EnumMap<InstrumentTypeEnum, IPricingService> pricingServiceMap = new EnumMap<>(InstrumentTypeEnum.class);
 
+	public HoldingPricingService(
+			Collection<IPricingService> pricingServiceCollection,
+			EntityRepositoryFactory entityRepositoryFactory,
+			EntityRepositoryFactoryHelper entityRepositoryFactoryHelper, ExchangeRateService exchangeRateService,
+			EmailService emailService) {
+
+		for (IPricingService pricingService : pricingServiceCollection) {
+			for (InstrumentTypeEnum type : pricingService.canHandle()) {
+				pricingServiceMap.put(type, pricingService);
+			}
+		}
+		pricingServiceMap.forEach((type, pricingService) -> LOGGER.debug("[{}, {}]", type,
+				pricingService.getClass().getSimpleName()));
+		this.entityRepositoryFactory = entityRepositoryFactory;
+		this.entityRepositoryFactoryHelper = entityRepositoryFactoryHelper;
+		this.exchangeRateService = exchangeRateService;
+		this.emailService = emailService;
+		
+		this.holdingRepository = this.entityRepositoryFactoryHelper.getHoldingRepository();
+		this.positionRepository = this.entityRepositoryFactoryHelper.getPositionRepository();
+		this.priceRepository = this.entityRepositoryFactoryHelper.getPriceRepository();
+		this.holdingPriceInterdayVRepository = this.entityRepositoryFactoryHelper.getHoldingPriceInterdayVRepository();
+	}
+	
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
         snapshotInstant = Instant.now();
         now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
         var priceHoldingsExceptions = new ApplicationException();
-        
-        CASH_CAD_PRICE = priceRepository.findById(-1l).orElseThrow();
-        CASH_USD_PRICE = priceRepository.findById(-2l).orElseThrow();
 
-
-		if (! /* not */ OFFLINE_MODE) {
-			try {
-				getAndPersistExchangeRates();
-			} catch (ApplicationException e) {
-				var message = String.format("Unable to get and persist exchange rates: %s", e.getMessage());
-				LOGGER.warn(message);
-				priceHoldingsExceptions.addMessage(message);
-			}
+		try {
+			getAndPersistExchangeRates();
+		} catch (ApplicationException e) {
+			var message = String.format("Unable to get and persist exchange rates: %s", e.getMessage());
+			LOGGER.warn(message);
+			priceHoldingsExceptions.addMessage(message);
 		}
 
-        var holdingList = holdingRepository.findLatestAsOfDateHoldings();
+        var holdingIdList = holdingRepository.findLatestAsOfDateHoldingIds();
+        var holdingList= holdingRepository.findByIdIn(holdingIdList);
+        enrichHoldingList(holdingList);
+        
         priceCache.clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
@@ -114,8 +139,43 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         }
 	}
 
+	/**
+	 * Enrich the holding list with the corresponding instrument detail based on the instrument type
+	 * 
+	 * @param holdingList
+	 */
+	private void enrichHoldingList(List<Holding> holdingList) {
+		// 1. build map of instrument ids (set) by type
+		var instrumentIdByTypeMap = new EnumMap<InstrumentTypeEnum, Set<Long>>(InstrumentTypeEnum.class);
+        for (Holding holding : holdingList) {
+        	var instrumentType = holding.getInstrument().getType();
+        	if (instrumentType.equals(InstrumentTypeEnum.CASH)) {
+        		continue;
+        	}
+			instrumentIdByTypeMap.computeIfAbsent(instrumentType,
+					type -> instrumentIdByTypeMap.put(type, new HashSet<>()));
+    		instrumentIdByTypeMap.get(instrumentType).add(holding.getInstrument().getId());
+        }
+        // 2. use the map in 1) to retrieve the instrument details (eg inst_stock, inst_etc etc)) 
+        //    and build map 
+        var instrumentDetailByInstrumentIdMap = new HashMap<Long, IInstrumentDetail>();
+        for (Map.Entry<InstrumentTypeEnum, Set<Long>> entry : instrumentIdByTypeMap.entrySet()) {
+        	var inatrumentTypeEnum = entry.getKey();
+        	var investmentPortfolioTableEnum = inatrumentTypeEnum.getInvestmentPortfolioTableEnum();
+    		var instrumentDetailList = entityRepositoryFactory.getBaseInstrumentRepository(investmentPortfolioTableEnum).findByInstrumentIdIn(entry.getValue());
+    		for (IInstrumentDetail instrumnetDetail : instrumentDetailList) {
+    			instrumentDetailByInstrumentIdMap.put(instrumnetDetail.getInstrument().getId(), instrumnetDetail);
+    		}
+        }
+        // 3. enrich holding list with the retreived instrument details.
+        for (Holding holding : holdingList) {
+        	holding.setInstrumentDetail(instrumentDetailByInstrumentIdMap.get(holding.getInstrument().getId()));
+        }
+        
+	}
+
 	private ApplicationException checkStalePrice(Position position, ApplicationException priceHoldingsExceptions) {
-		if (StringUtils.equals(position.getInstrument().getTicker(), CASH_TICKER)) {
+		if (position.getInstrument().getType().equals(InstrumentTypeEnum.CASH)) {
 			return priceHoldingsExceptions;
 		}
 		if (TimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
@@ -159,7 +219,8 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 	private Position getHoldingPrice(Holding holding) throws ApplicationException {
 		var instrument = holding.getInstrument();
-		var price = getPrice(instrument);
+		var instrumentDetail = holding.getInstrumentDetail();
+		var price = getPrice(instrument, instrumentDetail);
 
 		var position = new Position();
 		position.setPositionSnapshot(OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault()));
@@ -187,63 +248,49 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		exchangeRateService.retrieveAndPersistExchangeRate(snapshotInstant, fromCurrency, toCurrency);
 	}
 
-	private Price getPrice(Instrument instrument) throws ApplicationException {
-		
-		if (OFFLINE_MODE) {
-			return CASH_CAD_PRICE;
-		}
+	private Price getPrice(Instrument instrument, IInstrumentDetail instrumentDetail) throws ApplicationException {
 
-		switch (instrument.getType()) {
-		case CASH:
-			switch (instrument.getCurrency()) {
-			case CAD:
-				return CASH_CAD_PRICE;
-			case USD:
-				return CASH_USD_PRICE;
-			default:
-				throw new IllegalArgumentException("Currency should be either CAD or USD");
-			}
-		case STOCK, ETF:
-			return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-		case MUTUAL_FUND:
-			return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-		default:
-			throw new IllegalArgumentException("Supported instruments types are CASH, STOCK & MUTUAL_FUND");
+		var pricingService = pricingServiceMap.get(instrument.getType());
+		if (pricingService == null) {
+			throw new IllegalArgumentException("Supported instruments types are CASH, STOCK, ETF & MUTUAL_FUND");
 		}
-//		if (StringUtils.equals(instrument.getTicker(), CASH_TICKER)) {
-//			switch (instrument.getCurrency()) {
-//				case CAD:
-//					return CASH_CAD_PRICE;
-//				case USD:
-//					return CASH_USD_PRICE;
-//				default:
-//					throw new IllegalArgumentException("Currency should be either CAD or USD");
-//			}
-//		} else {
-//			if (instrument.getExchange().equals("CF")) { // CF -> Canadian Fund
-//				return mutualFundPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-//			} else {
-//				return stockPriceService.getSecurityPrice(snapshotInstant, instrument, priceCache);
-//			}
-//		}
+		
+		return pricingService.priceInstrument(snapshotInstant, instrument, instrumentDetail, priceCache);
 	}
-	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {/*public BeanTransformerResult (){ this(null, null); }*/};
+	
+	
+	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {};
+	/**
+	 * Delete position records and associated price records for a given snapshot
+	 * price records used by other snapshots are not deleted
+	 * 
+	 * @param positionSnapshot
+	 * @return PurgePositionSnapshotResult
+	 */
 	@Transactional
 	public PurgePositionSnapshotResult purgePositionSnapshot(OffsetDateTime positionSnapshot) {
+		LOGGER.debug("trace 0");
 		var positionList = positionRepository.findByPositionSnapshot(positionSnapshot);
-		var priceIdList = positionList.stream().map(position -> position.getPrice().getId()).collect(Collectors.toSet());
-		var positionDeleteCount = positionRepository.deleteByPositionSnapshot(positionSnapshot);
-		LOGGER.debug("priceIdList, size and contents: {} {}", priceIdList.size(), priceIdList);
+		LOGGER.debug("trace 1");
+		
+		positionRepository.flush();
+		positionRepository.deleteAllInBatch(positionList);
+		
+		LOGGER.debug("trace 2");
 		// we do not want to delete the Cash price records so will remove them from the list
-		while (priceIdList.remove(Long.valueOf(-1)));
-		while (priceIdList.remove(Long.valueOf(-2)));
-		// look if among this priceIdList are used by another snapshot run
+		var priceSet = positionList.stream().map(position -> position.getPrice()).filter(price -> price.getId().compareTo(0l) == 1).collect(Collectors.toSet());
+		var priceIdList = priceSet.stream().map(price -> price.getId()).toList();
+		LOGGER.debug("trace 3");
+		LOGGER.debug("priceIdList, size and contents: {} {}", priceIdList.size(), priceIdList);
+		// see if any of the price ids are used by another position snapshot
 		var priceIdListUsedInAnotherSnapshot = positionRepository.selectExistingPriceIds(priceIdList);
 		LOGGER.debug("existingPriceIdList, size and contents: {} {}", priceIdListUsedInAnotherSnapshot.size(), priceIdListUsedInAnotherSnapshot);
-		priceIdList.removeAll(priceIdListUsedInAnotherSnapshot);
-		LOGGER.debug("priceIdList, size and contents: {} {}", priceIdList.size(), priceIdList);
+		priceSet.removeIf(price -> priceIdListUsedInAnotherSnapshot.contains(price.getId()));
+		LOGGER.debug("priceSet, size and ids: {} {}", priceSet.size(), String.join(",", priceSet.stream().map(p -> p.getId().toString()).toList()));
 		
-		var priceDeleteCount = priceRepository.deleteByIdIn(priceIdList);
-		return new PurgePositionSnapshotResult(positionDeleteCount, priceDeleteCount);
+		priceRepository.flush();
+		priceRepository.deleteAllInBatch(priceSet);
+		
+		return new PurgePositionSnapshotResult((long)positionList.size(), (long)priceSet.size());
 	}
 }

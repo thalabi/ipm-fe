@@ -5,6 +5,9 @@ import java.util.Arrays;
 import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentEtf;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMutualFund;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 
 public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	INSTRUMENT(Instrument.class, false, new String[] {"NAME","TICKER","EXCHANGE","CURRENCY"}),

@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 
 import com.kerneldc.common.BaseTableRepository;
@@ -14,7 +15,6 @@ import com.kerneldc.ipm.domain.Position;
 public interface PositionRepository extends BaseTableRepository<Position, Long> {
 	
 	Long deleteByPositionSnapshotNot(OffsetDateTime positionSnapshot);
-	Long deleteByPositionSnapshot(OffsetDateTime positionSnapshot);
 	
 	@Query(value = """
 			select distinct cast(position_snapshot as varchar) as positionSnapshot from position order by positionSnapshot
@@ -22,6 +22,7 @@ public interface PositionRepository extends BaseTableRepository<Position, Long> 
 			, nativeQuery = true)
 	List<PositionSnapshot> selectAllPositionSnapshots();
 	
+	@EntityGraph(attributePaths = { "instrument", "portfolio", "price" })
 	List<Position> findByPositionSnapshot(OffsetDateTime positionSnapshot);
 	
 	@Query(value = """

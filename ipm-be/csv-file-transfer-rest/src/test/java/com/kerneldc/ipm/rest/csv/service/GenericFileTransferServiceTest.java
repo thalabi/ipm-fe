@@ -34,7 +34,7 @@ import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.enums.UploadTableEnum;
-import com.kerneldc.ipm.rest.csv.repository.EntityRepositoryFactory;
+import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactory;
 import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService;
 import com.kerneldc.ipm.rest.csv.service.transformer.BeanTransformerService;
 import com.kerneldc.ipm.rest.csv.service.transformer.CsvFileTransformerService;

@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.domain;
+package com.kerneldc.ipm.domain.instrumentdetail;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -8,20 +8,22 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.IInstrumentDetail;
+import com.kerneldc.ipm.domain.Instrument;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "inst_rtf")
-@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_rtf_seq", allocationSize = 1)
+@Entity(name = "inst_stock")
+@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_stock_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentEtf extends AbstractPersistableEntity {
+public class InstrumentStock extends AbstractPersistableEntity implements IInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "instrument_id")
     private Instrument instrument;
 	

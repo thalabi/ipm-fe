@@ -1,30 +1,34 @@
-package com.kerneldc.ipm.batch;
+package com.kerneldc.ipm.batch.pricing;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.TimeUtils;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@RequiredArgsConstructor
-@Slf4j
-public abstract class BaseAbstractPriceService {
-
-	private final PriceRepository priceRepository;
-
-	protected record PriceQuote(BigDecimal lastPrice, OffsetDateTime tradeTime) {}
-
-	public Price getSecurityPrice(Instant snapshotInstant, Instrument instrument, Map<Long, Price> priceCache) throws ApplicationException {
+/**
+ * This interface is for pricing instruments that are tradable
+ *
+ */
+public interface ITradingInstrumentPricingService extends IPricingService {
+	
+	static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	public record PriceQuote(BigDecimal lastPrice, OffsetDateTime tradeTime) {}
+	
+	PriceQuote quote(Instrument instrument) throws ApplicationException;
+	
+	default Price priceInstrument(Instant snapshotInstant, Instrument instrument, IInstrumentDetail instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException {
 		var price = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();
 		var exchange = instrument.getExchange();
@@ -46,7 +50,7 @@ public abstract class BaseAbstractPriceService {
 			
 			
 			// check if the price is already in the table
-			var priceList = priceRepository.findByLogicalKeyHolder(price.getLogicalKeyHolder());
+			var priceList = priceRepository().findByLogicalKeyHolder(price.getLogicalKeyHolder());
 			if (CollectionUtils.isNotEmpty(priceList)) {
 				price = priceList.get(0);
 			} else {
@@ -59,6 +63,6 @@ public abstract class BaseAbstractPriceService {
 		}
 		return price;
 	}
-
-	public abstract PriceQuote quote(Instrument instrument) throws ApplicationException ;
+	
+	PriceRepository priceRepository();
 }

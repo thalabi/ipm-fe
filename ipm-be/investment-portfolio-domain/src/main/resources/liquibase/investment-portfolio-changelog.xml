@@ -19,6 +19,7 @@
 	<include file="liquibase/investment-portfolio/holding/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/holding/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/investment-portfolio/holding/create-unique-constraint-1.xml"/>
+	<include file="liquibase/investment-portfolio/holding/add-not-null-foreign-keys.xml"/>
 
 	<include file="liquibase/investment-portfolio/price/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/price/create-unique-constraint-lk.xml"/>
@@ -28,6 +29,7 @@
 	<include file="liquibase/investment-portfolio/position/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/position/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/investment-portfolio/position/create-unique-constraint-1.xml"/>
+	<include file="liquibase/investment-portfolio/position/add-not-null-foreign-keys.xml"/>
 
 	<include file="liquibase/investment-portfolio/exchange-rate/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/exchange-rate/create-unique-constraint-lk.xml"/>
@@ -39,16 +41,19 @@
 
 	<include file="liquibase/investment-portfolio/instrument/add-instrument-type.xml"/>
 	
-	<include file="liquibase/investment-portfolio/inst-stock/create-table.xml"/>
-	<include file="liquibase/investment-portfolio/inst-stock/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/investment-portfolio/inst-stock/data/populate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/add-not-null-instrument-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/data/populate.xml"/>
 	
-	<include file="liquibase/investment-portfolio/inst-mutual-fund/create-table.xml"/>
-	<include file="liquibase/investment-portfolio/inst-mutual-fund/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/investment-portfolio/inst-mutual-fund/data/populate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/add-not-null-instrument-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/data/populate.xml"/>
 
-	<include file="liquibase/investment-portfolio/inst-etf/create-table.xml"/>
-	<include file="liquibase/investment-portfolio/inst-etf/create-unique-constraint-lk.xml"/>
-	<include file="liquibase/investment-portfolio/inst-etf/data/populate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/add-not-null-instrument-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/data/populate.xml"/>
 	
 </databaseChangeLog>

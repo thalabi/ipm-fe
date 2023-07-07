@@ -1,11 +1,14 @@
-package com.kerneldc.ipm.batch;
+package com.kerneldc.ipm.batch.pricing;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -15,6 +18,7 @@ import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.TimeUtils;
 
@@ -24,19 +28,19 @@ import yahoofinance.YahooFinance;
 
 @Service
 @Slf4j
-public class StockPriceService extends BaseAbstractPriceService {
+public class StockAndEtfPriceService implements ITradingInstrumentPricingService {
 
 	private enum STOCK_PRICE_SERVICE { YAHOO, ALPAVANTAGE };
 	private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.ALPAVANTAGE;
-	
 	private static final String ALPHAVANTAGE_URL_TEMPLATE =  "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=%s&symbol=%s";
 	
-	private String alphavantageApiKey;
-	
+	private final String alphavantageApiKey;
+	private final PriceRepository priceRepository;
 	
 	private Table<String, String, Float> fallbackPriceLookupTable = HashBasedTable.create();
-	public StockPriceService(PriceRepository priceRepository, String alphavantageApiKey) {
-		super(priceRepository);
+	
+	public StockAndEtfPriceService(PriceRepository priceRepository, @Value("${alphavantage.api.key}") String alphavantageApiKey) {
+		this.priceRepository = priceRepository;
 		this.alphavantageApiKey = alphavantageApiKey;
 		
 		fallbackPriceLookupTable.put("SENS", "CNSX", 0.005f);
@@ -151,5 +155,15 @@ public class StockPriceService extends BaseAbstractPriceService {
 		} else {
 			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())), TimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
 		}
+	}
+	
+	@Override
+	public Collection<InstrumentTypeEnum> canHandle() {
+		return List.of(InstrumentTypeEnum.STOCK, InstrumentTypeEnum.ETF);
+	}
+
+	@Override
+	public PriceRepository priceRepository() {
+		return priceRepository;
 	}
 }

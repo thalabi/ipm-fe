@@ -28,6 +28,7 @@
 		<module>csv-file-transfer-rest</module>
 		<module>investment-portfolio-domain</module>
 		<module>investment-portfolio-batch</module>
+		<module>common-services</module>
 	</modules>
 	
 	<dependencies>

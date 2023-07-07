@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.domain.Holding;
-import com.kerneldc.ipm.repository.HoldingDetail;
+import com.kerneldc.ipm.repository.IHoldingDetail;
 import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
@@ -59,14 +59,14 @@ public class InvestmentPortfolioConroller {
     }
 
     @GetMapping("/getHoldingDetails")
-	public ResponseEntity<Map<String, List<HoldingDetail>>> getHoldingDetails(Long portfolioId) {
+	public ResponseEntity<Map<String, List<IHoldingDetail>>> getHoldingDetails(Long portfolioId) {
     	LOGGER.info("Begin ...");
     	var holdingDetailList = holdingRepository.findByPortfolioId(portfolioId);
     	LOGGER.info("holdingDetailList: {}", holdingDetailList);
     	holdingDetailList.stream().forEach(holdingDetail ->
     		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), holdingDetail.getExchange(), holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity())
     	);
-    	Map<String, List<HoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
+    	Map<String, List<IHoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
     	LOGGER.info("End ...");
     	return ResponseEntity.ok(namedHoldingDetailList);
     }

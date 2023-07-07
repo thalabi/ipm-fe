@@ -29,11 +29,11 @@ public class Holding extends AbstractPersistableEntity {
 	@Setter(AccessLevel.NONE)
 	private OffsetDateTime asOfDate;
 	@Setter(AccessLevel.NONE)
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "instrument_id")
 	private Instrument instrument;
 	@Setter(AccessLevel.NONE)
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
 	
@@ -55,6 +55,9 @@ public class Holding extends AbstractPersistableEntity {
 	@CsvBindByName
 	private Float quantity;
 
+	@Transient
+	private IInstrumentDetail instrumentDetail;
+	
 	public void setAsOfDate(OffsetDateTime asOfDate) {
 		this.asOfDate = asOfDate;
 		setLogicalKeyHolder();
