@@ -19,6 +19,7 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
+import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.TimeUtils;
 
@@ -28,7 +29,7 @@ import yahoofinance.YahooFinance;
 
 @Service
 @Slf4j
-public class StockAndEtfPriceService implements ITradingInstrumentPricingService {
+public class StockAndEtfPriceService implements ITradingInstrumentPricingService<IListedInstrumentDetail> {
 
 	private enum STOCK_PRICE_SERVICE { YAHOO, ALPAVANTAGE };
 	private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.ALPAVANTAGE;
@@ -47,17 +48,17 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	}
 
 	@Override
-	public PriceQuote quote(Instrument instrument) throws ApplicationException {
+	public PriceQuote quote(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
 		if (ENABLED_STOCK_PRICE_SERVICE == STOCK_PRICE_SERVICE.YAHOO) {
-			return yahooFinanceQuoteService(instrument);
+			return yahooFinanceQuoteService(instrument, instrumentStock);
 		} else {
-			return alphaVantageQuoteService(instrument);
+			return alphaVantageQuoteService(instrument, instrumentStock);
 		}
 	}
 
-	private PriceQuote yahooFinanceQuoteService(Instrument instrument) throws ApplicationException {
+	private PriceQuote yahooFinanceQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
 		var ticker = instrument.getTicker();
-		var exchange = instrument.getExchange();
+		var exchange = instrumentStock.getExchange();
 		Stock stock;
 		// For instruments in the TSE and CNSX exchanges try appending .TO and then .CN to the symbol 
 		try {
@@ -87,9 +88,9 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	}
 	
 	private static final int MAX_RETRIES = 2;
-	protected PriceQuote alphaVantageQuoteService(Instrument instrument) throws ApplicationException {
+	protected PriceQuote alphaVantageQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
 		var ticker = instrument.getTicker();
-		var exchange = instrument.getExchange();
+		var exchange = instrumentStock.getExchange();
 		
 		var alphavantageSymbol = ticker;
 		if (Arrays.asList("TSE","CNSX").contains(exchange)) {
@@ -143,7 +144,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		}
 		
 		if (quote == null || quote.getPrice() == null) {
-			var fallbackPrice = fallbackPriceLookupTable.get(instrument.getTicker(), instrument.getExchange());
+			var fallbackPrice = fallbackPriceLookupTable.get(instrument.getTicker(), instrumentStock.getExchange());
 			if (fallbackPrice != null) {
 				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
 				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());

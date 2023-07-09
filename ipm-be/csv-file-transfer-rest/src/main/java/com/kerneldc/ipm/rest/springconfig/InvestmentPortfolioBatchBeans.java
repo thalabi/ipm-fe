@@ -27,7 +27,7 @@ public class InvestmentPortfolioBatchBeans {
 //	@Bean
 //	public HoldingPricingService holdingPricingServiceBean(EntityRepositoryFactory entityRepositoryFactory,
 //			EntityRepositoryFactoryHelper entityRepositoryFactoryHelper,
-//			Collection<IPricingService> pricingServiceCollection,
+//			Collection<IInstrumentPricingService> pricingServiceCollection,
 //			ExchangeRateRepository exchangeRateRepository, PriceRepository priceRepository,
 //			EmailService emailService) {
 //		return new HoldingPricingService(entityRepositoryFactory, entityRepositoryFactoryHelper, 

@@ -22,7 +22,7 @@ public class PositionBeanReferentialEntityEnrichmentStage1 implements IBeanRefer
 			var position = (Position) bean;
 			
 			position.setTicker(position.getInstrument().getTicker());
-			position.setExchange(position.getInstrument().getExchange());
+			//position.setExchange(position.getInstrument().getExchange());
 			
 			position.setAccountNumber(position.getPortfolio().getAccountNumber());
 			position.setInstitution(position.getPortfolio().getInstitution());

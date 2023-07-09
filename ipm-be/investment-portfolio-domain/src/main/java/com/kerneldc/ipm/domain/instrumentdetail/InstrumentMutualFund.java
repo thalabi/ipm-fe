@@ -8,7 +8,6 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
 import com.opencsv.bean.CsvBindByName;
 

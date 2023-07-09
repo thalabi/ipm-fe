@@ -10,6 +10,7 @@ import javax.persistence.Transient;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 

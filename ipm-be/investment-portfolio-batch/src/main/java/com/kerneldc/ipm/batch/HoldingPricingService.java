@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -21,17 +22,17 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.pricing.IPricingService;
+import com.kerneldc.ipm.batch.pricing.IInstrumentPricingService;
 import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactory;
 import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactoryHelper;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
-import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.domain.Price;
+import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 import com.kerneldc.ipm.repository.HoldingPriceInterdayVRepository;
 import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
@@ -60,20 +61,17 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	
 	private Map<Long, Price> priceCache = new HashMap<>();
 	
-	private EnumMap<InstrumentTypeEnum, IPricingService> pricingServiceMap = new EnumMap<>(InstrumentTypeEnum.class);
+	private EnumMap<InstrumentTypeEnum, IInstrumentPricingService<IInstrumentDetail>> instrumentPricingServiceMap = new EnumMap<>(InstrumentTypeEnum.class);
 
 	public HoldingPricingService(
-			Collection<IPricingService> pricingServiceCollection,
+			Collection<? extends IInstrumentPricingService<? extends IInstrumentDetail>> pricingServiceCollection,
 			EntityRepositoryFactory entityRepositoryFactory,
 			EntityRepositoryFactoryHelper entityRepositoryFactoryHelper, ExchangeRateService exchangeRateService,
 			EmailService emailService) {
 
-		for (IPricingService pricingService : pricingServiceCollection) {
-			for (InstrumentTypeEnum type : pricingService.canHandle()) {
-				pricingServiceMap.put(type, pricingService);
-			}
-		}
-		pricingServiceMap.forEach((type, pricingService) -> LOGGER.debug("[{}, {}]", type,
+		populateInstrumentPricingServiceMap(pricingServiceCollection);
+		LOGGER.debug("Loading instrumentPricingServiceMap with:");
+		instrumentPricingServiceMap.forEach((type, pricingService) -> LOGGER.debug("[{}, {}]", type,
 				pricingService.getClass().getSimpleName()));
 		this.entityRepositoryFactory = entityRepositoryFactory;
 		this.entityRepositoryFactoryHelper = entityRepositoryFactoryHelper;
@@ -84,6 +82,17 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		this.positionRepository = this.entityRepositoryFactoryHelper.getPositionRepository();
 		this.priceRepository = this.entityRepositoryFactoryHelper.getPriceRepository();
 		this.holdingPriceInterdayVRepository = this.entityRepositoryFactoryHelper.getHoldingPriceInterdayVRepository();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void populateInstrumentPricingServiceMap(
+			Collection<? extends IInstrumentPricingService<? extends IInstrumentDetail>> pricingServiceCollection) {
+		for (var instrumentPricingService : pricingServiceCollection) {
+			instrumentPricingService.canHandle();
+			for (InstrumentTypeEnum type : instrumentPricingService.canHandle()) {
+				instrumentPricingServiceMap.put(type, (IInstrumentPricingService<IInstrumentDetail>)instrumentPricingService);
+			}
+		}
 	}
 	
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
@@ -179,7 +188,10 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			return priceHoldingsExceptions;
 		}
 		if (TimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
-			var exceptionMessage = String.format("Stale price retrieved for ticker: %s and exchange: %s. Price date is as of %s", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPrice().getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
+			var exceptionMessage = String.format(
+					"Stale price retrieved for ticker: %s. Price date is as of %s",
+					position.getInstrument().getTicker(), 
+					position.getPrice().getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
 			if (! /* not */ priceHoldingsExceptions.getMessageList().contains(exceptionMessage)) {
 				LOGGER.warn(exceptionMessage);
 				priceHoldingsExceptions.addMessage(exceptionMessage);
@@ -250,12 +262,13 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 	private Price getPrice(Instrument instrument, IInstrumentDetail instrumentDetail) throws ApplicationException {
 
-		var pricingService = pricingServiceMap.get(instrument.getType());
-		if (pricingService == null) {
-			throw new IllegalArgumentException("Supported instruments types are CASH, STOCK, ETF & MUTUAL_FUND");
+		var instrumentPricingService = instrumentPricingServiceMap.get(instrument.getType());
+		if (instrumentPricingService == null) {
+			var typeList = Stream.of(InstrumentTypeEnum.values()).map(InstrumentTypeEnum::name).toList();
+			throw new IllegalArgumentException(String.format("Supported instrument types are [%s]", String.join(", ", typeList)));
 		}
 		
-		return pricingService.priceInstrument(snapshotInstant, instrument, instrumentDetail, priceCache);
+		return instrumentPricingService.priceInstrument(snapshotInstant, instrument, instrumentDetail, priceCache);
 	}
 	
 	

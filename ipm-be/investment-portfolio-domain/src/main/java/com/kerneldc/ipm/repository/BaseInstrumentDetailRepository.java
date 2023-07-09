@@ -9,7 +9,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
-import com.kerneldc.ipm.domain.IInstrumentDetail;
+import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 
 @NoRepositoryBean
 public interface BaseInstrumentDetailRepository<T extends AbstractPersistableEntity, ID extends Serializable>

@@ -8,7 +8,6 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
 import com.opencsv.bean.CsvBindByName;
 
@@ -19,7 +18,7 @@ import lombok.Setter;
 @Entity(name = "inst_stock")
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_stock_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentStock extends AbstractPersistableEntity implements IInstrumentDetail {
+public class InstrumentStock extends AbstractPersistableEntity implements IListedInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 

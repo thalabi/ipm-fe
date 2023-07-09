@@ -17,6 +17,7 @@ import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.domain.Portfolio;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
@@ -57,8 +58,10 @@ class HoldingBeanTransformerStage1Test {
 		context.setBeans(List.of(holding1));
 		
 		var instrument1 = new Instrument();
+		var instrumentStock = new InstrumentStock();
+		instrumentStock.setInstrument(instrument1);
 		instrument1.setTicker(TICKER1);
-		instrument1.setExchange(EXCHANGE1);
+		instrumentStock.setExchange(EXCHANGE1);
 		when(instrumentRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getTicker(), holding1.getExchange()))).thenReturn(List.of(instrument1));
 		
 		var portfolio1 = new Portfolio();

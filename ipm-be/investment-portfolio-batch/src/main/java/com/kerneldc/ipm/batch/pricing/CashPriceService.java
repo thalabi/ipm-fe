@@ -8,17 +8,17 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.domain.IInstrumentDetail;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Price;
+import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class CashPriceService implements IPricingService {
+public class CashPriceService implements IInstrumentPricingService<IInstrumentDetail> {
 
 	private Price CASH_CAD_PRICE;
 	private Price CASH_USD_PRICE;

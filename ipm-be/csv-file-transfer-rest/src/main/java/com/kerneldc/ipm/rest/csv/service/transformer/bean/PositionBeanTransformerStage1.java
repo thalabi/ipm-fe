@@ -68,7 +68,7 @@ public class PositionBeanTransformerStage1 implements IBeanTransformer {
 			if (position.getInstrument() != null) {
 				List<Price> priceList = priceRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(position.getInstrument().getId(), position.getPriceTimestamp()));
 				if (CollectionUtils.isEmpty(priceList)) {
-					exceptionMessageJoiner.add(String.format(" Price not found with instrument: [%s:%s] and price timestamp: [%s].", position.getInstrument().getTicker(), position.getInstrument().getExchange(), position.getPriceTimestamp()));
+					exceptionMessageJoiner.add(String.format(" Price not found with instrument: [%s :s] and price timestamp: [%s].", position.getInstrument().getTicker(), /*position.getInstrument().getExchange(),*/ position.getPriceTimestamp()));
 					exceptionsFound = true;
 				} else {
 					position.setPrice(priceList.get(0));

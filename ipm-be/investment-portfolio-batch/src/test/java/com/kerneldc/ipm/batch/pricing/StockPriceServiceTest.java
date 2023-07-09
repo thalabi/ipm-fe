@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.pricing.StockAndEtfPriceService;
-import com.kerneldc.ipm.batch.pricing.BaseAbstractPriceService.PriceQuote;
+import com.kerneldc.ipm.batch.pricing.ITradingInstrumentPricingService.PriceQuote;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 
 class StockPriceServiceTest {
 
@@ -30,35 +30,39 @@ class StockPriceServiceTest {
 	@Test
 	void TestAlphaVantageQuoteOnce() throws ApplicationException {
 		var instrument = new Instrument();
+		var instrumentStock = new InstrumentStock();
+		instrumentStock.setInstrument(instrument);
 		instrument.setTicker("BCE");
-		instrument.setExchange("TSE");
-		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		instrumentStock.setExchange("TSE");
+		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 	@Test
 	void TestAlphaVantageQuoteMultipleTimes() throws ApplicationException {
 		var instrument = new Instrument();
+		var instrumentStock = new InstrumentStock();
+		instrumentStock.setInstrument(instrument);
 
 		PriceQuote priceQuote; 
 		instrument.setTicker("SENS");
-		instrument.setExchange("CNSX");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		instrumentStock.setExchange("CNSX");
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrument.setExchange("TSE");
+		instrumentStock.setExchange("TSE");
 		instrument.setTicker("BBD.B");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 		instrument.setTicker("RY");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 		instrument.setTicker("AGF.B");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 		instrument.setTicker("SU");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 		instrument.setTicker("T");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument);
+		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 	

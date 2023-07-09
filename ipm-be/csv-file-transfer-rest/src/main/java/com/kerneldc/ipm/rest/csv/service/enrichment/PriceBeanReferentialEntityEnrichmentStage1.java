@@ -22,7 +22,7 @@ public class PriceBeanReferentialEntityEnrichmentStage1 implements IBeanReferent
 			var price = (Price) bean;
 			
 			price.setTicker(price.getInstrument().getTicker());
-			price.setExchange(price.getInstrument().getExchange());
+			//price.setExchange(price.getInstrument().getExchange());
 		}
 		return beanReferentialEntityEnrichmentResultList;
 	}

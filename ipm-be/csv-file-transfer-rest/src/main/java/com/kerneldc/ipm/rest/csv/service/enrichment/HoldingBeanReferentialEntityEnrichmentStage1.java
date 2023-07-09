@@ -22,7 +22,7 @@ public class HoldingBeanReferentialEntityEnrichmentStage1 implements IBeanRefere
 			var holding = (Holding) bean;
 			
 			holding.setTicker(holding.getInstrument().getTicker());
-			holding.setExchange(holding.getInstrument().getExchange());
+			//holding.setExchange(holding.getInstrument().getExchange());
 			
 			holding.setAccountNumber(holding.getPortfolio().getAccountNumber());
 			holding.setInstitution(holding.getPortfolio().getInstitution());
