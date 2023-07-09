@@ -56,4 +56,6 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/add-not-null-instrument-id.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/data/populate.xml"/>
 	
+	<include file="liquibase/investment-portfolio/instrument/drop-exchange.xml"/>
+
 </databaseChangeLog>
