@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class TimeUtilsTest {
 
 	@Test
-	void testCompareDatePart() {
+	void testCompareDatePart_returnLess() { // first date's day is less than second date's day
 		var dateFormatter1 = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 		var now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
 		var yesterday = OffsetDateTime.ofInstant(
@@ -28,6 +28,21 @@ class TimeUtilsTest {
 		int result = TimeUtils.compareDatePart(yesterday, now);
 		System.out.println("compare result: " + result);
 		assertThat(TimeUtils.compareDatePart(yesterday, now), is(-1));
+	}
+
+	@Test
+	void testCompareDatePart_returnZero() { // the two dates are on the same date
+		var dateFormatter1 = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
+		var now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
+		var yesterday = OffsetDateTime.ofInstant(
+				LocalDate.parse("2023-07-10", dateFormatter1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+				ZoneId.systemDefault());
+		System.out.println("now date part: " + dateFormatter1.format(now));
+		System.out.println("yesterday: " + dateFormatter1.format(yesterday));
+		
+		int result = TimeUtils.compareDatePart(yesterday, now);
+		System.out.println("compare result: " + result);
+		assertThat(TimeUtils.compareDatePart(yesterday, now), is(0));
 	}
 
 	@Test

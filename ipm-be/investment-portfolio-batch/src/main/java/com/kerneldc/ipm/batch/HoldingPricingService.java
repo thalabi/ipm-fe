@@ -70,6 +70,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			EmailService emailService) {
 
 		populateInstrumentPricingServiceMap(pricingServiceCollection);
+		
 		LOGGER.debug("Loading instrumentPricingServiceMap with:");
 		instrumentPricingServiceMap.forEach((type, pricingService) -> LOGGER.debug("[{}, {}]", type,
 				pricingService.getClass().getSimpleName()));
@@ -176,7 +177,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
     			instrumentDetailByInstrumentIdMap.put(instrumnetDetail.getInstrument().getId(), instrumnetDetail);
     		}
         }
-        // 3. enrich holding list with the retreived instrument details.
+        // 3. enrich holding list with the retrieved instrument details.
         for (Holding holding : holdingList) {
         	holding.setInstrumentDetail(instrumentDetailByInstrumentIdMap.get(holding.getInstrument().getId()));
         }

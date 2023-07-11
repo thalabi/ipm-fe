@@ -59,8 +59,8 @@ public class TimeUtils {
 	public static int compareDatePart(OffsetDateTime date1, OffsetDateTime date2) {
 		Preconditions.checkArgument(date1 != null, "date1 must not be null");
 		Preconditions.checkArgument(date2 != null, "date2 must not be null");
-		var date1Date = date1.toInstant().truncatedTo(ChronoUnit.DAYS);
-		var date2Date = date2.toInstant().truncatedTo(ChronoUnit.DAYS);
+		var date1Date = date1.truncatedTo(ChronoUnit.DAYS);
+		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
 		return date1Date.compareTo(date2Date);
 	}
 }
