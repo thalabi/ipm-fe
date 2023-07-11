@@ -8,7 +8,7 @@ public interface IHoldingDetail {
 	String getAsOfDate();
 	Long getInstrumentId();
 	String getTicker();
-	String getExchange();
+	//String getExchange();
 	String getCurrency();
 	String getName();
 	Float getQuantity();

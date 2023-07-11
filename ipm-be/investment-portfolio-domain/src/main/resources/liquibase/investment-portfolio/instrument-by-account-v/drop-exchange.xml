@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="instrument_by_account_v-drop-exchange" author="thalabi">
+        <comment>Drop column exchange from instrument_by_account_v</comment>
+
+    	<createView viewName="instrument_by_account_v" replaceIfExists="true">
+			<![CDATA[
+select row_number() over (order by i.ticker||':exchange') id, i.ticker||':exchange' ticker_exchange, i.name instrument_name, h.quantity, p.account_number, p.name account_name
+  from holding h join instrument i on h.instrument_id = i.id 
+  join portfolio p on h.portfolio_id = p.id
+ where i.ticker != 'CASH'
+ 			]]>    
+		</createView>
+
+    </changeSet>
+
+</databaseChangeLog>
