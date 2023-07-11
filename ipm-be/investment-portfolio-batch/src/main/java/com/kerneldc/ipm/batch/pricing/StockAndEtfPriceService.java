@@ -44,7 +44,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		this.priceRepository = priceRepository;
 		this.alphavantageApiKey = alphavantageApiKey;
 		
-		fallbackPriceLookupTable.put("SENS", "CNSX", 0.005f);
+		fallbackPriceLookupTable.put("SENS", "CNSX", 0.01f);
 	}
 
 	@Override
