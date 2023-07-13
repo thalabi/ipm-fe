@@ -33,16 +33,19 @@ class TimeUtilsTest {
 	@Test
 	void testCompareDatePart_returnZero() { // the two dates are on the same date
 		var dateFormatter1 = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
-		var now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-		var yesterday = OffsetDateTime.ofInstant(
+		var dateFormatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+		var date1 = OffsetDateTime.ofInstant(
 				LocalDate.parse("2023-07-10", dateFormatter1).atStartOfDay(ZoneId.systemDefault()).toInstant(),
 				ZoneId.systemDefault());
-		System.out.println("now date part: " + dateFormatter1.format(now));
-		System.out.println("yesterday: " + dateFormatter1.format(yesterday));
+		var date2 = OffsetDateTime.ofInstant(
+				LocalDate.parse("2023-07-10 23:59:59", dateFormatter2).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+				ZoneId.systemDefault());
+		System.out.println("date1: " + dateFormatter1.format(date1));
+		System.out.println("date2: " + dateFormatter1.format(date2));
 		
-		int result = TimeUtils.compareDatePart(yesterday, now);
+		int result = TimeUtils.compareDatePart(date1, date2);
 		System.out.println("compare result: " + result);
-		assertThat(TimeUtils.compareDatePart(yesterday, now), is(0));
+		assertThat(TimeUtils.compareDatePart(date1, date2), is(0));
 	}
 
 	@Test
