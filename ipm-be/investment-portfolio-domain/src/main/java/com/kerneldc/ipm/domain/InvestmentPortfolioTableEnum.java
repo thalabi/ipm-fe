@@ -6,14 +6,16 @@ import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentEtf;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMoneyMarket;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMutualFund;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 
 public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	INSTRUMENT(Instrument.class, false, new String[] {"NAME","TICKER","EXCHANGE","CURRENCY"}),
 	INSTRUMENT_STOCK(InstrumentStock.class, false, new String[] {}),
-	INSTRUMENT_MUTUAL_FUND(InstrumentMutualFund.class, false, new String[] {}),
 	INSTRUMENT_ETF(InstrumentEtf.class, false, new String[] {}),
+	INSTRUMENT_MUTUAL_FUND(InstrumentMutualFund.class, false, new String[] {}),
+	INSTRUMENT_MONEY_MARKET(InstrumentMoneyMarket.class, false, new String[] {}),
 	PORTFOLIO(Portfolio.class, false, new String[] {"INSTITUTION","ACCOUNT_NUMBER","CURRENCY","NAME"}),
 	HOLDING(Holding.class, false, new String[] {"AS_OF_DATE","TICKER","EXCHANGE","QUANTITY","INSTITUTION","ACCOUNT_NUMBER"}),
 	POSITION(Position.class, false, new String[] {"TICKER", "EXCHANGE", "ACCOUNT_NUMBER", "INSTITUTION", "PRICE_TIMESTAMP", "POSITION_TIMESTAMP", "QUANTITY"}),

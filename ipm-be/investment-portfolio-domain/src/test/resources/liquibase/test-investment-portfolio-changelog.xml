@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<include file="liquibase/investment-portfolio/instrument/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-1.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/data/insert.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/add-instrument-type.xml"/>
+	
+	
+	<include file="liquibase/investment-portfolio/instrument/drop-unique-constrain-1.xml"/>
+	<include file="liquibase/investment-portfolio/instrument/drop-exchange.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-unique-constraint-lk.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument/data/fix-lk.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate.xml"/>
+
+</databaseChangeLog>

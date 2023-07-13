@@ -15,5 +15,10 @@
 			<artifactId>common-domain</artifactId>
 			<version>${parentProjectVersion}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

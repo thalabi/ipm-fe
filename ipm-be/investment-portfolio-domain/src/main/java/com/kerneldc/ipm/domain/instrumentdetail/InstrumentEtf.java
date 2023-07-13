@@ -1,14 +1,9 @@
 package com.kerneldc.ipm.domain.instrumentdetail;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
-import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.ipm.domain.Instrument;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
@@ -16,21 +11,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity(name = "inst_etf")
-@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_rtf_seq", allocationSize = 1)
+@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_etf_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentEtf extends AbstractPersistableEntity implements IListedInstrumentDetail {
+public class InstrumentEtf extends AbstractInstrumentDetailEntity implements IListedInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "instrument_id")
-    private Instrument instrument;
+//	@OneToOne(cascade = CascadeType.ALL, optional = false)
+//    @JoinColumn(name = "instrument_id")
+//	@Setter(AccessLevel.NONE)
+//    private Instrument instrument;
 	
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
 	private String exchange;
 
-
+//	public void setInstrument(Instrument instrument) {
+//		this.instrument = instrument;
+//		setLogicalKeyHolder();
+//	}
 	public void setExchange(String exchange) {
 		this.exchange = exchange;
 		setLogicalKeyHolder();

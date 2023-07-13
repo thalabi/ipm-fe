@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="populate-inst-money-market-h2-oracle" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <or>
+	        <dbms type="h2" />
+	        <dbms type="oracle" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into instrument (id, lk, version, ticker, currency, name, type)
+			values (instrument_seq.nextval, 'CIB275|USD|MONEY_MARKET', 0, 'CIB275', 'USD', 'Canadian Imperial Bank of Comm CIB275', 'MONEY_MARKET');
+		insert into inst_money_market (id, lk, version, instrument_id, price)
+		    values (inst_money_market_seq.nextval, 'CIB275|10', 0, (select id from instrument where lk='CIB275|USD|MONEY_MARKET'), 10);
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_money_market where lk='CIB275|10';
+			delete from instrument where lk='CIB275|USD|MONEY_MARKET';
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+
+    <changeSet id="populate-inst-money-market-postgresql" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into instrument (id, lk, version, ticker, currency, name, type)
+			values (nextval('instrument_seq'), 'CIB275|USD|MONEY_MARKET', 0, 'CIB275', 'USD', 'Canadian Imperial Bank of Comm CIB275', 'MONEY_MARKET');
+		insert into inst_money_market (id, lk, version, instrument_id, price)
+		    values (nextval('inst_money_market_seq'), 'CIB275|10', 0, (select id from instrument where lk='CIB275|USD|MONEY_MARKET'), 10);
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_money_market where lk='CIB275|10';
+			delete from instrument where lk='CIB275|USD|MONEY_MARKET';
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+    
+</databaseChangeLog>

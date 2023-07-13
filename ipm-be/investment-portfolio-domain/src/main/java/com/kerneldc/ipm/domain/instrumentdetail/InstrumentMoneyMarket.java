@@ -1,5 +1,7 @@
 package com.kerneldc.ipm.domain.instrumentdetail;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.SequenceGenerator;
 
@@ -10,26 +12,26 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "inst_stock")
-@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_stock_seq", allocationSize = 1)
+@Entity(name = "inst_money_market")
+@SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_money_market_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentStock extends AbstractInstrumentDetailEntity implements IListedInstrumentDetail {
+public class InstrumentMoneyMarket extends AbstractInstrumentDetailEntity implements IInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
-	private String exchange;
+	private BigDecimal price;
 
 
-	public void setExchange(String exchange) {
-		this.exchange = exchange;
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 		setLogicalKeyHolder();
 	}
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(instrument.getTicker(), exchange);
+		var logicalKeyHolder = LogicalKeyHolder.build(instrument.getTicker(), price);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

@@ -30,11 +30,15 @@ public class LogicalKeyHolder implements Serializable, ILogicallyKeyed {
 				stringKeyParts[i++] = StringUtils.EMPTY;
 				continue;
 			}
+			if (keyPart.getClass().isEnum()) {
+				stringKeyParts[i++] = ((Enum<?>)keyPart).name();
+				continue;
+			}
 			switch (keyPart.getClass().getSimpleName()) {
 			case "String":
 				stringKeyParts[i++] = (String)keyPart;
 				break;
-			case "Integer", "Double", "Long":
+			case "Integer", "Double", "Long", "BigDecimal":
 				stringKeyParts[i++] = String.valueOf(keyPart);	
 				break;
 			case "LocalDateTime":

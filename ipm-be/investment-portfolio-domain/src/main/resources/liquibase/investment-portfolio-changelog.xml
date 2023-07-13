@@ -57,6 +57,16 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/data/populate.xml"/>
 	
 	<include file="liquibase/investment-portfolio/instrument-by-account-v/drop-exchange.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument/drop-unique-constrain-1.xml"/>
 	<include file="liquibase/investment-portfolio/instrument/drop-exchange.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-unique-constraint-lk.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument/data/fix-lk.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate-2.xml"/>
 
 </databaseChangeLog>

@@ -22,31 +22,34 @@ public class Instrument extends AbstractPersistableEntity {
 
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
+	@Setter(AccessLevel.NONE)
 	private InstrumentTypeEnum type; 
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
 	private String ticker;
-//	@CsvBindByName
-//	@Setter(AccessLevel.NONE)
-//	private String exchange;
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
+	@Setter(AccessLevel.NONE)
 	private CurrencyEnum currency;
 	@CsvBindByName
 	private String name;
 
+	public void setType(InstrumentTypeEnum type) {
+		this.type = type;
+		setLogicalKeyHolder();
+	}
 	public void setTicker(String ticker) {
 		this.ticker = ticker;
 		setLogicalKeyHolder();
 	}
-//	public void setExchange(String exchange) {
-//		this.exchange = exchange;
-//		setLogicalKeyHolder();
-//	}
+	public void setCurrency(CurrencyEnum currency) {
+		this.currency = currency;
+		setLogicalKeyHolder();
+	}
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(ticker);
+		var logicalKeyHolder = LogicalKeyHolder.build(ticker, currency, type);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }
