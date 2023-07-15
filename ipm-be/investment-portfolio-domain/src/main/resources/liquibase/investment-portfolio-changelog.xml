@@ -69,4 +69,8 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate-2.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/data/insert.xml"/>
+
 </databaseChangeLog>

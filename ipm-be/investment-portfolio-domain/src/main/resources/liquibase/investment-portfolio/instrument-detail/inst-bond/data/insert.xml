@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="populate-inst-bond-h2-oracle" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <or>
+	        <dbms type="h2" />
+	        <dbms type="oracle" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into instrument (id, lk, version, ticker, currency, name, type)
+			values (instrument_seq.nextval, '13607LNF6|USD|BOND', 0, '13607LNF6', 'USD', 'USCORP CIBC 5.144 04/28/25', 'BOND');
+		insert into inst_bond (id, lk, version, instrument_id,
+					issuer, cusip, price, coupon, issue_date, maturity_date, payment_frequency, next_payment_date)
+		    values (inst_bond_seq.nextval, '13607LNF6', 0, (select id from instrument where lk='13607LNF6|USD|BOND'),
+		   			'USCORP, CAN. IMP. BK OF COMMERCE', '13607LNF6', 1000, 5.144, '2023-04-28 00:00:00.000-0400', '2025-04-28 00:00:00.000-0400', 'SEMIANNUALLY', '2023-10-28 00:00:00.000-0400');
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_bond where lk='13607LNF6';
+			delete from instrument where lk='13607LNF6|USD|BOND';
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+
+    <changeSet id="populate-inst-bond-postgresql" author="thalabi">
+   	    <preConditions onFail="CONTINUE" onFailMessage="">
+	        <dbms type="postgresql" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		insert into instrument (id, lk, version, ticker, currency, name, type)
+			values (nextval('instrument_seq'), '13607LNF6|USD|BOND', 0, '13607LNF6', 'USD', 'USCORP CIBC 5.144 04/28/25', 'BOND');
+		insert into inst_bond (id, lk, version, instrument_id,
+					issuer, cusip, price, coupon, issue_date, maturity_date, payment_frequency, next_payment_date)
+		    values (nextval('inst_bond_seq'), '13607LNF6', 0, (select id from instrument where lk='13607LNF6|USD|BOND'),
+		   			'USCORP, CAN. IMP. BK OF COMMERCE', '13607LNF6', 1000, 5.144, '2023-04-28 00:00:00.000-0400', '2025-04-28 00:00:00.000-0400', 'SEMIANNUALLY', '2023-10-28 00:00:00.000-0400');
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			delete from inst_bond where lk='13607LNF6';
+			delete from instrument where lk='13607LNF6|USD|BOND';
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+    
+</databaseChangeLog>

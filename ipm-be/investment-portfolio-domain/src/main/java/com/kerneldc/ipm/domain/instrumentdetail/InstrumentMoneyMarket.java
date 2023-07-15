@@ -15,7 +15,7 @@ import lombok.Setter;
 @Entity(name = "inst_money_market")
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_money_market_seq", allocationSize = 1)
 @Getter @Setter
-public class InstrumentMoneyMarket extends AbstractInstrumentDetailEntity implements IInstrumentDetail {
+public class InstrumentMoneyMarket extends AbstractInstrumentDetailEntity implements IFixedPriceInstrumentDetail {
 	
 	private static final long serialVersionUID = 1L;
 

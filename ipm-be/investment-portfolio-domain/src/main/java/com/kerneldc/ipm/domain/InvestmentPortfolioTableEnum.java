@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.google.common.base.Enums;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentBond;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentEtf;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMoneyMarket;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMutualFund;
@@ -16,6 +17,7 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	INSTRUMENT_ETF(InstrumentEtf.class, false, new String[] {}),
 	INSTRUMENT_MUTUAL_FUND(InstrumentMutualFund.class, false, new String[] {}),
 	INSTRUMENT_MONEY_MARKET(InstrumentMoneyMarket.class, false, new String[] {}),
+	INSTRUMENT_BOND(InstrumentBond.class, false, new String[] {}),
 	PORTFOLIO(Portfolio.class, false, new String[] {"INSTITUTION","ACCOUNT_NUMBER","CURRENCY","NAME"}),
 	HOLDING(Holding.class, false, new String[] {"AS_OF_DATE","TICKER","EXCHANGE","QUANTITY","INSTITUTION","ACCOUNT_NUMBER"}),
 	POSITION(Position.class, false, new String[] {"TICKER", "EXCHANGE", "ACCOUNT_NUMBER", "INSTITUTION", "PRICE_TIMESTAMP", "POSITION_TIMESTAMP", "QUANTITY"}),

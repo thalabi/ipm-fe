@@ -63,4 +63,15 @@ public class TimeUtils {
 		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
 		return date1Date.compareTo(date2Date);
 	}
+	
+	public static OffsetDateTime offsetDateFromDateString(String date, DateTimeFormatter dateTimeFormatter) {
+		return OffsetDateTime.ofInstant(
+				LocalDate.parse(date, dateTimeFormatter).atStartOfDay().toInstant(OffsetDateTime.now().getOffset()),
+				ZoneId.systemDefault());
+	}
+	public static OffsetDateTime offsetDateFromDateTimeString(String dateTime, DateTimeFormatter dateTimeFormatter) {
+		return OffsetDateTime.ofInstant(
+				LocalDateTime.parse(dateTime, dateTimeFormatter).toInstant(OffsetDateTime.now().getOffset()),
+				ZoneId.systemDefault());
+	}
 }

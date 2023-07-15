@@ -12,8 +12,7 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Price;
-import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
-import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMoneyMarket;
+import com.kerneldc.ipm.domain.instrumentdetail.IFixedPriceInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.TimeUtils;
 
@@ -23,16 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MoneyMarketPriceService implements IInstrumentPricingService<IInstrumentDetail> {
+public class FixedPriceService implements IInstrumentPricingService<IFixedPriceInstrumentDetail> {
 
 	private final PriceRepository priceRepository;
 
 	@Override
-	public Price priceInstrument(Instant snapshotInstant, Instrument instrument, IInstrumentDetail instrumentDetail,
+	public Price priceInstrument(Instant snapshotInstant, Instrument instrument, IFixedPriceInstrumentDetail instrumentDetail,
 			Map<Long, Price> priceCache) throws ApplicationException {
 		var price = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();
-		var instrumentMoneyMarket = (InstrumentMoneyMarket)instrumentDetail;
 
 		if (price == null) {
 			price = new Price();
@@ -45,7 +43,7 @@ public class MoneyMarketPriceService implements IInstrumentPricingService<IInstr
 			if (CollectionUtils.isNotEmpty(priceList)) {
 				price = priceList.get(0);
 			} else {
-				price.setPrice(instrumentMoneyMarket.getPrice());
+				price.setPrice(instrumentDetail.getPrice());
 			}
 			LOGGER.info("Retrieved price for {}: {} {}", ticker, price.getPrice(),
 					price.getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
@@ -59,6 +57,6 @@ public class MoneyMarketPriceService implements IInstrumentPricingService<IInstr
 	
 	@Override
 	public Collection<InstrumentTypeEnum> canHandle() {
-		return List.of(InstrumentTypeEnum.MONEY_MARKET);
+		return List.of(InstrumentTypeEnum.MONEY_MARKET, InstrumentTypeEnum.BOND);
 	}
 }
