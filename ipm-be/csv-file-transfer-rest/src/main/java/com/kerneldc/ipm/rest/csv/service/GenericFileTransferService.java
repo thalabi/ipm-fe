@@ -383,7 +383,7 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 		beanToCsvBuilder.withProfile("csvWrite"); // so that sourceCsvLineNumber column is ignored. Not written to csv file.
 		
 		if (ArrayUtils.isNotEmpty(uploadTableEnum.getWriteColumnOrder())) {
-			LOGGER.info("Table has writeColumnOrder defined. Defining a mappingStrategy");
+			LOGGER.info("Table has writeColumnOrder defined. Defining a mappingStrategy ...");
 			HeaderColumnNameMappingStrategy<AbstractEntity> mappingStrategy = new HeaderColumnNameMappingStrategy<>();
 		    mappingStrategy.setType(uploadTableEnum.getEntity());
 		    

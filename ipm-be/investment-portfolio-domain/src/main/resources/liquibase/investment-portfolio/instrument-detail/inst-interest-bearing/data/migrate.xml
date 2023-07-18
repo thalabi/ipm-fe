@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="migrate-inst-interest-bearing" author="thalabi">
+
+		<sql>
+		<![CDATA[
+		update instrument
+		set type = 'INTEREST_BEARING',
+		    lk='CIB275|USD|INTEREST_BEARING'
+		where lk='CIB275|USD|MONEY_MARKET';
+		update instrument
+		set type = 'INTEREST_BEARING',
+		    lk='TDB8150|CAD|INTEREST_BEARING'
+		where lk='TDB8150|CAD|MONEY_MARKET';
+		]]>         
+		</sql>
+		<rollback>
+			<sql>
+			<![CDATA[
+			update instrument
+			set type = 'MONEY_MARKET',
+			    lk='CIB275|USD|MONEY_MARKET'
+			where lk='CIB275|USD|INTEREST_BEARING';
+			update instrument
+			set type = 'MONEY_MARKET',
+			    lk='TDB8150|CAD|MONEY_MARKET'
+			where lk='TDB8150|CAD|INTEREST_BEARING';
+			]]>         
+			</sql>
+		</rollback>
+    </changeSet>
+    
+</databaseChangeLog>

@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- Tables -->
+    <changeSet id="inst_interest_bearing_table" author="thalabi">
+    	<createSequence sequenceName="inst_interest_bearing_seq"/>
+        <createTable tableName="inst_interest_bearing">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="lk" type="varchar(255)"> 
+                <constraints nullable="false"/> 
+            </column> 
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+			<column name="instrument_id" type="bigint"> 
+                <constraints nullable="false"/> 
+            </column>
+            <column name="price" type="decimal(10,4)"/> 
+        </createTable>
+        <addForeignKeyConstraint baseTableName="inst_interest_bearing" baseColumnNames="instrument_id" constraintName="inst_interest_bearing_fk_1" referencedTableName="instrument" referencedColumnNames="id"/> 
+    </changeSet>
+
+</databaseChangeLog>

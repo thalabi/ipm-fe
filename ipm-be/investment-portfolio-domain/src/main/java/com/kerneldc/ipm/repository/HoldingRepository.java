@@ -40,18 +40,18 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			)
 			select h.id, cast(h.as_of_date as varchar) asOfDate, h.instrument_id instrumentId, i.ticker, i.currency, i.name, h.quantity,
 			case
-				when i.type = 'MONEY_MARKET' then imm.price
+				when i.type = 'INTEREST_BEARING' then iib.price
 				when i.type = 'BOND' then ib.price
 				else lp.latest_price
 			end as latestPrice,
 			case
-				when i.type in ('MONEY_MARKET', 'BOND') then cast(current_timestamp as varchar) 
+				when i.type in ('INTEREST_BEARING', 'BOND') then cast(current_timestamp as varchar) 
 				else cast(lp.latest_price_timestamp as varchar)
 			end as latestPriceTimestamp,
 			h.version from holding h
 			join instrument i on h.instrument_id = i.id
 			left outer join latest_price lp on h.instrument_id = lp.instrument_id
-			left outer join inst_money_market imm on h.instrument_id = imm.instrument_id
+			left outer join inst_interest_bearing iib on h.instrument_id = iib.instrument_id
 			left outer join inst_bond ib on h.instrument_id = ib.instrument_id
 			where h.portfolio_id = :portfolioId order by h.instrument_id, h.as_of_date
 			"""

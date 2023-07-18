@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="interest-bearing-add-columns" author="thalabi">
+        <addNotNullConstraint columnName="price" tableName="inst_interest_bearing"/>
+        <addColumn tableName="inst_interest_bearing">
+	        <column name="interest_rate" type="decimal(7,4)">  
+			</column> 
+	        <column name="type" type="varchar(255)">  
+			</column> 
+            <column name="term" type="varchar(255)">  
+			</column> 
+    	</addColumn> 
+    </changeSet>
+    
+    
+</databaseChangeLog>

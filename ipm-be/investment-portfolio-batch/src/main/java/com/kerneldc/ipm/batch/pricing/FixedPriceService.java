@@ -57,6 +57,6 @@ public class FixedPriceService implements IInstrumentPricingService<IFixedPriceI
 	
 	@Override
 	public Collection<InstrumentTypeEnum> canHandle() {
-		return List.of(InstrumentTypeEnum.MONEY_MARKET, InstrumentTypeEnum.BOND);
+		return List.of(InstrumentTypeEnum.INTEREST_BEARING, InstrumentTypeEnum.BOND);
 	}
 }

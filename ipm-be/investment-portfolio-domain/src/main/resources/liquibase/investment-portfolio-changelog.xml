@@ -72,5 +72,15 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/data/insert.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/rename-primary-key-constraint.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/data/migrate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/data/populate.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/set-columns-not-null.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-2.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-3.xml"/>
 
 </databaseChangeLog>

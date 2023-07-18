@@ -6,8 +6,6 @@ import javax.persistence.Converter;
 import com.google.common.base.Preconditions;
 import com.kerneldc.common.enums.ShortMonthEnum;
 
-
-
 @Converter(autoApply = true)
 public class ShortMonthEnumConverter implements AttributeConverter<ShortMonthEnum, Integer> {
 

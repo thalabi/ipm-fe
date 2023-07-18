@@ -38,7 +38,7 @@ public class LogicalKeyHolder implements Serializable, ILogicallyKeyed {
 			case "String":
 				stringKeyParts[i++] = (String)keyPart;
 				break;
-			case "Integer", "Double", "Long", "BigDecimal":
+			case "Integer", "Long", "Float", "Double", "BigDecimal":
 				stringKeyParts[i++] = String.valueOf(keyPart);	
 				break;
 			case "LocalDateTime":

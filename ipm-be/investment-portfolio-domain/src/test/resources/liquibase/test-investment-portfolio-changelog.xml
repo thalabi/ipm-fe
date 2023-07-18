@@ -17,14 +17,17 @@
 	<include file="liquibase/investment-portfolio/instrument/drop-unique-constrain-1.xml"/>
 	<include file="liquibase/investment-portfolio/instrument/drop-exchange.xml"/>
 
-	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-table.xml"/>
-	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/create-unique-constraint-lk.xml"/>
-
 	<include file="liquibase/investment-portfolio/instrument/data/fix-lk.xml"/>
-
-	<include file="liquibase/investment-portfolio/instrument-detail/inst-money-market/data/populate.xml"/>
 
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-unique-constraint-lk.xml"/>
+
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/test-create-table.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/test-create-unique-constraint-lk.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/set-columns-not-null.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-2.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-3.xml"/>
+	
 
 </databaseChangeLog>
