@@ -29,10 +29,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/protected/investmentPortfolioConroller")
+@RequestMapping("/protected/investmentPortfolioController")
 @RequiredArgsConstructor
 @Slf4j
-public class InvestmentPortfolioConroller {
+public class InvestmentPortfolioController {
 
 	private final HoldingPricingService holdingPricingService;
 	private final HoldingRepository holdingRepository;

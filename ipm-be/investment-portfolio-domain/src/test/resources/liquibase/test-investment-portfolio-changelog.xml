@@ -28,6 +28,6 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/set-columns-not-null.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-2.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-3.xml"/>
-	
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-4.xml"/>
 
 </databaseChangeLog>
