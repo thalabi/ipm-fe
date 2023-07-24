@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
@@ -26,10 +28,12 @@ public class Instrument extends AbstractPersistableEntity {
 	private InstrumentTypeEnum type; 
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
+	@Size(min = 1, max = 16, message = "Ticker must be between 1 and 16 characters")
 	private String ticker;
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
+	@NotNull
 	private CurrencyEnum currency;
 	@CsvBindByName
 	private String name;

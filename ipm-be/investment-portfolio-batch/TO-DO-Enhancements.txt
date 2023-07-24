@@ -1,3 +1,7 @@
 
 1. keep history of holdings by utilizing as_of_date column
 2. after implementing 1) position can be changed to link to holding and price
+
+3. add unique index on instrument_id column in instrument detail tables
+4. make financial instituition not null in db and on ui (required)
+5. make instrument ticker not null
