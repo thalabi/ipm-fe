@@ -30,7 +30,7 @@ public class CorsConfig implements WebMvcConfigurer, RepositoryRestConfigurer {
     
     private void configCorsRegistry(CorsRegistry corsRegistry) {
 		corsRegistry.addMapping("/**").allowedOrigins(corsUrlsToAllow).maxAge(corsMaxAgeInSecs)
-		.allowedMethods("GET", "HEAD", "POST", "DELETE") // by default GET, HEAD, and POST are allowed
+		.allowedMethods("GET", "HEAD", "POST", "DELETE", "PUT") // by default GET, HEAD, and POST are allowed
 		//.allowedHeaders("Content-Disposition").exposedHeaders("Content-Disposition")
 		.allowedHeaders("*").exposedHeaders("*")
 		;
