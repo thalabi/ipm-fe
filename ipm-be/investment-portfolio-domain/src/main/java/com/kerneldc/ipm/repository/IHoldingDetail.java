@@ -16,5 +16,15 @@ public interface IHoldingDetail {
 	// This was changed from type OffsetDateTime, as a workaround to 'org.hibernate.MappingException: No Dialect mapping for JDBC type: 2014' exception
 	String getLatestPriceTimestamp();
 	
+	String getInstrumentType();
+	// Interest bearing instrument details
+	/*FinancialInstitutionEnum*/ String getFinancialInstitution();
+	/*InterestBearingTypeEnum*/ String getType();
+	/*TermEnum*/ String getTerm();
+	Float getInterestRate();
+	String getMaturityDate();
+	Float getPromotionalInterestRate();
+	String getPromotionEndDate();
+
 	Long getVersion();
 }

@@ -48,6 +48,14 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 				when i.type in ('INTEREST_BEARING', 'BOND') then cast(current_timestamp as varchar) 
 				else cast(lp.latest_price_timestamp as varchar)
 			end as latestPriceTimestamp,
+			i.type instrumentType,
+			iib.financial_institution financialInstitution,
+			iib.type,
+			iib.term,
+			iib.interest_rate interestRate,
+			cast(iib.maturity_date as varchar) maturityDate,
+			iib.promotional_interest_rate promotionalInterestRate,
+			cast(iib.promotion_end_date as varchar) promotionEndDate,
 			h.version from holding h
 			join instrument i on h.instrument_id = i.id
 			left outer join latest_price lp on h.instrument_id = lp.instrument_id
