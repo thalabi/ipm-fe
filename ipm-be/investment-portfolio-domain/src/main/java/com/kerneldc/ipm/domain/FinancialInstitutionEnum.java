@@ -8,7 +8,8 @@ public enum FinancialInstitutionEnum {
 	CIBC(10),
 	TANGERINE(614),
 	EQ_BANK(623),
-	DUCA(828)
+	DUCA(828),
+	PEOPLES_TRUST(383)
 	;
 	
 	private int institutionNumber;
