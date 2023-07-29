@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.domain;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
@@ -37,7 +38,7 @@ public class Position extends AbstractPersistableEntity {
     @JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
 	@CsvBindByName
-	private Float quantity;
+	private BigDecimal quantity;
 	
     @ManyToOne(optional = false)
     @JoinColumn(name = "price_id")

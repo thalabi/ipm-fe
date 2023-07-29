@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.domain;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
@@ -54,7 +55,7 @@ public class Holding extends AbstractPersistableEntity {
 
 	
 	@CsvBindByName
-	private Float quantity;
+	private BigDecimal quantity;
 
 	@Transient
 	private IInstrumentDetail instrumentDetail;

@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.validation.constraints.Min;
@@ -19,7 +20,7 @@ public class SaveHoldingRequest {
     @Min(-2) // -1 is CAD Cash, -2 is USD Cash
     private Long instrumentId;
     @Positive
-    private Float quantity;
+    private BigDecimal quantity;
     @NotNull
     private OffsetDateTime asOfDate;
     @PositiveOrZero

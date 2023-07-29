@@ -9,7 +9,9 @@ public enum FinancialInstitutionEnum {
 	TANGERINE(614),
 	EQ_BANK(623),
 	DUCA(828),
-	PEOPLES_TRUST(383)
+	PEOPLES_TRUST(383),
+	OAKEN_HOME_TRUST(627),
+	OAKEN_HOME_BANK(361)
 	;
 	
 	private int institutionNumber;
