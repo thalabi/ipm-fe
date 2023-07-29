@@ -2,6 +2,7 @@ package com.kerneldc.ipm.repository;
 
 import java.math.BigDecimal;
 
+import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.TermEnum;
 
@@ -21,8 +22,10 @@ public interface IHoldingDetail {
 	
 	String getInstrumentType();
 	// Interest bearing instrument details
-	// TODO, this should be of type FinancialInstitutionEnum but would get exception becuase jackson cannot convert
-	String getFinancialInstitution();
+	Integer getFinancialInstitution();
+	default String getFinancialInstitutionString() {
+		return FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitution()).name();
+	}
 	InterestBearingTypeEnum getType();
 	TermEnum getTerm();
 	Float getInterestRate();
