@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="inst_interest_bearing_add_columns_5_1" author="thalabi">
+        <addColumn tableName="inst_interest_bearing">
+            <column name="email_notification" type="boolean"/> 
+    	</addColumn> 
+    </changeSet>
+    
+    <changeSet id="inst_interest_bearing_add_columns_5_2_h2_postgresql" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="Change set was not executed">
+	    	<or>
+		        <dbms type="h2" />
+		        <dbms type="postgresql" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		update inst_interest_bearing 
+		set email_notification = true;
+		]]>         
+		</sql>
+    </changeSet>
+    <changeSet id="inst_interest_bearing_add_columns_5_2_oracle" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="Change set was not executed">
+	        <dbms type="oracle" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		update inst_interest_bearing 
+		set email_notification = 1;
+		]]>         
+		</sql>
+    </changeSet>
+    
+    <changeSet id="inst_interest_bearing_add_columns_5_3" author="thalabi">
+        <addNotNullConstraint columnName="email_notification" tableName="inst_interest_bearing"/>
+    </changeSet>
+    
+</databaseChangeLog>

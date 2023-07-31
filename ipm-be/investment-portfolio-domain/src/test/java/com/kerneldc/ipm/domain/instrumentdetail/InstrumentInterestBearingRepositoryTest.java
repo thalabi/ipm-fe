@@ -38,6 +38,7 @@ class InstrumentInterestBearingRepositoryTest {
 		ib.setType(InterestBearingTypeEnum.MONEY_MARKET);
 		ib.setPrice(new BigDecimal("10"));
 		ib.setInterestRate(4.1f);
+		ib.setEmailNotification(true);
 		instrumentInterestBearingRepository.saveAndFlush(ib);
 		System.out.println("Instrument: " + i);
 		System.out.println("InstrumentInterestBearing: " + ib);
@@ -57,6 +58,7 @@ class InstrumentInterestBearingRepositoryTest {
 		ib.setType(InterestBearingTypeEnum.CHEQUING);
 		ib.setPrice(new BigDecimal("1"));
 		ib.setInterestRate(1f);
+		ib.setEmailNotification(true);
 		ib.setFinancialInstitution(FinancialInstitutionEnum.TANGERINE);
 		instrumentInterestBearingRepository.saveAndFlush(ib);
 		System.out.println("Instrument: " + i);

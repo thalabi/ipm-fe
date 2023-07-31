@@ -41,6 +41,8 @@ public class InstrumentBond extends AbstractInstrumentDetailEntity implements IF
 	private PaymentFrequencyEnum paymentFrequency;
 	@CsvBindByName
 	private OffsetDateTime nextPaymentDate;
+	@CsvBindByName
+	private Boolean emailNotification;
 
 	public void setCusip(String cusip) {
 		this.cusip = cusip;

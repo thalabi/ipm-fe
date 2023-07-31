@@ -90,4 +90,8 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/create-unique-constraint-inst-id.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/create-unique-constraint-inst-id.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/add-column.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-5.xml"/>
+
+	
 </databaseChangeLog>

@@ -48,6 +48,8 @@ public class InstrumentInterestBearing extends AbstractInstrumentDetailEntity im
 	private Float promotionalInterestRate;
 	@CsvBindByName
 	private OffsetDateTime promotionEndDate;
+	@CsvBindByName
+	private Boolean emailNotification;
 
 	public void setType(InterestBearingTypeEnum type) {
 		this.type = type;

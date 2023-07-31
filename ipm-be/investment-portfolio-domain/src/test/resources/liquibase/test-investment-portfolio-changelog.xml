@@ -30,4 +30,7 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-3.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-4.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/add-column.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-5.xml"/>
+
 </databaseChangeLog>
