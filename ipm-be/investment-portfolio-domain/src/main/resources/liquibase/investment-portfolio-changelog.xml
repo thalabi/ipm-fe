@@ -84,4 +84,10 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-3.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-4.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/create-unique-constraint-inst-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-etf/create-unique-constraint-inst-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/create-unique-constraint-inst-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-mutual-fund/create-unique-constraint-inst-id.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-stock/create-unique-constraint-inst-id.xml"/>
+
 </databaseChangeLog>
