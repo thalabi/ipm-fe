@@ -31,4 +31,5 @@ public class InstrumentInterestBearingRequest {
     //@Positive
 	private Float promotionalInterestRate;
 	private OffsetDateTime promotionEndDate;
+	private Boolean emailNotification;
 }

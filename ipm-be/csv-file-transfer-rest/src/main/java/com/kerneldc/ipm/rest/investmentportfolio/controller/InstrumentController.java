@@ -109,6 +109,7 @@ public class InstrumentController {
     	iib.setMaturityDate(instrumentInterestBearingRequest.getMaturityDate());
     	iib.setPromotionalInterestRate(instrumentInterestBearingRequest.getPromotionalInterestRate());
     	iib.setPromotionEndDate(instrumentInterestBearingRequest.getPromotionEndDate());
+    	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
     	instrumentInterestBearingRepository.save(iib);
     	LOGGER.info("InstrumentInterestBearing: {}", iib);
     	LOGGER.info(LOG_END);
@@ -145,6 +146,7 @@ public class InstrumentController {
     	iib.setMaturityDate(instrumentInterestBearingRequest.getMaturityDate());
     	iib.setPromotionalInterestRate(instrumentInterestBearingRequest.getPromotionalInterestRate());
     	iib.setPromotionEndDate(instrumentInterestBearingRequest.getPromotionEndDate());
+    	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
     	instrumentInterestBearingRepository.save(iib);
     	LOGGER.info("InstrumentInterestBearing: {}", iib);
     	LOGGER.info(LOG_END);
