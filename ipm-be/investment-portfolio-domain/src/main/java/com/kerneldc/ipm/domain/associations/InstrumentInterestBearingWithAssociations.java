@@ -21,6 +21,7 @@ public interface InstrumentInterestBearingWithAssociations {
     OffsetDateTime getMaturityDate();
     Float getPromotionalInterestRate();
     OffsetDateTime getPromotionEndDate();
+    Boolean getEmailNotification();
 
 	Instrument getInstrument();
 }
