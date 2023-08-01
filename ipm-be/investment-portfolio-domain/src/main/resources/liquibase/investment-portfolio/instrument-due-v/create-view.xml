@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="instrument_due_v" author="thalabi">
+        <comment>Create instrument_due_v</comment>
+
+    	<createView viewName="instrument_due_v" replaceIfExists="true">
+			<![CDATA[
+			with latest_as_of_date_holding_inst_ids as (
+				select h2.instrument_id
+				from holding h2
+				where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (
+						select max(h.as_of_date) as_of_date, h.instrument_id, h.portfolio_id from holding h group by instrument_id, portfolio_id
+				)
+			)	
+			select i.id, p.institution, p.name portfolio_name, p.account_number, i.name instrument_name, i.ticker, i.currency, iib.type,
+			case
+				when iib.financial_institution = 1 then 'BMO'
+				when iib.financial_institution = 4 then 'TD'
+				when iib.financial_institution = 10 then 'CIBC'
+				when iib.financial_institution = 361 then 'OAKEN_HOME_BANK'
+				when iib.financial_institution = 383 then 'PEOPLES_TRUST'
+				when iib.financial_institution = 614 then 'TANGERINE'
+				when iib.financial_institution = 623 then 'EQ_BANK'
+				when iib.financial_institution = 627 then 'OAKEN_HOME_TRUST'
+				when iib.financial_institution = 828 then 'DUCA'
+			end financial_institution,
+			substr(iib.term, 6) term, iib.price, iib.interest_rate, cast(iib.maturity_date as date),
+			iib.promotional_interest_rate, cast(iib.promotion_end_date as date),
+			cast(
+			case
+				when maturity_date is not null then maturity_date 
+				when promotion_end_date is not null then promotion_end_date 
+				else null
+			end
+			as date) as due_date
+			from inst_interest_bearing iib
+			join instrument i on iib.instrument_id = i.id
+			join holding h on h.instrument_id = i.id
+			join latest_as_of_date_holding_inst_ids hi on hi.instrument_id = i.id
+			join portfolio p on h.portfolio_id = p.id
+			where 
+			case
+				when maturity_date is not null then maturity_date 
+				when promotion_end_date is not null then promotion_end_date 
+				else null
+			end is not null
+			order by due_date desc, financial_institution, type, currency
+ 			]]>
+		</createView>
+
+    </changeSet>
+
+</databaseChangeLog>

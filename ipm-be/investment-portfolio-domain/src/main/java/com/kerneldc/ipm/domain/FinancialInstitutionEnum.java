@@ -3,15 +3,18 @@ package com.kerneldc.ipm.domain;
 public enum FinancialInstitutionEnum {
 
 	// For a list of all FI see https://en.wikipedia.org/wiki/Routing_number_(Canada)
+	//
+	// *** remember to update instrument_due_v as well 
+	//
 	BMO(1),
 	TD(4),
 	CIBC(10),
+	OAKEN_HOME_BANK(361),
+	PEOPLES_TRUST(383),
 	TANGERINE(614),
 	EQ_BANK(623),
-	DUCA(828),
-	PEOPLES_TRUST(383),
 	OAKEN_HOME_TRUST(627),
-	OAKEN_HOME_BANK(361)
+	DUCA(828)
 	;
 	
 	private int institutionNumber;

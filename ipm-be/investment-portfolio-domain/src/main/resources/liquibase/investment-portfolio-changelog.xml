@@ -93,5 +93,6 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-bond/add-column.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-5.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-due-v/create-view.xml"/>
 	
 </databaseChangeLog>
