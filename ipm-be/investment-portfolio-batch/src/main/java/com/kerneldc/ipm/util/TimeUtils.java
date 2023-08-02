@@ -3,8 +3,10 @@
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
@@ -33,7 +35,15 @@ public class TimeUtils {
 	}
 
 	public static OffsetDateTime toOffsetDateTime(LocalDate localDate) {
-		return localDate == null ? null : toOffsetDateTime(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		return toOffsetDateTime(LocalDateTime.of(localDate, LocalTime.MIDNIGHT));
+	}
+	public static OffsetDateTime toOffsetDateTime(LocalDateTime localDateTime) {
+		if (localDateTime == null) {
+			return null;
+		}
+		ZoneOffset zoneOffSet = ZoneId.systemDefault().getRules().getOffset(localDateTime);
+		return localDateTime.atOffset(zoneOffSet);
+
 	}
 	
 	public static OffsetDateTime toOffsetDateTime(Calendar calendar) {
