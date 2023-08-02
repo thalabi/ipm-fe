@@ -43,6 +43,7 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private String financialInstitution;
 	private String term;
 	private BigDecimal price;
+	private BigDecimal quantity;
 	private Float interestRate;
 	private String maturityDate;
 	private Float promotionalInterestRate;
