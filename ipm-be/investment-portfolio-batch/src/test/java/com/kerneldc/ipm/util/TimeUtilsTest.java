@@ -3,6 +3,7 @@ package com.kerneldc.ipm.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,7 +28,7 @@ class TimeUtilsTest {
 		
 		int result = TimeUtils.compareDatePart(yesterday, now);
 		System.out.println("compare result: " + result);
-		assertThat(TimeUtils.compareDatePart(yesterday, now), is(-1));
+		assertThat(TimeUtils.compareDatePart(yesterday, now), lessThan(0));
 	}
 
 	@Test
@@ -60,5 +61,20 @@ class TimeUtilsTest {
 		System.out.println("FormatStyle.MEDIUM: " + now.format(dateFormatter3));
 		System.out.println("FormatStyle.SHORT: " + now.format(dateFormatter4));
 	}
-
+/*
+	@Test
+	void testDaysBetween_success() {
+		var dateFormatter1 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+		var dateFormatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
+		var date1 = OffsetDateTime.ofInstant(
+				Instant.parse("2023-07-31T00:00:01"),
+				ZoneId.systemDefault());
+		var date2 = OffsetDateTime.ofInstant(
+				LocalDate.parse("2023-07-31", dateFormatter2).atStartOfDay(ZoneId.systemDefault()).toInstant(),
+				ZoneId.systemDefault());
+		System.out.println("date1: "+date1+", date2: "+date2);
+		var result = TimeUtils.daysBetween(date1, date2);
+		System.out.println(result);
+	}
+*/	
 }

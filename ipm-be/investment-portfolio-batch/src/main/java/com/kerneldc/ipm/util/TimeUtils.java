@@ -13,6 +13,9 @@ import java.util.Date;
 
 import com.google.common.base.Preconditions;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class TimeUtils {
 
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
@@ -73,5 +76,13 @@ public class TimeUtils {
 		return OffsetDateTime.ofInstant(
 				LocalDateTime.parse(dateTime, dateTimeFormatter).toInstant(OffsetDateTime.now().getOffset()),
 				ZoneId.systemDefault());
+	}
+	public static long daysBetween(OffsetDateTime date1, OffsetDateTime date2) {
+		Preconditions.checkArgument(date1 != null, "date1 must not be null");
+		Preconditions.checkArgument(date2 != null, "date2 must not be null");
+		var date1Date = date1.truncatedTo(ChronoUnit.DAYS);
+		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
+		LOGGER.debug("date1: {}, date2: {}, date1Date: {}, date2Date:{}", date1, date2, date1Date, date2Date);
+		return ChronoUnit.DAYS.between(date1Date, date2Date);
 	}
 }
