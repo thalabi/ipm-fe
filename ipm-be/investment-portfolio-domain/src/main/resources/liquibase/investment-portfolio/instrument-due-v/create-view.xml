@@ -31,7 +31,7 @@
 				when iib.financial_institution = 627 then 'OAKEN_HOME_TRUST'
 				when iib.financial_institution = 828 then 'DUCA'
 			end financial_institution,
-			substr(iib.term, 6) term, iib.price, iib.interest_rate, cast(iib.maturity_date as date),
+			substr(iib.term, 6) term, iib.price, h.quantity, iib.interest_rate, cast(iib.maturity_date as date),
 			iib.promotional_interest_rate, cast(iib.promotion_end_date as date),
 			cast(
 			case
