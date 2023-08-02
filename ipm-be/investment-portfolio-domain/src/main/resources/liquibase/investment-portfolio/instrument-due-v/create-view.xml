@@ -51,7 +51,7 @@
 				when promotion_end_date is not null then promotion_end_date 
 				else null
 			end is not null
-			order by due_date desc, financial_institution, type, currency
+			order by due_date, financial_institution, type, currency
  			]]>
 		</createView>
 
