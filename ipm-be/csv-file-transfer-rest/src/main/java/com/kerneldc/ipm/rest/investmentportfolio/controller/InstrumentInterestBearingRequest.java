@@ -20,7 +20,7 @@ public class InstrumentInterestBearingRequest {
 	private Instrument instrument;
     @NotNull
     private InterestBearingTypeEnum type;
-    //@NotNull
+    @NotNull
 	private FinancialInstitutionEnum financialInstitution;
 	@Positive
 	private BigDecimal price;
@@ -28,8 +28,8 @@ public class InstrumentInterestBearingRequest {
 	private Float interestRate;
 	private TermEnum term;
 	private OffsetDateTime maturityDate;
-    //@Positive
 	private Float promotionalInterestRate;
 	private OffsetDateTime promotionEndDate;
+	@NotNull
 	private Boolean emailNotification;
 }

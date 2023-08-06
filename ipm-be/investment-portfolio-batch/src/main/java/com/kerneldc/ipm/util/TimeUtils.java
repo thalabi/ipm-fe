@@ -87,6 +87,11 @@ public class TimeUtils {
 				LocalDateTime.parse(dateTime, dateTimeFormatter).toInstant(OffsetDateTime.now().getOffset()),
 				ZoneId.systemDefault());
 	}
+	public static OffsetDateTime offsetDateTimeFromDateString(String dateTime, DateTimeFormatter dateTimeFormater) {
+		var ldt = LocalDateTime.of(LocalDate.parse(dateTime, dateTimeFormater), LocalTime.MIDNIGHT);
+		return ldt.atOffset(ZoneId.systemDefault().getRules().getOffset(ldt));
+	}
+	
 	public static long daysBetween(OffsetDateTime date1, OffsetDateTime date2) {
 		Preconditions.checkArgument(date1 != null, "date1 must not be null");
 		Preconditions.checkArgument(date2 != null, "date2 must not be null");

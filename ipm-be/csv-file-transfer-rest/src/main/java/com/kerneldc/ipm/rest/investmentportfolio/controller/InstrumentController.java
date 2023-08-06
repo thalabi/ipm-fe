@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.Instrument;
@@ -37,7 +39,16 @@ public class InstrumentController {
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
 	private final InstrumentInterestBearingRepository instrumentInterestBearingRepository;
+	private final InstrumentDueNotificationService instrumentDueNotificationService;
 	
+	// For testing purposes
+    @GetMapping("/triggerInstrumetDueNotification")
+	public ResponseEntity<Void> triggerInstrumetDueNotification() throws ApplicationException {
+    	LOGGER.info(LOG_BEGIN);
+    	instrumentDueNotificationService.checkDueDate();
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(null);
+    }
     @GetMapping("/getCurrencies")
 	public ResponseEntity<List<CurrencyEnum>> getCurrencies() {
     	LOGGER.info(LOG_BEGIN);
@@ -91,9 +102,10 @@ public class InstrumentController {
 //    }
 
     @PostMapping("/addInstrumentInterestBearing")
-    public ResponseEntity<InstrumentInterestBearingResponse> addInstrumentInterestBearing(@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest) {
+    public ResponseEntity<InstrumentInterestBearingResponse> addInstrumentInterestBearing(@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("instrumentInterestBearingRequest: {}", instrumentInterestBearingRequest);
+    	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var i = new Instrument();
     	i.setType(instrumentInterestBearingRequest.getInstrument().getType());
     	i.setTicker(instrumentInterestBearingRequest.getInstrument().getTicker());
@@ -115,7 +127,73 @@ public class InstrumentController {
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, iib));
     }
-    @DeleteMapping("/deleteInstrumentInterestBearing/{id}")
+
+	private void validateInstrumentInterestBearingRequest(
+			InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
+		var exception = new ApplicationException();
+		switch (instrumentInterestBearingRequest.getType()) {
+		case MONEY_MARKET, CHEQUING, INVESTMENT_SAVINGS:
+			if (instrumentInterestBearingRequest.getTerm() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a term",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getMaturityDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+				exception.addMessage(
+						String.format("%s interest bearing instrument can not have a promotional interestr eate",
+								instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (! /* not */ exception.getMessageList().isEmpty()) {
+				throw exception;
+			}
+			break;
+		case SAVINGS:
+			if (instrumentInterestBearingRequest.getTerm() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a term",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getMaturityDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null
+					&& instrumentInterestBearingRequest.getPromotionEndDate() == null
+					|| instrumentInterestBearingRequest.getPromotionalInterestRate() == null
+							&& instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+				exception.addMessage(String.format(
+						"For a %s interest bearing instrument, if a promotion is in effect, both the promotional interest rate and promotion end date must to be provided",
+						instrumentInterestBearingRequest.getType()));
+			}
+			break;
+		case GIC, TERM_DEPOSIT:
+			if (instrumentInterestBearingRequest.getTerm() == null) {
+				exception.addMessage(String.format("%s interest bearing instrument must have a term",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getMaturityDate() == null) {
+				exception.addMessage(String.format("%s interest bearing instrument must have a maturity date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+				exception.addMessage(
+						String.format("%s interest bearing instrument can not have a promotional interestr eate",
+								instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			break;
+		}
+	}
+	@DeleteMapping("/deleteInstrumentInterestBearing/{id}")
     public ResponseEntity<InstrumentInterestBearingResponse> deleteInstrumentInterestBearing(@PathVariable Long id) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);

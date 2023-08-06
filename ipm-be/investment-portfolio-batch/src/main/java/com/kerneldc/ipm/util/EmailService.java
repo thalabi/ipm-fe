@@ -19,6 +19,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
+import com.kerneldc.ipm.domain.InstrumentDueV;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -38,9 +39,17 @@ public class EmailService {
 	@Value("${dailyMarketValueNotification.template.downArrowUrl}")
 	private String downArrowUrl;
 
+	@Value("${application.email.instrumentDueNotificationFrom}")
+	private String instrumentDueNotificationFrom;
+	@Value("${application.email.instrumentDueNotificationTo}")
+	private String instrumentDueNotificationTo;
+
+	
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE = "dailyMarketValueNotification.ftlh";
 	private static final String DAILY_MARKET_VALUE_FAILURE_TEMPLATE = "dailyMarketValueFailure.ftlh";
+	private static final String INSTRUMENT_DUE_NOTIFICATION_SUBJECT = "Instrument(s) Due";
+	private static final String INSTRUMENT_DUE_NOTIFICATION_TEMPLATE = "instrumentDueNotification.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
 	
@@ -86,12 +95,29 @@ public class EmailService {
 			mimeMessageHelper.setText(processDailyMarketValueFailureTemplate(priceHoldingsExceptions), true);
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException | IOException | TemplateException e) {
-			var message = "Exception while sending Daily Market Value Failure email."; 
+			var message = "Exception while sending daily market Value email."; 
 			LOGGER.error(message, e);
 			throw new ApplicationException(message + " (" + e.getMessage() + ")");
 			
 		}
 		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
+	}
+	public void sendInstrumentDueNotification(List<InstrumentDueV> instrumentDueVList) throws ApplicationException {
+		var mimeMessage = javaMailSender.createMimeMessage();
+		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
+		try {
+			mimeMessageHelper.setFrom(instrumentDueNotificationFrom);
+			mimeMessageHelper.setTo(InternetAddress.parse(instrumentDueNotificationTo));
+			mimeMessageHelper.setSubject(INSTRUMENT_DUE_NOTIFICATION_SUBJECT);
+			mimeMessageHelper.setText(processInstrumentDueNotificationTemplate(instrumentDueVList), true);
+			javaMailSender.send(mimeMessage);
+		} catch (MessagingException | IOException | TemplateException e) {
+			var message = "Exception while sending instrument(s) due notification email."; 
+			LOGGER.error(message, e);
+			throw new ApplicationException(message + " (" + e.getMessage() + ")");
+			
+		}
+		LOGGER.info("Sent instrument(s) due notification email to: {}", instrumentDueNotificationTo);
 	}
 	
 	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
@@ -105,6 +131,13 @@ public class EmailService {
 		templateModelMap.put("downArrowUrl", downArrowUrl);
 
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
+	}
+	// TO DO continue
+	private String processInstrumentDueNotificationTemplate(List<InstrumentDueV> instrumentDueVList) throws IOException, TemplateException {
+		Map<String, Object> templateModelMap = new HashMap<>();
+		templateModelMap.put("instrumentDueVList", instrumentDueVList);
+
+		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(INSTRUMENT_DUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
 	private String processDailyMarketValueFailureTemplate(ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();

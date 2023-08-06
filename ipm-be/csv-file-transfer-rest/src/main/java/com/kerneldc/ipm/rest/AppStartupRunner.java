@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
+import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
@@ -26,13 +27,19 @@ public class AppStartupRunner implements ApplicationRunner {
 	private final InstrumentStockRepository instrumentStockRepository;
 	private final InstrumentMutualFundRepository instrumentMutualFundRepository;
 	private final HoldingRepository holdingRepository;
+	private final InstrumentDueNotificationService instrumentDueNotificationService;
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		LOGGER.info("App started");
-		LOGGER.info("trace 0");
-		var ids = holdingRepository.findLatestAsOfDateHoldingIds();
-		var holdings = holdingRepository.findByIdIn(ids);
-		LOGGER.info("trace 0 end");
+
+		instrumentDueNotificationService.checkDueDate();
+		
+
+		
+//		LOGGER.info("trace 0");
+//		var ids = holdingRepository.findLatestAsOfDateHoldingIds();
+//		var holdings = holdingRepository.findByIdIn(ids);
+//		LOGGER.info("trace 0 end");
 		
 //		Optional<Instrument> iOptional = instrumentRepository.findById(1l);
 //		iOptional.ifPresent(i -> {

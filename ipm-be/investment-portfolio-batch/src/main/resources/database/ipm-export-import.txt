@@ -1,0 +1,10 @@
+Login in to sr22
+sudo su - postgres
+cd /var/lib/pgsql/15/backups
+ pg_dump -U postgres --schema=ipm > ipm
+ 
+ Transfer ipm file to windows
+ psql -U postgres -d postgres
+ drop schema ipm cascade\g
+ 
+ psql -U postgres -d postgres < ipm

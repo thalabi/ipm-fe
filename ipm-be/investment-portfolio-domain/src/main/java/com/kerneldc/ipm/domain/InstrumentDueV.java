@@ -48,5 +48,14 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private String maturityDate;
 	private Float promotionalInterestRate;
 	private String promotionEndDate;
+	
+	private String issuer;
+	private String cusip;
+	private Float coupon;
+	private String issueDate;
+	private String paymentFrequency;
+	private String nextPaymentDate;
+	
+	private Boolean emailNotification;
 	private String dueDate;
 }

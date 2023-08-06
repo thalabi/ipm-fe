@@ -63,6 +63,11 @@ class TimeUtilsTest {
 	}
 
 	@Test
+	void testOffsetDateTimeFromString_withDateStringAndDateFormetter() {
+		var result = TimeUtils.offsetDateTimeFromDateString("2023-08-04", DateTimeFormatter.ofPattern("uuuu-MM-dd"));
+		System.out.println("result: "+ result);
+	}
+	@Test
 	void testDaysBetween_success() {
 		var dateFormatter1 = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
 		var dateFormatter2 = DateTimeFormatter.ofPattern("uuuu-MM-dd");
