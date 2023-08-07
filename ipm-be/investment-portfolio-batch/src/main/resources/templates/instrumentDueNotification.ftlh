@@ -4,7 +4,7 @@
   <style type="text/css">
 
   tr {
-    line-height: 0.75rem;
+    line-height: 1rem;
     background-color: #e4e4e4; 
   }
 
