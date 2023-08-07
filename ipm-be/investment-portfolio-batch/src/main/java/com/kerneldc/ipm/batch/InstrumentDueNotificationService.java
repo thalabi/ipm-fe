@@ -57,19 +57,15 @@ public class InstrumentDueNotificationService {
 			}
 		}
 		if (! /* not */ instrumentDueVtoNotifyList.isEmpty()) {
-			emailService.sendInstrumentDueNotification(daysToNotify, instrumentDueVtoNotifyList);
+			var overdueInstrument = instrumentDueVtoNotifyList.stream().filter(instrumentDueV -> instrumentDueV.getOverdue()).findFirst();
+			emailService.sendInstrumentDueNotification(daysToNotify, instrumentDueVtoNotifyList, overdueInstrument.isPresent());
 		}
 		LOGGER.info("instrumentDueVtoNotifyList size: {}", instrumentDueVtoNotifyList.size());
 		
 	}
 
 	private void setDateOverdue(InstrumentDueV instrumentDueV, Long numberOfDays) {
-		if (numberOfDays < 0l) {
-			instrumentDueV.setOverdue(true);
-		} else {
-			instrumentDueV.setOverdue(false);
-		}
-		
+		instrumentDueV.setOverdue(numberOfDays < 0l);
 	}
 
 	public void checkDueDate() throws ApplicationException {

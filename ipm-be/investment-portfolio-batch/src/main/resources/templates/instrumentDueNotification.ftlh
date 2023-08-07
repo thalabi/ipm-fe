@@ -33,6 +33,10 @@
 	  </#if>
   will be due within the next ${daysToNotify} days:</h3>
   
+  <#if (overdueInstrumentFound)>
+  	<h3>*** Dates marked in <span class="red">red</span> are overdue ***</h3>
+  </#if>
+  
   <table>
   <#list instrumentDueVList as instrumentDueV>
 
