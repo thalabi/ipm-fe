@@ -89,14 +89,14 @@ public class EmailService {
 		sendFailureEmail(priceHoldingsExceptions, dailyMarketValueNotificationFrom, dailyMarketValueNotificationTo, DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
 		LOGGER.info("Sent daily market value notification failure email to: {}", dailyMarketValueNotificationTo);
 	}
-	public void sendInstrumentDueNotification(List<InstrumentDueV> instrumentDueVList) throws ApplicationException {
+	public void sendInstrumentDueNotification(Long daysToNotify, List<InstrumentDueV> instrumentDueVList) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 		try {
 			mimeMessageHelper.setFrom(instrumentDueNotificationFrom);
 			mimeMessageHelper.setTo(InternetAddress.parse(instrumentDueNotificationTo));
 			mimeMessageHelper.setSubject(INSTRUMENT_DUE_NOTIFICATION_SUBJECT);
-			mimeMessageHelper.setText(processInstrumentDueNotificationTemplate(instrumentDueVList), true);
+			mimeMessageHelper.setText(processInstrumentDueNotificationTemplate(instrumentDueVList, daysToNotify), true);
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException | IOException | TemplateException e) {
 			var message = "Exception while sending instrument(s) due notification email."; 
@@ -142,9 +142,10 @@ public class EmailService {
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
 	// TO DO continue
-	private String processInstrumentDueNotificationTemplate(List<InstrumentDueV> instrumentDueVList) throws IOException, TemplateException {
+	private String processInstrumentDueNotificationTemplate(List<InstrumentDueV> instrumentDueVList, Long daysToNotify) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("instrumentDueVList", instrumentDueVList);
+		templateModelMap.put("daysToNotify", daysToNotify);
 
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(INSTRUMENT_DUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}

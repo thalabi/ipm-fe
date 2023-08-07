@@ -7,9 +7,21 @@
     line-height: 1rem;
     background-color: #e4e4e4; 
   }
+  .red {
+    color: red;
+  }
 
   </style>
 </head>
+
+<#function checkOverdue overdue>
+  <#if (overdue)>
+    <#return "red" />
+  <#else>
+    <#return "" />
+  </#if>
+</#function>
+
 <body>
 
   <h3>The following
@@ -19,7 +31,7 @@
 	  <#if (instrumentDueVList?size > 1)>
 	  ${instrumentDueVList?size} instruments
 	  </#if>
-  will require attention soon:</h3>
+  will be due within the next ${daysToNotify} days:</h3>
   
   <table>
   <#list instrumentDueVList as instrumentDueV>
@@ -72,7 +84,7 @@
   
   <#if ((instrumentDueV.maturityDate)?? && instrumentDueV.type != "BOND")>
 	  <tr>
-	  	<td>Maturity date:</td> <td><strong>${instrumentDueV.maturityDate}</strong></td>
+	  	<td>Maturity date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.maturityDate}</strong></td>
 	  </tr>
   </#if>
 
@@ -89,7 +101,7 @@
 	</#if>
   	<#if ((instrumentDueV.nextPaymentDate)??)>
 	  <tr>
-	  	<td>Next payment date:</td> <td><strong>${instrumentDueV.nextPaymentDate}</strong></td>
+	  	<td>Next payment date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.nextPaymentDate}</strong></td>
 	  </tr>
 	</#if>
   </#if>
@@ -126,7 +138,7 @@
   
   <#if ((instrumentDueV.promotionEndDate)??)>
 	  <tr>
-	  	<td>Promotion end date:</td> <td><strong>${instrumentDueV.promotionEndDate}</strong></td>
+	  	<td>Promotion end date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.promotionEndDate}</strong></td>
 	  </tr>
   </#if>
 

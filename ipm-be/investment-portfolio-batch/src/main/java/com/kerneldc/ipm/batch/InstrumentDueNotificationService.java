@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Preconditions;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.InstrumentDueV;
 import com.kerneldc.ipm.repository.InstrumentDueVRepository;
@@ -30,8 +31,9 @@ public class InstrumentDueNotificationService {
 	
 	private OffsetDateTime now;
 	
-	public void checkDueDate() throws ApplicationException {
+	public void checkDueDate(Long daysToNotify) throws ApplicationException {
 		LOGGER.info("daysToNotify: {}", daysToNotify);
+		Preconditions.checkArgument(daysToNotify > 0l, "daysToNotify is %s, Days to notify cannot be negative.", daysToNotify);
 		now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
 		var instrumentDueVList = instrumentInterestBearingRepository.findByEmailNotification(true);
 		if (instrumentDueVList.isEmpty()) {
@@ -47,13 +49,30 @@ public class InstrumentDueNotificationService {
 			Long numberOfDays = TimeUtils.daysBetween(now, dueDate);
 			LOGGER.debug("daysBetween({}, {}) = {}", now, dueDate, numberOfDays);
 			if (numberOfDays.compareTo(daysToNotify) <= 0) {
+				
+				setDateOverdue(instrumentDueV, numberOfDays);
+				
 				instrumentDueVtoNotifyList.add(instrumentDueV);
 				LOGGER.debug("Notify that this instrument is due: {}", instrumentDueV);
 			}
 		}
 		if (! /* not */ instrumentDueVtoNotifyList.isEmpty()) {
-			emailService.sendInstrumentDueNotification(instrumentDueVtoNotifyList);
+			emailService.sendInstrumentDueNotification(daysToNotify, instrumentDueVtoNotifyList);
 		}
 		LOGGER.info("instrumentDueVtoNotifyList size: {}", instrumentDueVtoNotifyList.size());
+		
+	}
+
+	private void setDateOverdue(InstrumentDueV instrumentDueV, Long numberOfDays) {
+		if (numberOfDays < 0l) {
+			instrumentDueV.setOverdue(true);
+		} else {
+			instrumentDueV.setOverdue(false);
+		}
+		
+	}
+
+	public void checkDueDate() throws ApplicationException {
+		checkDueDate(daysToNotify);
 	}
 }

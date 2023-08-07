@@ -3,6 +3,7 @@ package com.kerneldc.ipm.domain;
 import java.math.BigDecimal;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
@@ -10,6 +11,7 @@ import com.kerneldc.common.domain.AbstractImmutableEntity;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity(name = "instrument_due_v")
 @Immutable
@@ -58,4 +60,8 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	
 	private Boolean emailNotification;
 	private String dueDate;
+	
+	@Transient
+	@Setter
+	private Boolean overdue;
 }
