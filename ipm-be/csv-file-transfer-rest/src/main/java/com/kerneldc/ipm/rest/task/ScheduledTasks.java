@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.HoldingPricingService;
+import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.util.EmailService;
 
@@ -40,6 +41,8 @@ public class ScheduledTasks {
 	
 	@Autowired
 	private HoldingPricingService holdingPricingService;
+	@Autowired
+	private InstrumentDueNotificationService instrumentDueNotificationService;
 	
 	@Autowired
 	private EmailService emailService;
@@ -124,6 +127,15 @@ public class ScheduledTasks {
 		} catch (ApplicationException applicationException) {
 			applicationException.printStackTrace();
 			emailService.sendDailyMarketValueFailure(applicationException);
+		}
+	}
+	@Scheduled(cron = "1 0 0 * * MON-FRI")
+	public void checkInstrumentDue() throws ApplicationException {
+		try {
+			instrumentDueNotificationService.checkDueDate();
+		} catch (ApplicationException applicationException) {
+			applicationException.printStackTrace();
+			emailService.sendInstrumentDueFailure(applicationException);
 		}
 	}
 }

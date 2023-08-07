@@ -86,21 +86,8 @@ public class EmailService {
 		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
 	}
 	public void sendDailyMarketValueFailure(ApplicationException priceHoldingsExceptions) throws ApplicationException {
-		var mimeMessage = javaMailSender.createMimeMessage();
-		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
-		try {
-			mimeMessageHelper.setFrom(dailyMarketValueNotificationFrom);
-			mimeMessageHelper.setTo(InternetAddress.parse(dailyMarketValueNotificationTo));
-			mimeMessageHelper.setSubject(DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
-			mimeMessageHelper.setText(processDailyMarketValueFailureTemplate(priceHoldingsExceptions), true);
-			javaMailSender.send(mimeMessage);
-		} catch (MessagingException | IOException | TemplateException e) {
-			var message = "Exception while sending daily market Value email."; 
-			LOGGER.error(message, e);
-			throw new ApplicationException(message + " (" + e.getMessage() + ")");
-			
-		}
-		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
+		sendFailureEmail(priceHoldingsExceptions, dailyMarketValueNotificationFrom, dailyMarketValueNotificationTo, DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT);
+		LOGGER.info("Sent daily market value notification failure email to: {}", dailyMarketValueNotificationTo);
 	}
 	public void sendInstrumentDueNotification(List<InstrumentDueV> instrumentDueVList) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
@@ -119,7 +106,29 @@ public class EmailService {
 		}
 		LOGGER.info("Sent instrument(s) due notification email to: {}", instrumentDueNotificationTo);
 	}
-	
+
+	public void sendInstrumentDueFailure(ApplicationException instrumentDueExceptions) throws ApplicationException {
+		sendFailureEmail(instrumentDueExceptions, instrumentDueNotificationFrom, instrumentDueNotificationTo, INSTRUMENT_DUE_NOTIFICATION_SUBJECT);
+		LOGGER.info("Sent instrument due failure notification email to: {}", instrumentDueNotificationTo);
+	}
+	private void sendFailureEmail(ApplicationException applicationExceptions, String emailFromAddress, String emailToAddress, String emailSubject) throws ApplicationException {
+		var mimeMessage = javaMailSender.createMimeMessage();
+		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
+		try {
+			mimeMessageHelper.setFrom(emailFromAddress);
+			mimeMessageHelper.setTo(InternetAddress.parse(emailToAddress));
+			mimeMessageHelper.setSubject(emailSubject);
+			mimeMessageHelper.setText(processDailyMarketValueFailureTemplate(applicationExceptions), true);
+			javaMailSender.send(mimeMessage);
+		} catch (MessagingException | IOException | TemplateException e) {
+			var message = "Exception while sending failure email."; 
+			LOGGER.error(message, e);
+			throw new ApplicationException(message + " (" + e.getMessage() + ")");
+			
+		}
+		LOGGER.info("Sent daily market value notification email to: {}", dailyMarketValueNotificationTo);
+	}
+
 	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
