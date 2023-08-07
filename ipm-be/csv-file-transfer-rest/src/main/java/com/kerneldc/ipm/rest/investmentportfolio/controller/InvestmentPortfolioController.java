@@ -34,6 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InvestmentPortfolioController {
 
+	private static final String LOG_BEGIN = "Begin ...";
+	private static final String LOG_END = "End ...";
+
 	private final HoldingPricingService holdingPricingService;
 	private final HoldingRepository holdingRepository;
 	private final PortfolioRepository portfolioRepository;
@@ -41,9 +44,9 @@ public class InvestmentPortfolioController {
 	private final PositionRepository positionRepository;
 	
     @GetMapping("/priceHoldings")
-	public ResponseEntity<PriceHoldingResponse> priceHoldings(Boolean sendEmail) {
-    	LOGGER.info("Begin ...");
-    	var priceHoldingResponse = new PriceHoldingResponse();
+	public ResponseEntity<BatchJobResponse> priceHoldings(Boolean sendEmail) {
+    	LOGGER.info(LOG_BEGIN);
+    	var priceHoldingResponse = new BatchJobResponse();
     	try {
 			holdingPricingService.priceHoldings(sendEmail, false);
 	    	priceHoldingResponse.setMessage(StringUtils.EMPTY);
@@ -54,26 +57,26 @@ public class InvestmentPortfolioController {
 	    	priceHoldingResponse.setMessage(e.getMessage());
 	    	priceHoldingResponse.setTimestamp(LocalDateTime.now());
 		}
-    	LOGGER.info("End ...");
+    	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(priceHoldingResponse);
     }
 
     @GetMapping("/getHoldingDetails")
 	public ResponseEntity<Map<String, List<IHoldingDetail>>> getHoldingDetails(Long portfolioId) {
-    	LOGGER.info("Begin ...");
+    	LOGGER.info(LOG_BEGIN);
     	var holdingDetailList = holdingRepository.findByPortfolioId(portfolioId);
     	LOGGER.info("holdingDetailList: {}", holdingDetailList);
     	holdingDetailList.stream().forEach(holdingDetail ->
     		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), /*holdingDetail.getExchange(),*/ holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity())
     	);
     	Map<String, List<IHoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
-    	LOGGER.info("End ...");
+    	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(namedHoldingDetailList);
     }
     
     @PostMapping("/addHolding")
     public ResponseEntity<SaveHoldingResponse> addHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
-    	LOGGER.info("Begin ...");
+    	LOGGER.info(LOG_BEGIN);
     	var portfolioId = saveHoldingRequest.getPortfolioId();
     	var instrumentId = saveHoldingRequest.getInstrumentId();
     	var holdingList = holdingRepository.findByPortfolioIdAndInstrumentIdAndAsOfDate(portfolioId, instrumentId, saveHoldingRequest.getAsOfDate());
@@ -90,13 +93,13 @@ public class InvestmentPortfolioController {
     	holding.setQuantity(saveHoldingRequest.getQuantity());
     	holding.setAsOfDate(saveHoldingRequest.getAsOfDate());
     	holding = holdingRepository.save(holding);
-    	LOGGER.info("End ...");
+    	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
     }
     
     @PostMapping("/updateHolding")
     public ResponseEntity<SaveHoldingResponse> updateHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
-    	LOGGER.info("Begin ...");
+    	LOGGER.info(LOG_BEGIN);
     	var portfolioId = saveHoldingRequest.getPortfolioId();
     	var instrumentId = saveHoldingRequest.getInstrumentId();
     	var holdingOptional = holdingRepository.findById(saveHoldingRequest.getId());
@@ -118,29 +121,29 @@ public class InvestmentPortfolioController {
     	holding.setQuantity(saveHoldingRequest.getQuantity());
     	holding.setAsOfDate(saveHoldingRequest.getAsOfDate());
     	holding = holdingRepository.save(holding);
-    	LOGGER.info("End ...");
+    	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
     }
 
     @GetMapping("/getDistinctPositionSnapshots")
 	public ResponseEntity<List<PositionSnapshot>> getDistinctPositionSnapshots() {
-    	LOGGER.info("Begin ...");
+    	LOGGER.info(LOG_BEGIN);
     	
     	var positionSnapshotList = positionRepository.selectAllPositionSnapshots();
-       	LOGGER.info("End ...");
+       	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(positionSnapshotList);
     }
     
     @PostMapping("/purgePositionSnapshot")
     public ResponseEntity<String> purgePositionSnapshot(@Valid @RequestBody PurgePositionSnapshotRequest purgePositionSnapshotRequest) {
-    	LOGGER.info("Begin ...");
+    	LOGGER.info(LOG_BEGIN);
     	
     	LOGGER.info("purgePositionSnapshotRequest.getPositionSnapshot(): {}", purgePositionSnapshotRequest.getPositionSnapshot());
 		var purgePositionSnapshotResult = holdingPricingService.purgePositionSnapshot(purgePositionSnapshotRequest.getPositionSnapshot());
 		LOGGER.info("Purged {} position and {} price records.", purgePositionSnapshotResult.positionDeleteCount(),
 				purgePositionSnapshotResult.priceDeleteCount());
     	
-    	LOGGER.info("End ...");
+    	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(StringUtils.EMPTY);
     }
 

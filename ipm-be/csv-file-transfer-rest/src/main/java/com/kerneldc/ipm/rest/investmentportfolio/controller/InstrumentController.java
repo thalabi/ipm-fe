@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,11 +57,22 @@ public class InstrumentController {
     	return ResponseEntity.ok(daysToNotify);
     }
     @GetMapping("/triggerInstrumetDueNotification")
-	public ResponseEntity<Void> triggerInstrumetDueNotification(@RequestParam @Min(1) Long daysToNotify) throws ApplicationException {
+	public ResponseEntity<BatchJobResponse> triggerInstrumetDueNotification(@RequestParam @Min(1) Long daysToNotify) throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
-    	instrumentDueNotificationService.checkDueDate(daysToNotify);
+    	var checkDueDateResponse = new BatchJobResponse();
+    	try {
+    		instrumentDueNotificationService.checkDueDate(daysToNotify);
+	    	checkDueDateResponse.setMessage(StringUtils.EMPTY);
+	    	checkDueDateResponse.setTimestamp(LocalDateTime.now());
+		} catch (ApplicationException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.error("Exception checking instrument due dates:\n", e);
+	    	checkDueDateResponse.setMessage(e.getMessage());
+	    	checkDueDateResponse.setTimestamp(LocalDateTime.now());
+		}
     	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(null);
+    	return ResponseEntity.ok(checkDueDateResponse);
+    	
     }
     @GetMapping("/getCurrencies")
 	public ResponseEntity<List<CurrencyEnum>> getCurrencies() {

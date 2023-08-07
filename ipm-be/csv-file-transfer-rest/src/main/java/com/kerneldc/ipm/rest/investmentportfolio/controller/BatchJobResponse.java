@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class PriceHoldingResponse {
+public class BatchJobResponse {
 
 	private String message;
 	private LocalDateTime timestamp;
