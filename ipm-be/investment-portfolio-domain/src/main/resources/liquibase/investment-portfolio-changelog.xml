@@ -95,4 +95,6 @@
 
 	<include file="liquibase/investment-portfolio/instrument-due-v/create-view.xml"/>
 	
+	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-2.xml"/>
+	
 </databaseChangeLog>
