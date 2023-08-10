@@ -2,6 +2,10 @@ package com.kerneldc.ipm.repository;
 
 import java.math.BigDecimal;
 
+import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
+import com.kerneldc.ipm.domain.TermEnum;
+
 public interface IHoldingDetail {
 	Long getId();
 	// This was changed from type OffsetDateTime, as a workaround to 'org.hibernate.MappingException: No Dialect mapping for JDBC type: 2014' exception
@@ -16,7 +20,6 @@ public interface IHoldingDetail {
 	// This was changed from type OffsetDateTime, as a workaround to 'org.hibernate.MappingException: No Dialect mapping for JDBC type: 2014' exception
 	String getLatestPriceTimestamp();
 	
-	/*
 	String getInstrumentType();
 	// Interest bearing instrument details
 	Integer getFinancialInstitution();
@@ -29,6 +32,6 @@ public interface IHoldingDetail {
 	String getMaturityDate();
 	Float getPromotionalInterestRate();
 	String getPromotionEndDate();
-	*/
+
 	Long getVersion();
 }
