@@ -24,7 +24,7 @@ public interface IHoldingDetail {
 	// Interest bearing instrument details
 	Integer getFinancialInstitution();
 	default String getFinancialInstitutionString() {
-		return FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitution()).name();
+		return getFinancialInstitution() != null ? FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitution()).name() : null;
 	}
 	InterestBearingTypeEnum getType();
 	TermEnum getTerm();

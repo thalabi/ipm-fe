@@ -10,6 +10,7 @@ import javax.validation.constraints.Min;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.DigestUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -133,7 +134,7 @@ public class InstrumentController {
     	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var i = new Instrument();
     	i.setType(instrumentInterestBearingRequest.getInstrument().getType());
-    	i.setTicker(instrumentInterestBearingRequest.getInstrument().getTicker());
+    	i.setTicker(md5(instrumentInterestBearingRequest.getInstrument().getName()));
     	i.setCurrency( instrumentInterestBearingRequest.getInstrument().getCurrency());
     	i.setName(instrumentInterestBearingRequest.getInstrument().getName());
     	var iib = new InstrumentInterestBearing();
@@ -237,7 +238,7 @@ public class InstrumentController {
     	}
     	var i = iib.getInstrument();
     	i.setType(instrumentInterestBearingRequest.getInstrument().getType());
-    	i.setTicker(instrumentInterestBearingRequest.getInstrument().getTicker());
+    	i.setTicker(md5(instrumentInterestBearingRequest.getInstrument().getName()));
     	i.setCurrency( instrumentInterestBearingRequest.getInstrument().getCurrency());
     	i.setName(instrumentInterestBearingRequest.getInstrument().getName());
     	iib.setInstrument(i);
@@ -284,4 +285,7 @@ public class InstrumentController {
 //    	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
 //    }
 
+    private static String md5(String name) {
+    	return DigestUtils.md5Digest(name.getBytes()).toString();
+    }
 }

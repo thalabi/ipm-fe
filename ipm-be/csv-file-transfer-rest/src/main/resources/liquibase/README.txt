@@ -16,7 +16,7 @@ drop user ipm;
 
 to backup schema:
 
-pg_dump -U postgres -n ipm -f -c  -f ipm.bak postgres
+pg_dump -U postgres -n ipm -f ipm.bak postgres
 
 to restore schema:
 
