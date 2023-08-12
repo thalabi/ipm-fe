@@ -129,7 +129,7 @@ public class ScheduledTasks {
 			emailService.sendDailyMarketValueFailure(applicationException);
 		}
 	}
-	@Scheduled(cron = "1 0 0 * * MON-FRI")
+	@Scheduled(cron = "1 0 0 * * *")
 	public void checkInstrumentDue() throws ApplicationException {
 		try {
 			instrumentDueNotificationService.checkDueDate();
