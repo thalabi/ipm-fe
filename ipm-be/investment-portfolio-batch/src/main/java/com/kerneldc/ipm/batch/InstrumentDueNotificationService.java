@@ -32,6 +32,7 @@ public class InstrumentDueNotificationService {
 	private OffsetDateTime now;
 	
 	public void checkDueDate(Long daysToNotify) throws ApplicationException {
+		LOGGER.info("Begin ...");
 		LOGGER.info("daysToNotify: {}", daysToNotify);
 		Preconditions.checkArgument(daysToNotify > 0l, "daysToNotify is %s, Days to notify cannot be negative.", daysToNotify);
 		now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
@@ -61,7 +62,7 @@ public class InstrumentDueNotificationService {
 			emailService.sendInstrumentDueNotification(daysToNotify, instrumentDueVtoNotifyList, overdueInstrument.isPresent());
 		}
 		LOGGER.info("instrumentDueVtoNotifyList size: {}", instrumentDueVtoNotifyList.size());
-		
+		LOGGER.info("End ...");		
 	}
 
 	private void setDateOverdue(InstrumentDueV instrumentDueV, Long numberOfDays) {

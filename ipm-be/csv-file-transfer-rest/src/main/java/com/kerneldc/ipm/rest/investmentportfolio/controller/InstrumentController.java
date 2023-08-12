@@ -238,7 +238,14 @@ public class InstrumentController {
     	}
     	var i = iib.getInstrument();
     	i.setType(instrumentInterestBearingRequest.getInstrument().getType());
-    	i.setTicker(md5(instrumentInterestBearingRequest.getInstrument().getName()));
+    	if (Arrays.asList(InterestBearingTypeEnum.MONEY_MARKET, InterestBearingTypeEnum.INVESTMENT_SAVINGS).contains(instrumentInterestBearingRequest.getType())) {
+    		LOGGER.info("trace 0");
+    		i.setTicker(instrumentInterestBearingRequest.getInstrument().getTicker());
+    	} else {
+    		i.setTicker(md5(instrumentInterestBearingRequest.getInstrument().getName()));
+    		LOGGER.info("trace 1");
+    	}
+    	LOGGER.info("i.getTicker(): {}", i.getTicker());
     	i.setCurrency( instrumentInterestBearingRequest.getInstrument().getCurrency());
     	i.setName(instrumentInterestBearingRequest.getInstrument().getName());
     	iib.setInstrument(i);
