@@ -28,6 +28,7 @@ public class InstrumentInterestBearingRequest {
 	private Float interestRate;
 	private TermEnum term;
 	private OffsetDateTime maturityDate;
+	private OffsetDateTime nextPaymentDate;
 	private Float promotionalInterestRate;
 	private OffsetDateTime promotionEndDate;
 	@NotNull

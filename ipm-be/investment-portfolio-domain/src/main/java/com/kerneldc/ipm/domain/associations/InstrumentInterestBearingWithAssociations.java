@@ -19,6 +19,7 @@ public interface InstrumentInterestBearingWithAssociations {
     Float getInterestRate();
     TermEnum getTerm();
     OffsetDateTime getMaturityDate();
+    OffsetDateTime getNextPaymentDate();
     Float getPromotionalInterestRate();
     OffsetDateTime getPromotionEndDate();
     Boolean getEmailNotification();

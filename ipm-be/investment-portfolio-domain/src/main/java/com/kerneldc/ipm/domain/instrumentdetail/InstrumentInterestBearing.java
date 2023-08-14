@@ -45,6 +45,8 @@ public class InstrumentInterestBearing extends AbstractInstrumentDetailEntity im
 	@CsvBindByName
 	private OffsetDateTime maturityDate;
 	@CsvBindByName
+	private OffsetDateTime nextPaymentDate;
+	@CsvBindByName
 	private Float promotionalInterestRate;
 	@CsvBindByName
 	private OffsetDateTime promotionEndDate;

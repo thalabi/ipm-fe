@@ -145,6 +145,7 @@ public class InstrumentController {
     	iib.setInterestRate(instrumentInterestBearingRequest.getInterestRate());
     	iib.setTerm(instrumentInterestBearingRequest.getTerm());
     	iib.setMaturityDate(instrumentInterestBearingRequest.getMaturityDate());
+    	iib.setNextPaymentDate(instrumentInterestBearingRequest.getNextPaymentDate());
     	iib.setPromotionalInterestRate(instrumentInterestBearingRequest.getPromotionalInterestRate());
     	iib.setPromotionEndDate(instrumentInterestBearingRequest.getPromotionEndDate());
     	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
@@ -165,6 +166,10 @@ public class InstrumentController {
 			}
 			if (instrumentInterestBearingRequest.getMaturityDate() != null) {
 				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
 						instrumentInterestBearingRequest.getType()));
 			}
 			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
@@ -189,6 +194,10 @@ public class InstrumentController {
 				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
 						instrumentInterestBearingRequest.getType()));
 			}
+			if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
+				exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
+						instrumentInterestBearingRequest.getType()));
+			}
 			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null
 					&& instrumentInterestBearingRequest.getPromotionEndDate() == null
 					|| instrumentInterestBearingRequest.getPromotionalInterestRate() == null
@@ -205,6 +214,10 @@ public class InstrumentController {
 			}
 			if (instrumentInterestBearingRequest.getMaturityDate() == null) {
 				exception.addMessage(String.format("%s interest bearing instrument must have a maturity date",
+						instrumentInterestBearingRequest.getType()));
+			}
+			if (instrumentInterestBearingRequest.getNextPaymentDate() == null) {
+				exception.addMessage(String.format("%s interest bearing instrument must have a next payment date",
 						instrumentInterestBearingRequest.getType()));
 			}
 			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
@@ -256,6 +269,7 @@ public class InstrumentController {
     	iib.setTerm(instrumentInterestBearingRequest.getTerm());
     	iib.setMaturityDate(instrumentInterestBearingRequest.getMaturityDate());
     	iib.setPromotionalInterestRate(instrumentInterestBearingRequest.getPromotionalInterestRate());
+    	iib.setNextPaymentDate(instrumentInterestBearingRequest.getNextPaymentDate());
     	iib.setPromotionEndDate(instrumentInterestBearingRequest.getPromotionEndDate());
     	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
     	instrumentInterestBearingRepository.save(iib);

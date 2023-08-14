@@ -97,4 +97,6 @@
 	
 	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-2.xml"/>
 	
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-6.xml"/>
+	
 </databaseChangeLog>
