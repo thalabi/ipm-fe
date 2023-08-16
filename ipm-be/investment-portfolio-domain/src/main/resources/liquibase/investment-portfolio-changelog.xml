@@ -99,4 +99,6 @@
 	
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-6.xml"/>
 	
+	<include file="liquibase/investment-portfolio/portfolio/add-column-logically-deleted.xml"/>
+
 </databaseChangeLog>

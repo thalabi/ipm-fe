@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="
+		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="portfolio_add_column_logically_deleted_1" author="thalabi">
+        <addColumn tableName="portfolio">
+            <column name="logically_deleted" type="boolean"/> 
+    	</addColumn> 
+    </changeSet>
+    
+    <changeSet id="portfolio_add_column_logically_deleted_2_h2_postgresql" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="Change set was not executed">
+	    	<or>
+		        <dbms type="h2" />
+		        <dbms type="postgresql" />
+	        </or>
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		update portfolio 
+		set logically_deleted = false;
+		]]>         
+		</sql>
+    </changeSet>
+    <changeSet id="portfolio_add_column_logically_deleted_2_oracle" author="thalabi">
+	    <preConditions onFail="CONTINUE" onFailMessage="Change set was not executed">
+	        <dbms type="oracle" />
+	    </preConditions>
+		<sql>
+		<![CDATA[
+		update portfolio 
+		set logically_deleted = 0;
+		]]>         
+		</sql>
+    </changeSet>
+    
+    <changeSet id="portfolio_add_column_logically_deleted_3" author="thalabi">
+        <addNotNullConstraint columnName="logically_deleted" tableName="portfolio"/>
+    </changeSet>
+    
+</databaseChangeLog>

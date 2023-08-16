@@ -2,6 +2,8 @@ Login in to sr22
 sudo su - postgres
 cd /var/lib/pgsql/15/backups
  pg_dump -U postgres --schema=ipm > ipm
+ mv ipm ipm.bak-2023-08-14
+
  
  Transfer ipm file to windows
  psql -U postgres -d postgres

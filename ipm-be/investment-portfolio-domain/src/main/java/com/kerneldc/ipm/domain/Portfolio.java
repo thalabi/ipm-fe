@@ -31,6 +31,8 @@ public class Portfolio extends AbstractPersistableEntity {
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
 	private CurrencyEnum currency;
+	@CsvBindByName
+	private Boolean logicallyDeleted;
 
 	public void setInstitution(String institution) {
 		this.institution = institution;
