@@ -49,12 +49,13 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
 	private final EntityRepositoryFactory entityRepositoryFactory;
 	private final EntityRepositoryFactoryHelper entityRepositoryFactoryHelper;
-	private final HoldingRepository holdingRepository;
-	private final PositionRepository positionRepository;
-	private final PriceRepository priceRepository;
-	private final HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	private final ExchangeRateService exchangeRateService;
 	private final EmailService emailService;
+	
+	private HoldingRepository holdingRepository;
+	private PositionRepository positionRepository;
+	private PriceRepository priceRepository;
+	private HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	
 	private Instant snapshotInstant;
 	private OffsetDateTime now;

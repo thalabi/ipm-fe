@@ -57,9 +57,9 @@ public class PositionBeanTransformerStage1 implements IBeanTransformer {
 				position.setInstrument(instrumentList.get(0));
 			}
 			
-			List<Portfolio> portfolioList = portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(position.getInstitution(), position.getAccountNumber()));
+			List<Portfolio> portfolioList = portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(position.getFinancialInstitution().getInstitutionNumber(), position.getAccountNumber()));
 			if (CollectionUtils.isEmpty(portfolioList)) {
-				exceptionMessageJoiner.add(String.format(" Posrtfolio not found with instititution: [%s] and account number: [%s].", position.getInstitution(), position.getAccountNumber()));
+				exceptionMessageJoiner.add(String.format(" Posrtfolio not found with instititution: [%s] and account number: [%s].", position.getFinancialInstitution(), position.getAccountNumber()));
 				exceptionsFound = true;
 			} else {
 				position.setPortfolio(portfolioList.get(0));

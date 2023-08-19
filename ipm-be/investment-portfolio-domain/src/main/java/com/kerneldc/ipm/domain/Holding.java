@@ -48,7 +48,7 @@ public class Holding extends AbstractPersistableEntity {
 
 	@Transient
 	@CsvBindByName
-	private String institution;
+	private FinancialInstitutionEnum financialInstitution;
 	@Transient
 	@CsvBindByName(column = "account_number")
 	private String accountNumber;

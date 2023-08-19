@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
@@ -27,7 +28,7 @@ class HoldingBeanTransformerStage1Test {
 
 	private static final String TICKER1 = "T";
 	private static final String EXCHANGE1 = "NYSE";
-	private static final String INSTITUTION1 = "WealthSimple";
+	private static final FinancialInstitutionEnum INSTITUTION1 = FinancialInstitutionEnum.TD;
 	private static final String ACCOUNT_NUMBER1 = "123456S";
 	private static HoldingBeanTransformerStage1 holdingBeanTransformerStage1;
 	private static InstrumentRepository instrumentRepository;
@@ -52,7 +53,7 @@ class HoldingBeanTransformerStage1Test {
 		holding1.setTicker(TICKER1);
 		holding1.setExchange(EXCHANGE1);
 
-		holding1.setInstitution(INSTITUTION1);
+		holding1.setFinancialInstitution(INSTITUTION1);
 		holding1.setAccountNumber(ACCOUNT_NUMBER1);
 
 		context.setBeans(List.of(holding1));
@@ -65,9 +66,9 @@ class HoldingBeanTransformerStage1Test {
 		when(instrumentRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getTicker(), holding1.getExchange()))).thenReturn(List.of(instrument1));
 		
 		var portfolio1 = new Portfolio();
-		portfolio1.setInstitution(INSTITUTION1);
+		portfolio1.setFinancialInstitution(INSTITUTION1);
 		portfolio1.setAccountNumber(ACCOUNT_NUMBER1);
-		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getInstitution(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
+		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getFinancialInstitution().getInstitutionNumber(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
 
 		try {
 			holdingBeanTransformerStage1.transform(context);
@@ -84,16 +85,16 @@ class HoldingBeanTransformerStage1Test {
 		holding1.setTicker(TICKER1);
 		holding1.setExchange(EXCHANGE1);
 
-		holding1.setInstitution(INSTITUTION1);
+		holding1.setFinancialInstitution(INSTITUTION1);
 		holding1.setAccountNumber(ACCOUNT_NUMBER1);
 
 		context.setBeans(List.of(holding1));
 
 		when(instrumentRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getTicker(), holding1.getExchange()))).thenReturn(List.of());
 		var portfolio1 = new Portfolio();
-		portfolio1.setInstitution(INSTITUTION1);
+		portfolio1.setFinancialInstitution(INSTITUTION1);
 		portfolio1.setAccountNumber(ACCOUNT_NUMBER1);
-		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getInstitution(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
+		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getFinancialInstitution().getInstitutionNumber(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
 		
 		try {
 			holdingBeanTransformerStage1.transform(context);

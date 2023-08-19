@@ -3,6 +3,7 @@ package com.kerneldc.ipm.domain;
 public enum FinancialInstitutionEnum {
 
 	// For a list of all FI see https://en.wikipedia.org/wiki/Routing_number_(Canada)
+	// and https://www.bankrouting.ca/financial-institution-numbers
 	//
 	// *** remember to update instrument_due_v as well 
 	//

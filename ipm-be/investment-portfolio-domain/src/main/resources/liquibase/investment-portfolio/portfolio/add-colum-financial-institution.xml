@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="portfolio-add-column-financial-institution-1" author="thalabi">
+        <addColumn tableName="portfolio">
+            <column name="financial_institution" type="decimal(4)"> 
+            </column> 
+    	</addColumn> 
+    </changeSet>
+
+    <changeSet id="portfolio-add-column-financial-institution-2" author="thalabi">
+		<sql>
+		<![CDATA[
+		update portfolio 
+		set financial_institution = (
+			case
+				when institution = 'TD Waterhouse' then 4
+	     		when institution = 'Tangerine' then 614
+	     		when institution = 'EQ Bank' then 623
+	     		when institution = 'Peoples Trust' then 383
+	     		when institution = 'Oaken' then 627
+	     		when institution = 'DUCA' then 828
+	     		else financial_institution end);
+		]]>         
+		</sql>
+    </changeSet>
+
+    <changeSet id="portfolio-add-column-financial-institution-3" author="thalabi">
+		<addNotNullConstraint tableName="portfolio" columnName="financial_institution"/>
+    </changeSet>
+
+    <changeSet id="portfolio-add-column-financial-institution-4" author="thalabi">
+		<sql>
+		<![CDATA[
+		update portfolio 
+		set lk = financial_institution || '|' || account_number;
+		]]>         
+		</sql>
+    </changeSet>
+
+</databaseChangeLog>

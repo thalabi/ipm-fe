@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.InstrumentDueV;
 import com.kerneldc.ipm.repository.InstrumentDueVRepository;
 import com.kerneldc.ipm.util.EmailService;
@@ -52,6 +53,7 @@ public class InstrumentDueNotificationService {
 			if (numberOfDays.compareTo(daysToNotify) <= 0) {
 				
 				setDateOverdue(instrumentDueV, numberOfDays);
+				setFinancialInstitutionName(instrumentDueV);
 				
 				instrumentDueVtoNotifyList.add(instrumentDueV);
 				LOGGER.debug("Notify that this instrument is due: {}", instrumentDueV);
@@ -67,6 +69,14 @@ public class InstrumentDueNotificationService {
 
 	private void setDateOverdue(InstrumentDueV instrumentDueV, Long numberOfDays) {
 		instrumentDueV.setOverdue(numberOfDays < 0l);
+	}
+	private void setFinancialInstitutionName(InstrumentDueV instrumentDueV) {
+		if (instrumentDueV.getPortfolioFi() != null) {
+			instrumentDueV.setPortfolioFiName(FinancialInstitutionEnum.financialInstitutionEnumOf(instrumentDueV.getPortfolioFi()).name());
+		}
+		if (instrumentDueV.getIssuerFi() != null) {
+			instrumentDueV.setIssuerFiName(FinancialInstitutionEnum.financialInstitutionEnumOf(instrumentDueV.getIssuerFi()).name());
+		}
 	}
 
 	public void checkDueDate() throws ApplicationException {

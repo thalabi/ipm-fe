@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.domain;
+package com.kerneldc.ipm.domain.repository;
 
 
 import static org.hamcrest.CoreMatchers.equalTo;

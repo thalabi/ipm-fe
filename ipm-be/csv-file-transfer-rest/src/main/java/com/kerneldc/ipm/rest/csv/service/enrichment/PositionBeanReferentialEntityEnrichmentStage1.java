@@ -25,7 +25,7 @@ public class PositionBeanReferentialEntityEnrichmentStage1 implements IBeanRefer
 			//position.setExchange(position.getInstrument().getExchange());
 			
 			position.setAccountNumber(position.getPortfolio().getAccountNumber());
-			position.setInstitution(position.getPortfolio().getInstitution());
+			position.setFinancialInstitution(position.getPortfolio().getFinancialInstitution());
 
 			position.setPriceTimestamp(position.getPrice().getPriceTimestamp());
 

@@ -20,9 +20,15 @@ public class Portfolio extends AbstractPersistableEntity {
 	
 	private static final long serialVersionUID = 1L;
 
+//	@CsvBindByName
+//	@Setter(AccessLevel.NONE)
+//	private String institution;
+
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
-	private String institution;
+	private FinancialInstitutionEnum financialInstitution;
+	
+	
 	@CsvBindByName(column = "account_number")
 	@Setter(AccessLevel.NONE)
 	private String accountNumber;
@@ -34,8 +40,12 @@ public class Portfolio extends AbstractPersistableEntity {
 	@CsvBindByName
 	private Boolean logicallyDeleted;
 
-	public void setInstitution(String institution) {
-		this.institution = institution;
+//	public void setInstitution(String institution) {
+//		this.institution = institution;
+//		setLogicalKeyHolder();
+//	}
+	public void setFinancialInstitution(FinancialInstitutionEnum financialInstitution) {
+		this.financialInstitution = financialInstitution;
 		setLogicalKeyHolder();
 	}
 	public void setAccountNumber(String accountNumber) {
@@ -45,7 +55,7 @@ public class Portfolio extends AbstractPersistableEntity {
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(institution, accountNumber);
+		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitution.getInstitutionNumber(), accountNumber);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

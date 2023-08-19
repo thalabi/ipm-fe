@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.domain.instrumentdetail;
+package com.kerneldc.ipm.domain.repository.instrumentdetail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,6 +13,7 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.repository.instrumentdetail.InstrumentInterestBearingRepository;
 
 @DataJpaTest

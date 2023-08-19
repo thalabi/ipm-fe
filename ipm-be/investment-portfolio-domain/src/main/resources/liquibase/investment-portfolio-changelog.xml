@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <databaseChangeLog
-	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xsi:schemaLocation="
-		http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
 
 	<include file="liquibase/investment-portfolio/instrument/create-table.xml"/>
 	<include file="liquibase/investment-portfolio/instrument/create-unique-constraint-lk.xml"/>
@@ -100,5 +103,11 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-columns-6.xml"/>
 	
 	<include file="liquibase/investment-portfolio/portfolio/add-column-logically-deleted.xml"/>
+	<include file="liquibase/investment-portfolio/portfolio/add-colum-financial-institution.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument-due-v/alter-view-1.xml"/>
+	<include file="liquibase/investment-portfolio/portfolio/drop-column-institution.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument/alter-columns-not-null.xml"/>
 
 </databaseChangeLog>

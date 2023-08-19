@@ -49,7 +49,7 @@ public class HoldingBeanTransformerStage1 implements IBeanTransformer {
 			Consumer<AbstractPersistableEntity> setPortfolio = portfolio -> holding.setPortfolio((Portfolio)portfolio);
 			var portfolioNotFound = IBeanTransformer.lookupAndSetForeignEntity(portfolioRepository,
 					"Portfolio not found with instititution: [%s] and account number: [%s]", exceptionMessageJoiner,
-					setPortfolio, holding.getInstitution(), holding.getAccountNumber());
+					setPortfolio, holding.getFinancialInstitution().getInstitutionNumber(), holding.getAccountNumber());
 
 			if (instrumentNotFound || portfolioNotFound) {
 				context.getBeanTransformerExceptionList().add(new BeanTransformerException(getTransformerName(), holding, exceptionMessageJoiner.toString()));

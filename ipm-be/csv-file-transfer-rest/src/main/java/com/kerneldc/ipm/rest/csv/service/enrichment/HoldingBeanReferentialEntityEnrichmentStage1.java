@@ -25,7 +25,7 @@ public class HoldingBeanReferentialEntityEnrichmentStage1 implements IBeanRefere
 			//holding.setExchange(holding.getInstrument().getExchange());
 			
 			holding.setAccountNumber(holding.getPortfolio().getAccountNumber());
-			holding.setInstitution(holding.getPortfolio().getInstitution());
+			holding.setFinancialInstitution(holding.getPortfolio().getFinancialInstitution());
 		}
 		return beanReferentialEntityEnrichmentResultList;
 	}
