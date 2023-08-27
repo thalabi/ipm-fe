@@ -12,10 +12,12 @@ import com.kerneldc.ipm.domain.Portfolio;
 public interface PortfolioRepository extends BaseTableRepository<Portfolio, Long> {
 	
 	@Query(value = """
-			select p.id, p.lk, p.institution, p.account_number as accountNumber, p.name, p.currency, p.version,
+			select p.id, p.lk, p.financial_institution as financialInstitution, p.name, p.account_number as accountNumber, p.currency, p.logically_deleted as logicallyDeleted,
 				case when (select count(h.*) from holding h where h.portfolio_id = p.id) > 0 then true else false end as hasHoldings,
-				case when (select count(po.*) from position po where po.portfolio_id = p.id) > 0 then true else false end as hasPositions
+				case when (select count(po.*) from position po where po.portfolio_id = p.id) > 0 then true else false end as hasPositions,
+				p.version
 			from portfolio p
+			order by p.financial_institution, p.name
 			""", nativeQuery = true)
 	List<IPortfolioWithDependentFlags> findAllPortfoliosWithDependentFlags();
 

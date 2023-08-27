@@ -16,6 +16,7 @@ import lombok.Data;
 @Data
 public class InstrumentInterestBearingRequest {
 
+	private Long id;
     @NotNull
 	private Instrument instrument;
     @NotNull
@@ -33,4 +34,5 @@ public class InstrumentInterestBearingRequest {
 	private OffsetDateTime promotionEndDate;
 	@NotNull
 	private Boolean emailNotification;
+	private Long rowVersion;
 }

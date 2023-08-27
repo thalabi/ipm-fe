@@ -39,6 +39,13 @@ public abstract class AbstractPersistableEntity extends AbstractEntity implement
 	@Version
 	@Column(name = "version")
 	private Long version;
+	// expose version here since Spring JPA rest does not
+	public Long getRowVersion() {
+		return version;
+	}
+	public void setRowVersion(Long rowVersion) {
+		version = rowVersion;
+	}
 
 	@CsvBindByName
 	@CsvIgnore(profiles = "csvWrite") // ignore column sourceCsvLineNumber when writing out csv file (when profile is set to csvWrite)

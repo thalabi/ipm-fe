@@ -123,21 +123,21 @@ public class PortfolioController {
 //    }
 
     @GetMapping("/getPortfoliosWithDependentFlags")
-	public ResponseEntity<List<IPortfolioWithDependentFlags>> getPortfoliosWithDependentFlags(Long portfolioId) {
+	public ResponseEntity<List<IPortfolioWithDependentFlags>> getPortfoliosWithDependentFlags() {
     	LOGGER.info(LOG_BEGIN);
     	var portfolioWithDependentFlagsList = portfolioRepository.findAllPortfoliosWithDependentFlags();
     	LOGGER.info("portfolioWithDependentFlagsList.size(): {}", portfolioWithDependentFlagsList.size());
     	portfolioWithDependentFlagsList.stream().forEach(iPortfolioWithDependentFlags ->
 		LOGGER.debug("{} {} {} {} {} {} {} {}", iPortfolioWithDependentFlags.getId(),
-				iPortfolioWithDependentFlags.getLk(), iPortfolioWithDependentFlags.getVersion(),
-				iPortfolioWithDependentFlags.getInstitution(), iPortfolioWithDependentFlags.getAccountNumber(),
-				iPortfolioWithDependentFlags.getName(), iPortfolioWithDependentFlags.getCurrency(),
-				iPortfolioWithDependentFlags.getHasHoldings(), iPortfolioWithDependentFlags.getHasPositions())    	);
+				iPortfolioWithDependentFlags.getLk(),
+				iPortfolioWithDependentFlags.getFinancialInstitution(), iPortfolioWithDependentFlags.getName(), iPortfolioWithDependentFlags.getAccountNumber(),
+				iPortfolioWithDependentFlags.getCurrency(), iPortfolioWithDependentFlags.getLogicallyDeleted(),
+				iPortfolioWithDependentFlags.getHasHoldings(), iPortfolioWithDependentFlags.getHasPositions(),
+		 iPortfolioWithDependentFlags.getVersion()));
     	//Map<String, List<IHoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(portfolioWithDependentFlagsList);
     }
-
 	
     @PostMapping("/addInstrumentInterestBearing")
     public ResponseEntity<InstrumentInterestBearingResponse> addInstrumentInterestBearing(@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
