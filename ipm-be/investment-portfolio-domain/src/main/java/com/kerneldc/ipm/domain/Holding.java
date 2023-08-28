@@ -38,6 +38,8 @@ public class Holding extends AbstractPersistableEntity {
     @ManyToOne(optional = false)
     @JoinColumn(name = "portfolio_id")
 	private Portfolio portfolio;
+	@CsvBindByName
+	private BigDecimal quantity;
 	
 	@Transient
 	@CsvBindByName
@@ -52,10 +54,6 @@ public class Holding extends AbstractPersistableEntity {
 	@Transient
 	@CsvBindByName(column = "account_number")
 	private String accountNumber;
-
-	
-	@CsvBindByName
-	private BigDecimal quantity;
 
 	@Transient
 	private IInstrumentDetail instrumentDetail;

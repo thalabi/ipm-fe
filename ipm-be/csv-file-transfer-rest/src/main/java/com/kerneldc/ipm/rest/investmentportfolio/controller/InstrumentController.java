@@ -84,7 +84,7 @@ public class InstrumentController {
     	LOGGER.info("instrumentInterestBearingRequest: {}", instrumentInterestBearingRequest);
     	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
-    	instrumentInterestBearingService.add(iib);
+    	instrumentInterestBearingService.save(iib);
     	LOGGER.info("InstrumentInterestBearing: {}", iib);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, iib));
@@ -99,7 +99,7 @@ public class InstrumentController {
     	LOGGER.info("instrumentInterestBearingRequest.getInstrument().getRowVersion(): {}", instrumentInterestBearingRequest.getInstrument().getRowVersion());
     	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
-    	instrumentInterestBearingService.update(iib);
+    	instrumentInterestBearingService.save(iib);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, iib));
     }

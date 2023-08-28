@@ -8,11 +8,14 @@ import java.util.Arrays;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import com.kerneldc.common.exception.ConcurrentRecordAccessException;
+import com.kerneldc.common.exception.RecordIntegrityViolationException;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.repository.instrumentdetail.InstrumentInterestBearingRepository;
@@ -28,36 +31,52 @@ public class InstrumentInterestBearingService {
 	private static final String LOG_END = "End ...";
 	private final InstrumentInterestBearingRepository instrumentInterestBearingRepository;
 	
-	@Transactional
-	public void add(InstrumentInterestBearing iib) {
+	/**
+	 * This is a wrapper for the transactionalSave() method below.
+	 * It's purpose to catch the DataIntegrityViolationException as it is only thrown after the transaction has completed.
+	 * 
+	 * @param holding
+	 * @return
+	 */
+	public InstrumentInterestBearing save(InstrumentInterestBearing iib) {
 		LOGGER.info(LOG_BEGIN);
-		var i = iib.getInstrument();
-    	i.setTicker(getTicker(iib.getType(), i.getName(), i.getTicker()));
-    	iib.setPrice(setDefaultPrice(iib.getPrice()));
-		instrumentInterestBearingRepository.save(iib);
-		LOGGER.info(LOG_END);
+		try {
+	    	LOGGER.info(LOG_END);
+			return transactionalSave(iib);
+		} catch (DataIntegrityViolationException e) {
+			LOGGER.error("save of record {} caused: ", iib, e);
+			throw new RecordIntegrityViolationException(e);
+		}
 	}
-	
+
 	@Transactional
-	public void update(InstrumentInterestBearing iib) {
+	private InstrumentInterestBearing transactionalSave(InstrumentInterestBearing iib) {
 		LOGGER.info("iib: {}", iib);
 		var i = iib.getInstrument();
 		i.setTicker(getTicker(iib.getType(), i.getName(), i.getTicker()));
 		iib.setPrice(setDefaultPrice(iib.getPrice()));
 		try {
 			instrumentInterestBearingRepository.save(iib);
+		} catch (DataIntegrityViolationException e) {
+			LOGGER.error("save of record {} caused: ", iib, e);
+			throw new RecordIntegrityViolationException(e);
 		} catch (ObjectOptimisticLockingFailureException e) {
-			LOGGER.error("update of record {} caused: ", iib, e);
-			throw new ConcurrentRecordAccessException(e);
+			LOGGER.error("save of record {} caused: ", iib, e);
+			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.UPDATE_EXCEPTION_MESSAGE, e);
 		}
-		LOGGER.info("iib after save: {}", iib);
 		LOGGER.info(LOG_END);
+		return iib;
 	}
 	
 	@Transactional
 	public void delete(Long id) {
 		LOGGER.info(LOG_BEGIN);
-		instrumentInterestBearingRepository.deleteById(id);
+		try {
+			instrumentInterestBearingRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			LOGGER.error("delete of record id {} caused: ", id, e);
+			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.DELETE_EXCEPTION_MESSAGE, e);
+		}
 		LOGGER.info(LOG_END);
 	}
 

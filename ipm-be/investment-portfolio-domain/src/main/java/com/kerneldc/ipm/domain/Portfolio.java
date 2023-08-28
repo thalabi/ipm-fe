@@ -12,23 +12,19 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "portfolio_seq", allocationSize = 1)
 @Getter @Setter
+@Slf4j
 public class Portfolio extends AbstractPersistableEntity {
 	
 	private static final long serialVersionUID = 1L;
 
-//	@CsvBindByName
-//	@Setter(AccessLevel.NONE)
-//	private String institution;
-
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
 	private FinancialInstitutionEnum financialInstitution;
-	
-	
 	@CsvBindByName(column = "account_number")
 	@Setter(AccessLevel.NONE)
 	private String accountNumber;
@@ -45,6 +41,7 @@ public class Portfolio extends AbstractPersistableEntity {
 //		setLogicalKeyHolder();
 //	}
 	public void setFinancialInstitution(FinancialInstitutionEnum financialInstitution) {
+		LOGGER.info("setFinancialInstitution(), financialInstitution: {}", financialInstitution);
 		this.financialInstitution = financialInstitution;
 		setLogicalKeyHolder();
 	}
@@ -55,7 +52,9 @@ public class Portfolio extends AbstractPersistableEntity {
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitution.getInstitutionNumber(), accountNumber);
+		LOGGER.info("setLogicalKeyHolder(), financialInstitution: {}", financialInstitution);
+		var financialInstitutionNumber = financialInstitution == null ? 0 : financialInstitution.getInstitutionNumber();
+		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitutionNumber, accountNumber);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }
