@@ -5,10 +5,9 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 
 public interface IPortfolioWithDependentFlags {
 	Long getId();
-	String getLk();
-	Integer getFinancialInstitution();
-	default String getFinancialInstitutionName() { // set to FinancialInstitutionEnum name
-		return FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitution()).name();
+	Integer getFinancialInstitutionNumber();
+	default String getFinancialInstitution() { // set to FinancialInstitutionEnum name
+		return FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitutionNumber()).name();
 	}
 	String getName();
 	String getAccountNumber();

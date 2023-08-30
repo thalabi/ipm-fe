@@ -36,10 +36,6 @@ public class Portfolio extends AbstractPersistableEntity {
 	@CsvBindByName
 	private Boolean logicallyDeleted;
 
-//	public void setInstitution(String institution) {
-//		this.institution = institution;
-//		setLogicalKeyHolder();
-//	}
 	public void setFinancialInstitution(FinancialInstitutionEnum financialInstitution) {
 		LOGGER.info("setFinancialInstitution(), financialInstitution: {}", financialInstitution);
 		this.financialInstitution = financialInstitution;

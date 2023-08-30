@@ -32,7 +32,7 @@ public class InstrumentInterestBearingService {
 	private final InstrumentInterestBearingRepository instrumentInterestBearingRepository;
 	
 	/**
-	 * This is a wrapper for the transactionalSave() method below.
+	 * This is a wrapper for the {@link #transactionalSave(InstrumentInterestBearing) transactionalSave} method.
 	 * It's purpose to catch the DataIntegrityViolationException as it is only thrown after the transaction has completed.
 	 * 
 	 * @param holding
@@ -41,25 +41,28 @@ public class InstrumentInterestBearingService {
 	public InstrumentInterestBearing save(InstrumentInterestBearing iib) {
 		LOGGER.info(LOG_BEGIN);
 		try {
-	    	LOGGER.info(LOG_END);
-			return transactionalSave(iib);
+			transactionalSave(iib);
 		} catch (DataIntegrityViolationException e) {
 			LOGGER.error("save of record {} caused: ", iib, e);
 			throw new RecordIntegrityViolationException(e);
 		}
+		LOGGER.info(LOG_END);
+		return iib;
 	}
 
+	/**
+	 * @param iib
+	 * @return
+	 */
 	@Transactional
 	private InstrumentInterestBearing transactionalSave(InstrumentInterestBearing iib) {
+		LOGGER.info(LOG_BEGIN);
 		LOGGER.info("iib: {}", iib);
 		var i = iib.getInstrument();
 		i.setTicker(getTicker(iib.getType(), i.getName(), i.getTicker()));
 		iib.setPrice(setDefaultPrice(iib.getPrice()));
 		try {
 			instrumentInterestBearingRepository.save(iib);
-		} catch (DataIntegrityViolationException e) {
-			LOGGER.error("save of record {} caused: ", iib, e);
-			throw new RecordIntegrityViolationException(e);
 		} catch (ObjectOptimisticLockingFailureException e) {
 			LOGGER.error("save of record {} caused: ", iib, e);
 			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.UPDATE_EXCEPTION_MESSAGE, e);

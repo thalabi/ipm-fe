@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +24,6 @@ import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.IHoldingDetail;
-import com.kerneldc.ipm.repository.InstrumentRepository;
-import com.kerneldc.ipm.repository.PortfolioRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
 import com.kerneldc.ipm.repository.service.HoldingService;
@@ -44,8 +43,6 @@ public class InvestmentPortfolioController {
 	private final HoldingPricingService holdingPricingService;
 	private final HoldingService holdingService;
 	private final HoldingRepository holdingRepository;
-	private final PortfolioRepository portfolioRepository;
-	private final InstrumentRepository instrumentRepository;
 	private final PositionRepository positionRepository;
 	
     @GetMapping("/priceHoldings")
@@ -79,9 +76,10 @@ public class InvestmentPortfolioController {
     	return ResponseEntity.ok(namedHoldingDetailList);
     }
     
-    @PostMapping("/addHolding")
-    public ResponseEntity<SaveHoldingResponse> addHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
+    @PutMapping("/saveHolding")
+    public ResponseEntity<SaveHoldingResponse> saveHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
     	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("saveHoldingRequest: {}", saveHoldingRequest);
     	var holding = copyToHolding(saveHoldingRequest);
     	holding = holdingService.save(holding);
     	LOGGER.info(LOG_END);
@@ -110,16 +108,6 @@ public class InvestmentPortfolioController {
     	holding.setVersion(saveHoldingRequest.getVersion());
 		return holding;
 	}
-
-	@PostMapping("/updateHolding")
-    public ResponseEntity<SaveHoldingResponse> updateHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
-    	LOGGER.info(LOG_BEGIN);
-    	LOGGER.info("saveHoldingRequest: {}", saveHoldingRequest);
-    	var holding = copyToHolding(saveHoldingRequest);
-    	holding = holdingService.save(holding);
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
-    }
 
 	@DeleteMapping("/deleteHolding/{id}")
     public ResponseEntity<SaveHoldingResponse> deleteHolding(@PathVariable Long id) {

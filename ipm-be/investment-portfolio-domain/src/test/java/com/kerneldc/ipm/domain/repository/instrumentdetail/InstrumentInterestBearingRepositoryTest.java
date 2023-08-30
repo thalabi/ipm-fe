@@ -17,7 +17,7 @@ import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.repository.instrumentdetail.InstrumentInterestBearingRepository;
 
 @DataJpaTest
-class InstrumentInterestBearingRepositoryTest {
+public class InstrumentInterestBearingRepositoryTest {
 
 	@Autowired
 	private InstrumentInterestBearingRepository instrumentInterestBearingRepository;
@@ -29,19 +29,8 @@ class InstrumentInterestBearingRepositoryTest {
 
 	@Test
 	void testInsertInstrumentInterestBearingtRepository() {
-		var i = new Instrument();
-		i.setType(InstrumentTypeEnum.INTEREST_BEARING);
-		i.setTicker("CIB275");
-		i.setName("Canadian Imperial Bank of Comm CIB275");
-		i.setCurrency(CurrencyEnum.USD);
-		var ib = new InstrumentInterestBearing();
-		ib.setInstrument(i);
-		ib.setType(InterestBearingTypeEnum.MONEY_MARKET);
-		ib.setPrice(new BigDecimal("10"));
-		ib.setInterestRate(4.1f);
-		ib.setEmailNotification(true);
+		var ib = moneyMarket();	
 		instrumentInterestBearingRepository.saveAndFlush(ib);
-		System.out.println("Instrument: " + i);
 		System.out.println("InstrumentInterestBearing: " + ib);
 		assertThat(ib.getId()).isNotNull();
 		assertThat(ib.getInstrument().getId()).isNotNull();
@@ -49,6 +38,15 @@ class InstrumentInterestBearingRepositoryTest {
 
 	@Test
 	void testInsertInstrumentInterestBearingtRepository2() {
+		var ib = tangerine();
+		instrumentInterestBearingRepository.saveAndFlush(ib);
+		System.out.println("InstrumentInterestBearing: " + ib);
+		System.out.println("InstrumentInterestBearing lk: " + ib.getLogicalKeyHolder());
+		assertThat(ib.getId()).isNotNull();
+		assertThat(ib.getInstrument().getId()).isNotNull();
+	}
+
+	private InstrumentInterestBearing tangerine() {
 		var i = new Instrument();
 		i.setType(InstrumentTypeEnum.INTEREST_BEARING);
 		i.setTicker("Chequing");
@@ -61,12 +59,21 @@ class InstrumentInterestBearingRepositoryTest {
 		ib.setInterestRate(1f);
 		ib.setEmailNotification(true);
 		ib.setFinancialInstitution(FinancialInstitutionEnum.TANGERINE);
-		instrumentInterestBearingRepository.saveAndFlush(ib);
-		System.out.println("Instrument: " + i);
-		System.out.println("InstrumentInterestBearing: " + ib);
-		System.out.println("InstrumentInterestBearing lk: " + ib.getLogicalKeyHolder());
-		assertThat(ib.getId()).isNotNull();
-		assertThat(ib.getInstrument().getId()).isNotNull();
+		return ib;
 	}
-
+	
+	public static InstrumentInterestBearing moneyMarket() {
+		var i = new Instrument();
+		i.setType(InstrumentTypeEnum.INTEREST_BEARING);
+		i.setTicker("CIB275");
+		i.setName("Canadian Imperial Bank of Comm CIB275");
+		i.setCurrency(CurrencyEnum.USD);
+		var ib = new InstrumentInterestBearing();
+		ib.setInstrument(i);
+		ib.setType(InterestBearingTypeEnum.MONEY_MARKET);
+		ib.setPrice(new BigDecimal("10"));
+		ib.setInterestRate(4.1f);
+		ib.setEmailNotification(true);
+		return ib;
+	}
 }

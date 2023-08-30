@@ -1,8 +1,6 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -14,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.common.exception.ConcurrentRecordAccessException;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
-import com.kerneldc.ipm.domain.CurrencyEnum;
-import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.Instrument;
-import com.kerneldc.ipm.domain.InstrumentTypeEnum;
-import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
-import com.kerneldc.ipm.domain.TermEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.repository.service.InstrumentInterestBearingService;
 
@@ -76,27 +67,12 @@ public class InstrumentController {
     	return ResponseEntity.ok(checkDueDateResponse);	
     }
 
-    @PostMapping("/addInstrumentInterestBearing")
-	public ResponseEntity<InstrumentInterestBearingResponse> addInstrumentInterestBearing(
+    @PutMapping("/saveInstrumentInterestBearing")
+	public ResponseEntity<InstrumentInterestBearingResponse> updateInstrumentInterestBearing(
 			@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest)
 			throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("instrumentInterestBearingRequest: {}", instrumentInterestBearingRequest);
-    	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
-    	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
-    	instrumentInterestBearingService.save(iib);
-    	LOGGER.info("InstrumentInterestBearing: {}", iib);
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, iib));
-    }
-
-    @PutMapping("/updateInstrumentInterestBearing")
-    public ResponseEntity<InstrumentInterestBearingResponse> updateInstrumentInterestBearing(@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ConcurrentRecordAccessException, ApplicationException {
-    	LOGGER.info(LOG_BEGIN);
-    	LOGGER.info("instrumentInterestBearingRequest.getId(): {}", instrumentInterestBearingRequest.getId());
-    	LOGGER.info("instrumentInterestBearingRequest.getInstrument().getId(): {}", instrumentInterestBearingRequest.getInstrument().getId());
-    	LOGGER.info("instrumentInterestBearingRequest.getRowVersion(): {}", instrumentInterestBearingRequest.getRowVersion());
-    	LOGGER.info("instrumentInterestBearingRequest.getInstrument().getRowVersion(): {}", instrumentInterestBearingRequest.getInstrument().getRowVersion());
     	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
     	instrumentInterestBearingService.save(iib);
@@ -105,7 +81,7 @@ public class InstrumentController {
     }
     
 	@DeleteMapping("/deleteInstrumentInterestBearing/{id}")
-    public ResponseEntity<InstrumentInterestBearingResponse> deleteInstrumentInterestBearing(@PathVariable Long id) throws ApplicationException, ConcurrentRecordAccessException {
+    public ResponseEntity<InstrumentInterestBearingResponse> deleteInstrumentInterestBearing(@PathVariable Long id) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);
     	instrumentInterestBearingService.delete(id);
@@ -216,39 +192,4 @@ public class InstrumentController {
 		}
 	}
 	
-    @GetMapping("/getCurrencies")
-	public ResponseEntity<List<CurrencyEnum>> getCurrencies() {
-    	LOGGER.info(LOG_BEGIN);
-    	var currencies = Arrays.asList(CurrencyEnum.values());
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(currencies);
-    }
-    @GetMapping("/getFinancialInstitutions")
-	public ResponseEntity<List<FinancialInstitutionEnum>> getFinancialInstitutions() {
-    	LOGGER.info(LOG_BEGIN);
-    	var financialInstitutions = Arrays.asList(FinancialInstitutionEnum.values());
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(financialInstitutions);
-    }
-    @GetMapping("/getInstrumentTypes")
-	public ResponseEntity<List<InstrumentTypeEnum>> getInstrumentTypes() {
-    	LOGGER.info(LOG_BEGIN);
-    	var instrumentTypes = Arrays.asList(InstrumentTypeEnum.values());
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(instrumentTypes);
-    }
-    @GetMapping("/getInterestBearingTypes")
-	public ResponseEntity<List<InterestBearingTypeEnum>> getInterestBearingTypes() {
-    	LOGGER.info(LOG_BEGIN);
-    	var interestBearingTypes = Arrays.asList(InterestBearingTypeEnum.values());
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(interestBearingTypes);
-    }
-    @GetMapping("/getTerms")
-	public ResponseEntity<List<TermEnum>> getTerms() {
-    	LOGGER.info(LOG_BEGIN);
-    	var terms = Arrays.asList(TermEnum.values());
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(terms);
-    }
 }

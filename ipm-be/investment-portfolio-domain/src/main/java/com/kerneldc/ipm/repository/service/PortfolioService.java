@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.kerneldc.common.exception.ConcurrentRecordAccessException;
 import com.kerneldc.common.exception.RecordIntegrityViolationException;
-import com.kerneldc.ipm.domain.Holding;
-import com.kerneldc.ipm.repository.HoldingRepository;
+import com.kerneldc.ipm.domain.Portfolio;
+import com.kerneldc.ipm.repository.PortfolioRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,55 +18,57 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class HoldingService {
-
+public class PortfolioService {
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
-	private final HoldingRepository holdingRepository;
-
+	private final PortfolioRepository portfolioRepository;
+	
 	/**
-	 * This is a wrapper for the transactionalSave() method below.
+	 * This is a wrapper for the {@link #transactionalSave(Portfolio) transactionalSave} method.
 	 * It's purpose to catch the DataIntegrityViolationException as it is only thrown after the transaction has completed.
 	 * 
 	 * @param holding
 	 * @return
 	 */
-	public Holding save(Holding holding) {
+	public Portfolio save(Portfolio iib) {
 		LOGGER.info(LOG_BEGIN);
 		try {
-			transactionalSave(holding);
+			transactionalSave(iib);
 		} catch (DataIntegrityViolationException e) {
-			LOGGER.error("save of record {} caused: ", holding, e);
+			LOGGER.error("save of record {} caused: ", iib, e);
 			throw new RecordIntegrityViolationException(e);
 		}
 		LOGGER.info(LOG_END);
-		return holding;
-	}
-	
-	@Transactional
-	private Holding transactionalSave(Holding holding) {
-		LOGGER.info(LOG_BEGIN);
-		LOGGER.info("holding: {}", holding);
-		try {
-			holdingRepository.save(holding);
-		} catch (ObjectOptimisticLockingFailureException e) {
-			LOGGER.error("save of record {} caused: ", holding, e);
-			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.UPDATE_EXCEPTION_MESSAGE, e);
-		}
-    	LOGGER.info(LOG_END);
-		return holding;
+		return iib;
 	}
 
+	/**
+	 * @param portfolio
+	 * @return
+	 */
+	@Transactional
+	private Portfolio transactionalSave(Portfolio portfolio) {
+		LOGGER.info(LOG_BEGIN);
+		LOGGER.info("portfolio: {}", portfolio);
+		try {
+			portfolioRepository.save(portfolio);
+		} catch (ObjectOptimisticLockingFailureException e) {
+			LOGGER.error("save of record {} caused: ", portfolio, e);
+			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.UPDATE_EXCEPTION_MESSAGE, e);
+		}
+		LOGGER.info(LOG_END);
+		return portfolio;
+	}
+	
 	@Transactional
 	public void delete(Long id) {
 		LOGGER.info(LOG_BEGIN);
 		try {
-			holdingRepository.deleteById(id);
+			portfolioRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
 			LOGGER.error("delete of record id {} caused: ", id, e);
 			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.DELETE_EXCEPTION_MESSAGE, e);
 		}
 		LOGGER.info(LOG_END);
 	}
-
 }
