@@ -68,7 +68,7 @@ public class InstrumentController {
     }
 
     @PutMapping("/saveInstrumentInterestBearing")
-	public ResponseEntity<InstrumentInterestBearingResponse> updateInstrumentInterestBearing(
+	public ResponseEntity<Void> updateInstrumentInterestBearing(
 			@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest)
 			throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
@@ -77,16 +77,16 @@ public class InstrumentController {
     	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
     	instrumentInterestBearingService.save(iib);
     	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, iib));
+    	return ResponseEntity.ok().body(null);
     }
     
 	@DeleteMapping("/deleteInstrumentInterestBearing/{id}")
-    public ResponseEntity<InstrumentInterestBearingResponse> deleteInstrumentInterestBearing(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteInstrumentInterestBearing(@PathVariable Long id) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);
     	instrumentInterestBearingService.delete(id);
     	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new InstrumentInterestBearingResponse(StringUtils.EMPTY, null));
+    	return ResponseEntity.ok().body(null);
     }
 	
     private InstrumentInterestBearing copyToInstrumentInterestBearing(

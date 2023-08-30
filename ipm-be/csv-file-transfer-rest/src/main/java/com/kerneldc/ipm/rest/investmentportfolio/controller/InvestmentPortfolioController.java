@@ -68,22 +68,28 @@ public class InvestmentPortfolioController {
     	LOGGER.info(LOG_BEGIN);
     	var holdingDetailList = holdingRepository.findByPortfolioId(portfolioId);
     	LOGGER.info("holdingDetailList: {}", holdingDetailList);
-    	holdingDetailList.stream().forEach(holdingDetail ->
-    		LOGGER.info("{} {} {} {} {} {} {} {}", holdingDetail.getId(), holdingDetail.getAsOfDate(), holdingDetail.getInstrumentId(), holdingDetail.getTicker(), /*holdingDetail.getExchange(),*/ holdingDetail.getCurrency(), holdingDetail.getName(), holdingDetail.getQuantity())
-    	);
     	Map<String, List<IHoldingDetail>> namedHoldingDetailList = Map.of("holdingDetails", holdingDetailList);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(namedHoldingDetailList);
     }
     
     @PutMapping("/saveHolding")
-    public ResponseEntity<SaveHoldingResponse> saveHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
+    public ResponseEntity<Void> saveHolding(@Valid @RequestBody SaveHoldingRequest saveHoldingRequest) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("saveHoldingRequest: {}", saveHoldingRequest);
     	var holding = copyToHolding(saveHoldingRequest);
     	holding = holdingService.save(holding);
     	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, holding));
+    	return ResponseEntity.ok().body(null);
+    }
+    
+    @DeleteMapping("/deleteHolding/{id}")
+    public ResponseEntity<Void> deleteHolding(@PathVariable Long id) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("id: {}", id);
+    	holdingService.delete(id);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
     }
     
     private Holding copyToHolding(@Valid SaveHoldingRequest saveHoldingRequest) {
@@ -109,19 +115,9 @@ public class InvestmentPortfolioController {
 		return holding;
 	}
 
-	@DeleteMapping("/deleteHolding/{id}")
-    public ResponseEntity<SaveHoldingResponse> deleteHolding(@PathVariable Long id) {
-    	LOGGER.info(LOG_BEGIN);
-    	LOGGER.info("id: {}", id);
-    	holdingService.delete(id);
-    	LOGGER.info(LOG_END);
-    	return ResponseEntity.ok(new SaveHoldingResponse(StringUtils.EMPTY, null));
-    }
-
     @GetMapping("/getDistinctPositionSnapshots")
 	public ResponseEntity<List<PositionSnapshot>> getDistinctPositionSnapshots() {
     	LOGGER.info(LOG_BEGIN);
-    	
     	var positionSnapshotList = positionRepository.selectAllPositionSnapshots();
        	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(positionSnapshotList);
