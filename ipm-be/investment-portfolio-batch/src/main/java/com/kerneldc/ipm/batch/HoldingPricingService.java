@@ -247,11 +247,15 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		return position;
 	}
 
-	private void persistPrices() {
+	private void persistPrices() throws ApplicationException {
 		var priceCollection = priceCache.values();
 		LOGGER.info("Price cache count: {}", priceCollection.size());
-			
-		var savedPriceList = priceRepository.saveAll(priceCollection);
+		List<Price> savedPriceList;	
+		try {
+			savedPriceList = priceRepository.saveAll(priceCollection);
+		} catch (RuntimeException e) {
+			throw new ApplicationException("Persisting prices threw an exception.", e);
+		}
 		LOGGER.info("Saved {} price records", savedPriceList.size());
 	}
 
