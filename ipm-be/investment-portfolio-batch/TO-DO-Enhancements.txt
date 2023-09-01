@@ -4,6 +4,6 @@
 
 3. DONE - add unique index on instrument_id column in instrument detail tables
 4. make financial instituition not null in db and on ui (required)
-5. make instrument ticker not null and add comments
+5. DONE - make instrument ticker not null and add notes
 6. redesign pricing. should not continuously add to price table for fixed price instruments   
 7. DONE - remove ticker from instrument_due_v and email

@@ -37,6 +37,8 @@ public class Instrument extends AbstractPersistableEntity {
 	private CurrencyEnum currency;
 	@CsvBindByName
 	private String name;
+	@CsvBindByName
+	private String notes;
 
 	public void setType(InstrumentTypeEnum type) {
 		this.type = type;

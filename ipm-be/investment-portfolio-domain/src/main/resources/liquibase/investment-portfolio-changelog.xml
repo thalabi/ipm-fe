@@ -109,5 +109,7 @@
 	<include file="liquibase/investment-portfolio/portfolio/drop-column-institution.xml"/>
 	
 	<include file="liquibase/investment-portfolio/instrument/alter-columns-not-null.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument/add-notes.xml"/>
 
 </databaseChangeLog>
