@@ -98,6 +98,7 @@ public class InstrumentController {
     	i.setTicker(instrumentInterestBearingRequest.getInstrument().getTicker());
     	i.setCurrency( instrumentInterestBearingRequest.getInstrument().getCurrency());
     	i.setName(instrumentInterestBearingRequest.getInstrument().getName());
+    	i.setNotes(instrumentInterestBearingRequest.getInstrument().getNotes());
     	i.setVersion(instrumentInterestBearingRequest.getInstrument().getRowVersion());
     	iib.setId(instrumentInterestBearingRequest.getId());
     	iib.setInstrument(i);
