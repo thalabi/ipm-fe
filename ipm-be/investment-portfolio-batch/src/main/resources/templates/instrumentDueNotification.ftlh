@@ -50,14 +50,6 @@
 	  </tr>
   </#if>
 
-<!--
-  <#if ((instrumentDueV.ticker)?? && instrumentDueV.type == "MONEY_MARKET" && instrumentDueV.type == "INVESTMENT_SAVINGS")>
-	  <tr >
-	  	<td>Ticker:</td> <td><strong>${instrumentDueV.ticker}</strong></td>
-	  </tr>
-  </#if>
--->
-
   <#if ((instrumentDueV.cusip)?? && instrumentDueV.type == "BOND")>
 	  <tr >
 	  	<td>Cusip:</td> <td><strong>${instrumentDueV.cusip}</strong></td>
@@ -77,9 +69,15 @@
   </#if>
 
   <#if ((instrumentDueV.type)??)>
-  <tr>
-  	<td>Type:</td> <td><strong>${instrumentDueV.type}</strong></td>
-  </tr>
+    <tr>
+  	  <td>Type:</td> <td><strong>${instrumentDueV.type}</strong></td>
+    </tr>
+  </#if>
+  
+  <#if ((instrumentDueV.currency)??)>
+    <tr>
+  	  <td>Currency:</td> <td><strong>${instrumentDueV.currency}</strong></td>
+    </tr>
   </#if>
   
   <#if ((instrumentDueV.term)??)>

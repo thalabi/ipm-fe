@@ -25,7 +25,6 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private String portfolioName;
 	private String accountNumber;
 	private String instrumentName;
-	//private String ticker;
 	private String currency;
 	private String type;
 	
