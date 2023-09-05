@@ -18,9 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 public class RestControllerExceptionHandler {
 
 	@ExceptionHandler(RecordIntegrityViolationException.class)
-	protected ResponseEntity<String> handleRecordIntegrityViolationException(RecordIntegrityViolationException ex) {
-		//return new ResponseEntity<>(NestedExceptionUtils.getMostSpecificCause(ex).getMessage(), HttpStatus.BAD_REQUEST);
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	protected ResponseEntity<RecordIntegrityViolationException.Content> handleRecordIntegrityViolationException(RecordIntegrityViolationException ex) {
+		var constraintMessage = ex.getConstraintMessage();
+		LOGGER.info("constraintMessage: {}", constraintMessage);
+		var stackTrace = ex.getStackTraceString();
+		LOGGER.info("stackTrace: {}", stackTrace);
+		return new ResponseEntity<>(ex.getContent(), HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(ConcurrentRecordAccessException.class)
