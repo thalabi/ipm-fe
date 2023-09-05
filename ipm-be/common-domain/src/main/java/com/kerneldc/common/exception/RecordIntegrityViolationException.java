@@ -1,8 +1,32 @@
 package com.kerneldc.common.exception;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.JDBCException;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import lombok.Getter;
+
 public class RecordIntegrityViolationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
+
+	@Getter
+	private final String constraintMessage;
+	
+	public RecordIntegrityViolationException(DataIntegrityViolationException cause) {
+		super("Operation caused data integrity violation.", cause);
+		var jdbcException = (JDBCException)cause.getCause();
+		var sqlException = jdbcException.getSQLException();
+		constraintMessage = sqlException.getMessage();
+	}
+	
+	public String getStackTraceString() {
+		return ExceptionUtils.getStackTrace(getCause());
+	}
+	public record Content(String message, String detailMessage, String stackTraceString) {}
+	public Content getContent() {
+		return new Content(getMessage(), this.constraintMessage, getStackTraceString());
+	}
 
 //	public RecordIntegrityViolationException() {
 //		// TODO Auto-generated constructor stub
@@ -12,11 +36,7 @@ public class RecordIntegrityViolationException extends RuntimeException {
 //		super(message);
 //		// TODO Auto-generated constructor stub
 //	}
-
-	public RecordIntegrityViolationException(Throwable cause) {
-		super("Operation caused data integrity violation.", cause);
-	}
-
+	
 //	public RecordIntegrityViolationException(String message, Throwable cause) {
 //		super(message, cause);
 //		// TODO Auto-generated constructor stub

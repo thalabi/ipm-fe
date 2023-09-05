@@ -7,3 +7,4 @@
 5. DONE - make instrument ticker not null and add notes
 6. redesign pricing. should not continuously add to price table for fixed price instruments   
 7. DONE - remove ticker from instrument_due_v and email
+8. Consider using a context to hold priceHoldingsExceptions in PriceHoldingsService
