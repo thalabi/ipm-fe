@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="instrument_due_v_remove_order_by" author="thalabi">
+        <comment>Alter instrument_due_v to remove order by clause</comment>
+
+		<dropView viewName="instrument_due_v" ifExists="true"/> 
+    	<createView viewName="instrument_due_v" replaceIfExists="true">
+			<![CDATA[
+			with latest_as_of_date_holding_inst_ids as (
+				select h2.instrument_id
+				from holding h2
+				where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (
+						select max(h.as_of_date) as_of_date, h.instrument_id, h.portfolio_id from holding h group by instrument_id, portfolio_id
+				)
+			)	
+			select i.id, p.financial_institution as portfolio_fi, p.name portfolio_name, p.account_number, i.name instrument_name, i.currency, iib.type,
+				iib.financial_institution as issuer_fi,
+				substr(iib.term, 6) term, iib.price, h.quantity, iib.interest_rate, cast(iib.maturity_date as date),
+				iib.promotional_interest_rate, cast(iib.promotion_end_date as date), null as issuer_entity, null as cusip,	null as coupon,	null as issue_date,	null as payment_frequency,
+				null as next_payment_date,
+				iib.email_notification,
+				cast(
+				case
+					when maturity_date is not null then maturity_date 
+					when promotion_end_date is not null then promotion_end_date 
+					else null
+				end
+				as date) as due_date
+			from inst_interest_bearing iib
+			join instrument i on iib.instrument_id = i.id
+			join holding h on h.instrument_id = i.id
+			join latest_as_of_date_holding_inst_ids hi on hi.instrument_id = i.id
+			join portfolio p on h.portfolio_id = p.id
+			where 
+			case
+				when maturity_date is not null then maturity_date 
+				when promotion_end_date is not null then promotion_end_date 
+				else null
+			end is not null
+			union
+			select i.id, p.financial_institution as portfolio_fi, p.name portfolio_name, p.account_number, i.name instrument_name, i.currency, 'BOND' as type,
+				null as issuer_fi,
+				null as term, ib.price, h.quantity, null as interest_rate, cast(ib.maturity_date as date),
+				null as promotional_interest_rate, null as promotion_end_date, ib.issuer as issuer_entity, ib.cusip,	ib.coupon, cast(ib.issue_date as date) as issue_date,
+				ib.payment_frequency, cast(ib.next_payment_date as date) as next_payment_date,
+				ib.email_notification,
+				cast(ib.next_payment_date as date) as due_date
+			from inst_bond ib
+			join instrument i on ib.instrument_id = i.id
+			join holding h on h.instrument_id = i.id
+			join latest_as_of_date_holding_inst_ids hi on hi.instrument_id = i.id
+			join portfolio p on h.portfolio_id = p.id
+ 			]]>
+		</createView>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -9,7 +9,8 @@ import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 
 public interface InstrumentDueVRepository extends BaseViewRepository<InstrumentDueV, Long> {
 	
-	List<InstrumentDueV> findByEmailNotification(Boolean emailNotification);
+	List<InstrumentDueV> findByEmailNotificationOrderByDueDateAscIssuerFiAscTypeAscCurrencyAsc(Boolean emailNotification);
+	List<InstrumentDueV> findByOrderByPortfolioFiAscCurrencyAscPortfolioNameAsc();
 	
 	@Override
 	default IEntityEnum canHandle() {

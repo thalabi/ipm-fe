@@ -111,5 +111,7 @@
 	<include file="liquibase/investment-portfolio/instrument/alter-columns-not-null.xml"/>
 	
 	<include file="liquibase/investment-portfolio/instrument/add-notes.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument-due-v/alter-view-remove-order-by.xml"/>
 
 </databaseChangeLog>

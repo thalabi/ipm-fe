@@ -37,7 +37,7 @@ public class InstrumentDueNotificationService {
 		LOGGER.info("daysToNotify: {}", daysToNotify);
 		Preconditions.checkArgument(daysToNotify > 0l, "daysToNotify is %s, Days to notify cannot be negative.", daysToNotify);
 		now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-		var instrumentDueVList = instrumentInterestBearingRepository.findByEmailNotification(true);
+		var instrumentDueVList = instrumentInterestBearingRepository.findByEmailNotificationOrderByDueDateAscIssuerFiAscTypeAscCurrencyAsc(true);
 		if (instrumentDueVList.isEmpty()) {
 			return;
 		}
