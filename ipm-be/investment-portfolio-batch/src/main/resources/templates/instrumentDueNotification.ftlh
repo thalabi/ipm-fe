@@ -44,6 +44,12 @@
   	<td>Portfolio:</td> <td><strong>${instrumentDueV.portfolioName}</strong></td>
   </tr>
 
+  <#if ((instrumentDueV.portfolioHolder)??)>
+	  <tr>
+	  	<td>Holder:</td> <td><strong>${instrumentDueV.portfolioHolder}</strong></td>
+	  </tr>
+  </#if>
+
   <#if ((instrumentDueV.instrumentName)??)>
 	  <tr>
 	  	<td>Instrument:</td> <td><strong>${instrumentDueV.instrumentName}</strong></td>
@@ -88,14 +94,14 @@
   
   <#if ((instrumentDueV.maturityDate)?? && instrumentDueV.type != "BOND")>
 	  <tr>
-	  	<td>Maturity date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.maturityDate}</strong></td>
+	  	<td>Maturity date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.maturityDate[0..9]}</strong></td>
 	  </tr>
   </#if>
 
   <#if (instrumentDueV.type == "BOND")>
   	<#if ((instrumentDueV.issueDate)??)>
 	  <tr>
-	  	<td>Issue date:</td> <td><strong>${instrumentDueV.issueDate}</strong></td>
+	  	<td>Issue date:</td> <td><strong>${instrumentDueV.issueDate[0..9]}</strong></td>
 	  </tr>
 	</#if>
   	<#if ((instrumentDueV.paymentFrequency)??)>
@@ -105,7 +111,7 @@
 	</#if>
   	<#if ((instrumentDueV.nextPaymentDate)??)>
 	  <tr>
-	  	<td>Next payment date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.nextPaymentDate}</strong></td>
+	  	<td>Next payment date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.nextPaymentDate[0..9]}</strong></td>
 	  </tr>
 	</#if>
   </#if>
@@ -142,7 +148,7 @@
   
   <#if ((instrumentDueV.promotionEndDate)??)>
 	  <tr>
-	  	<td>Promotion end date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.promotionEndDate}</strong></td>
+	  	<td>Promotion end date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.promotionEndDate[0..9]}</strong></td>
 	  </tr>
   </#if>
 

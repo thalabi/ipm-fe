@@ -1,24 +1,37 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
@@ -38,7 +51,8 @@ public class InstrumentController {
 	private static final String LOG_END = "End ...";
 	private final InstrumentInterestBearingService instrumentInterestBearingService;
 	private final InstrumentDueNotificationService instrumentDueNotificationService;
-	
+	private final FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
+
 	@Value("${instrument.due.days.to.notify}")
 	private Long daysToNotify;
 
@@ -68,7 +82,7 @@ public class InstrumentController {
     }
 
     @PutMapping("/saveInstrumentInterestBearing")
-	public ResponseEntity<Void> updateInstrumentInterestBearing(
+	public ResponseEntity<Void> saveInstrumentInterestBearing(
 			@Valid @RequestBody InstrumentInterestBearingRequest instrumentInterestBearingRequest)
 			throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
@@ -89,6 +103,48 @@ public class InstrumentController {
     	return ResponseEntity.ok().body(null);
     }
 	
+    @PostMapping("/generateFixedIncomeInstrumentReport")
+	public ResponseEntity<ReportJobResponse> generateFixedIncomeInstrumentReport(@RequestParam @NotNull @Pattern(regexp = "Download|Email", flags = Pattern.Flag.CASE_INSENSITIVE) String reportDisposition) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("reportDisposition: {}", reportDisposition);
+    	var reportJobResponse = new ReportJobResponse();
+    	try {
+			var report = reportDisposition.equalsIgnoreCase("Download") ? fixedIncomeInstrumentReportService.generate()
+					: fixedIncomeInstrumentReportService.generateAndEmail();
+			reportJobResponse.setFilename(report.getName());
+			reportJobResponse.setTimestamp(LocalDateTime.now());
+		} catch (ApplicationException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.error("Exception generating fixed income instrument report:\n", e);
+			reportJobResponse.setFilename(e.getMessage());
+			reportJobResponse.setTimestamp(LocalDateTime.now());
+		}
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(reportJobResponse);
+    }
+    
+	@GetMapping("/downloadFixedIncomeInstrumentReport")
+	public ResponseEntity<byte[]> downloadFixedIncomeInstrumentReport(@RequestParam @NotNull String filename) {
+    	LOGGER.info(LOG_BEGIN);
+		LOGGER.info("filename: {}", filename);
+    	var path = Paths.get(FileUtils.getTempDirectory().getPath(), filename);
+    	byte[] bytes = null;
+		try {
+			bytes = Files.readAllBytes(path);
+		} catch (NoSuchFileException e) {
+			LOGGER.error("Exception downloading fixed income instrument report:\n", e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "NoSuchFileException: "+e.getMessage(), e);
+		} catch (IOException e) {
+			LOGGER.error("Exception downloading fixed income instrument report:\n", e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}
+		LOGGER.info(LOG_END);
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+				.contentType(
+						MediaType.parseMediaType("application/vnd.ms-excel"))
+				.body(bytes);
+    }
+
     private InstrumentInterestBearing copyToInstrumentInterestBearing(
     		@Valid InstrumentInterestBearingRequest instrumentInterestBearingRequest) {
     	var iib = new InstrumentInterestBearing();

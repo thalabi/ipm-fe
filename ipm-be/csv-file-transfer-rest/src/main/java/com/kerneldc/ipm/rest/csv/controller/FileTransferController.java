@@ -23,6 +23,7 @@ import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.common.enums.UploadTableEnum;
 import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
+import com.kerneldc.ipm.util.AppTimeUtils;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
@@ -68,7 +69,7 @@ public class FileTransferController {
     	LOGGER.info("Downloading file: {}", exceptionsFileFullPath);
     	var fileBytes = FileUtils.readFileToByteArray(exceptionsFileFullPath.toFile());
 		LOGGER.info("End ...");
-    	return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "exceptionsFile-"+GenericFileTransferService.getNowString()+".csv")
+    	return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "exceptionsFile-"+AppTimeUtils.getNowString()+".csv")
     	        .contentType(MediaType.parseMediaType("application/csv")).body(fileBytes);
     }
 

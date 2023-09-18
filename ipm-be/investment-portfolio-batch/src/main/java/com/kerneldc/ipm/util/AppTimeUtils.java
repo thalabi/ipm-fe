@@ -18,11 +18,15 @@ import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TimeUtils {
+public class AppTimeUtils {
 
+	private static final DateTimeFormatter FILE_TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("uuuuMMdd-HHmmss.SSS");
+	// Format Sep 8, 2023, 12:00:00 AM
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
+	// Format Sep 8, 2023
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
-	private TimeUtils() {
+	private AppTimeUtils() {
 		throw new IllegalStateException("Utility class");
 	}
 
@@ -99,5 +103,10 @@ public class TimeUtils {
 		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
 		LOGGER.debug("date1: {}, date2: {}, date1Date: {}, date2Date:{}", date1, date2, date1Date, date2Date);
 		return ChronoUnit.DAYS.between(date1Date, date2Date);
+	}
+
+	public static String getNowString() {
+		var now = LocalDateTime.now();
+		return now.format(AppTimeUtils.FILE_TIMESTAMP_FORMATTER);
 	}
 }

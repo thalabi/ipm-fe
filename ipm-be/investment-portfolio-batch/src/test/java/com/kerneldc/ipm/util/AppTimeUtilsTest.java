@@ -17,7 +17,7 @@ import java.time.format.FormatStyle;
 
 import org.junit.jupiter.api.Test;
 
-class TimeUtilsTest {
+class AppTimeUtilsTest {
 
 	@Test
 	void testCompareDatePart_returnLess() { // first date's day is less than second date's day
@@ -28,9 +28,9 @@ class TimeUtilsTest {
 		System.out.println("now date part: " + dateFormatter1.format(now));
 		System.out.println("yesterday: " + dateFormatter1.format(yesterday));
 		
-		int result = TimeUtils.compareDatePart(yesterday, now);
+		int result = AppTimeUtils.compareDatePart(yesterday, now);
 		System.out.println("compare result: " + result);
-		assertThat(TimeUtils.compareDatePart(yesterday, now), lessThan(0));
+		assertThat(AppTimeUtils.compareDatePart(yesterday, now), lessThan(0));
 	}
 
 	@Test
@@ -44,9 +44,9 @@ class TimeUtilsTest {
 		System.out.println("date1: " + dateFormatter1.format(date1));
 		System.out.println("date2: " + dateFormatter1.format(date2));
 		
-		int result = TimeUtils.compareDatePart(date1, date2);
+		int result = AppTimeUtils.compareDatePart(date1, date2);
 		System.out.println("compare result: " + result);
-		assertThat(TimeUtils.compareDatePart(date1, date2), is(0));
+		assertThat(AppTimeUtils.compareDatePart(date1, date2), is(0));
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class TimeUtilsTest {
 
 	@Test
 	void testOffsetDateTimeFromString_withDateStringAndDateFormetter() {
-		var result = TimeUtils.offsetDateTimeFromDateString("2023-08-04", DateTimeFormatter.ofPattern("uuuu-MM-dd"));
+		var result = AppTimeUtils.offsetDateTimeFromDateString("2023-08-04", DateTimeFormatter.ofPattern("uuuu-MM-dd"));
 		System.out.println("result: "+ result);
 	}
 	@Test
@@ -76,7 +76,7 @@ class TimeUtilsTest {
 		var date1 = ldt1.atOffset(ZoneId.systemDefault().getRules().getOffset(ldt1));
 		var date2 = ldt2.atOffset(ZoneId.systemDefault().getRules().getOffset(ldt2));
 		System.out.println("date1: "+date1+", date2: "+date2);
-		var result = TimeUtils.daysBetween(date1, date2);
+		var result = AppTimeUtils.daysBetween(date1, date2);
 		System.out.println(result);
 		assertThat(result, equalTo(7l));
 	}

@@ -1,6 +1,5 @@
 package com.kerneldc.common.exception;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.JDBCException;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -20,13 +19,13 @@ public class RecordIntegrityViolationException extends RuntimeException {
 		constraintMessage = sqlException.getMessage();
 	}
 	
-	public String getStackTraceString() {
-		return ExceptionUtils.getStackTrace(getCause());
-	}
-	public record Content(String message, String detailMessage, String stackTraceString) {}
-	public Content getContent() {
-		return new Content(getMessage(), this.constraintMessage, getStackTraceString());
-	}
+//	public String getStackTraceString() {
+//		return ExceptionUtils.getStackTrace(getCause());
+//	}
+//	public record Content(String message, String detailMessage, String stackTraceString) {}
+//	public Content getContent() {
+//		return new Content(getMessage(), this.constraintMessage, getStackTraceString());
+//	}
 
 //	public RecordIntegrityViolationException() {
 //		// TODO Auto-generated constructor stub

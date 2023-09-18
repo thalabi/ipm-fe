@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +44,11 @@ public class EmailService {
 	private String instrumentDueNotificationFrom;
 	@Value("${application.email.instrumentDueNotificationTo}")
 	private String instrumentDueNotificationTo;
+	
+	@Value("${application.email.fixedIncomeInstrumentReportFrom}")
+	private String fixedIncomeInstrumentReportFrom;
+	@Value("${application.email.fixedIncomeInstrumentReportTo}")
+	private String fixedIncomeInstrumentReportTo;
 
 	
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
@@ -50,6 +56,8 @@ public class EmailService {
 	private static final String DAILY_MARKET_VALUE_FAILURE_TEMPLATE = "dailyMarketValueFailure.ftlh";
 	private static final String INSTRUMENT_DUE_NOTIFICATION_SUBJECT = "Instrument(s) Due";
 	private static final String INSTRUMENT_DUE_NOTIFICATION_TEMPLATE = "instrumentDueNotification.ftlh";
+	private static final String FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT = "Fixed Income Instrument Report";
+	private static final String FIXED_INCOME_INSTRUMENT_REPORT_TEMPLATE = "fixedIncomeInstrumentReport.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
 	
@@ -107,10 +115,36 @@ public class EmailService {
 		LOGGER.info("Sent instrument(s) due notification email to: {}", instrumentDueNotificationTo);
 	}
 
-	public void sendInstrumentDueFailure(ApplicationException instrumentDueExceptions) throws ApplicationException {
-		sendFailureEmail(instrumentDueExceptions, instrumentDueNotificationFrom, instrumentDueNotificationTo, INSTRUMENT_DUE_NOTIFICATION_SUBJECT);
-		LOGGER.info("Sent instrument due failure notification email to: {}", instrumentDueNotificationTo);
+	public void sendInstrumentDueNotificationFailure(ApplicationException instrumentDueNotificationExceptions) throws ApplicationException {
+		sendFailureEmail(instrumentDueNotificationExceptions, instrumentDueNotificationFrom, instrumentDueNotificationTo, INSTRUMENT_DUE_NOTIFICATION_SUBJECT);
+		LOGGER.info("Sent instrument due notification failure email to: {}", instrumentDueNotificationTo);
 	}
+
+	public void sendFixedIncomeInstrumentReport(File excelFile) throws ApplicationException {
+		var mimeMessage = javaMailSender.createMimeMessage();
+		try {
+			var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+			mimeMessageHelper.setFrom(fixedIncomeInstrumentReportFrom);
+			mimeMessageHelper.setTo(InternetAddress.parse(fixedIncomeInstrumentReportTo));
+			mimeMessageHelper.setSubject(FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT);
+			mimeMessageHelper.setText(processFixedIncomeInstrumentReportTemplate(), true);
+			mimeMessageHelper.addAttachment(excelFile.getPath(), excelFile);
+			javaMailSender.send(mimeMessage);
+		} catch (MessagingException | IOException | TemplateException e) {
+			var message = "Exception while sending fixed income instrument report email."; 
+			LOGGER.error(message, e);
+			throw new ApplicationException(message + " (" + e.getMessage() + ")");
+			
+		}
+		LOGGER.info("Sent fixed income instrument report email to: {}", fixedIncomeInstrumentReportTo);
+	}
+
+	public void sendFixedIncomeInstrumentReportFailure(ApplicationException fixedIncomeInstrumentReportExceptions) throws ApplicationException {
+		sendFailureEmail(fixedIncomeInstrumentReportExceptions, fixedIncomeInstrumentReportFrom, fixedIncomeInstrumentReportTo, FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT);
+		LOGGER.info("Sent fixed income instrument report failure email to: {}", fixedIncomeInstrumentReportTo);
+	}
+
+
 	private void sendFailureEmail(ApplicationException applicationExceptions, String emailFromAddress, String emailToAddress, String emailSubject) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		var mimeMessageHelper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
@@ -131,7 +165,7 @@ public class EmailService {
 
 	private String processDailyMarketValueNotificationTemplate(LocalDateTime todaysSnapshot, BigDecimal todaysMarketValue, Float percentChange, List<HoldingPriceInterdayV> nMarketValues, ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
-		templateModelMap.put("todaysSnapshot", TimeUtils.toDate(todaysSnapshot));
+		templateModelMap.put("todaysSnapshot", AppTimeUtils.toDate(todaysSnapshot));
 		templateModelMap.put("todaysMarketValue", todaysMarketValue);
 		templateModelMap.put("percentChange", percentChange);
 		templateModelMap.put("nMarketValues", nMarketValues);
@@ -141,7 +175,7 @@ public class EmailService {
 
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(DAILY_MARKET_VALUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
-	// TO DO continue
+
 	private String processInstrumentDueNotificationTemplate(List<InstrumentDueV> instrumentDueVList, Long daysToNotify, boolean overdueInstrumentFound) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("instrumentDueVList", instrumentDueVList);
@@ -150,6 +184,12 @@ public class EmailService {
 
 		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(INSTRUMENT_DUE_NOTIFICATION_TEMPLATE), templateModelMap);
 	}
+	
+	private String processFixedIncomeInstrumentReportTemplate() throws IOException, TemplateException {
+		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(FIXED_INCOME_INSTRUMENT_REPORT_TEMPLATE), null);
+	}
+
+
 	private String processDailyMarketValueFailureTemplate(ApplicationException priceHoldingsExceptions) throws IOException, TemplateException {
 		Map<String, Object> templateModelMap = new HashMap<>();
 		templateModelMap.put("priceHoldingsExceptions", priceHoldingsExceptions);

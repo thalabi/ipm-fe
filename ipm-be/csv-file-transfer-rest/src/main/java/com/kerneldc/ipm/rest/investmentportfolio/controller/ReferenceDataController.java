@@ -1,5 +1,6 @@
 package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.TermEnum;
@@ -60,5 +62,23 @@ public class ReferenceDataController {
     	var terms = Arrays.asList(TermEnum.values());
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(terms);
+    }
+//    @GetMapping("/getHolders")
+//	public ResponseEntity<List<HolderEnum>> getHolders() {
+//    	LOGGER.info(LOG_BEGIN);
+//    	var holders = Arrays.asList(HolderEnum.values());
+//    	LOGGER.info(LOG_END);
+//    	return ResponseEntity.ok(holders);
+//    }
+    record HolderAndName(String holder, String name) {}
+    @GetMapping("/getHolders")
+	public ResponseEntity<List<HolderAndName>> getHolders() {
+    	LOGGER.info(LOG_BEGIN);
+    	List<HolderAndName> holderNameList = new ArrayList<>();
+    	for (HolderEnum holderEnum: HolderEnum.values()) {
+    		holderNameList.add(new HolderAndName(holderEnum.name(), holderEnum.getName()));
+    	}
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(holderNameList);
     }
 }

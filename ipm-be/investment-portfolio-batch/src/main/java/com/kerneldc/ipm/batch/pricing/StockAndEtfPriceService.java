@@ -21,7 +21,7 @@ import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import yahoofinance.Stock;
@@ -84,7 +84,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		}
 		var quote =  stock.getQuote();
 		
-		return new PriceQuote(quote.getPrice(), TimeUtils.toOffsetDateTime(quote.getLastTradeTime()));
+		return new PriceQuote(quote.getPrice(), AppTimeUtils.toOffsetDateTime(quote.getLastTradeTime()));
 	}
 	
 	private static final int MAX_RETRIES = 2;
@@ -154,7 +154,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 				throw new ApplicationException(message);
 			}
 		} else {
-			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())), TimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
+			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())), AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
 		}
 	}
 	

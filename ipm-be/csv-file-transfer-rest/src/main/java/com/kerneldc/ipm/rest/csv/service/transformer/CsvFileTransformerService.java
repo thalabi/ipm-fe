@@ -11,9 +11,9 @@ import java.util.Collection;
 
 import org.springframework.stereotype.Service;
 
-import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.rest.csv.service.transformer.csv.ICsvFileTransformer;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
+import com.kerneldc.ipm.util.AppFileUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +78,7 @@ public class CsvFileTransformerService {
 	 * @throws IOException
 	 */
 	private PathAndLineCount copyToFilePrefixingLineNumber(InputStream inputStream) throws IOException {
-		var path = GenericFileTransferService.createTempFile();
+		var path = AppFileUtils.createTempFile();
 		long lineNumber = 0;
 		try (var bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 				var bufferedWriter = new BufferedWriter(new FileWriter(path.toFile()));) {

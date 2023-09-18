@@ -25,6 +25,9 @@ public class Portfolio extends AbstractPersistableEntity {
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
 	private FinancialInstitutionEnum financialInstitution;
+	@Enumerated(EnumType.STRING)
+	@CsvBindByName
+	private HolderEnum holder;
 	@CsvBindByName(column = "account_number")
 	@Setter(AccessLevel.NONE)
 	private String accountNumber;

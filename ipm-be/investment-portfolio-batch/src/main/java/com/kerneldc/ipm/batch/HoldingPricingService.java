@@ -38,7 +38,7 @@ import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.EmailService;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -189,11 +189,11 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		if (position.getInstrument().getType().equals(InstrumentTypeEnum.CASH)) {
 			return priceHoldingsExceptions;
 		}
-		if (TimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
+		if (AppTimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
 			var exceptionMessage = String.format(
 					"Stale price retrieved for ticker: %s. Price date is as of %s",
 					position.getInstrument().getTicker(), 
-					position.getPrice().getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
+					position.getPrice().getPriceTimestamp().format(AppTimeUtils.DATE_TIME_FORMATTER));
 			if (! /* not */ priceHoldingsExceptions.getMessageList().contains(exceptionMessage)) {
 				LOGGER.warn(exceptionMessage);
 				priceHoldingsExceptions.addMessage(exceptionMessage);

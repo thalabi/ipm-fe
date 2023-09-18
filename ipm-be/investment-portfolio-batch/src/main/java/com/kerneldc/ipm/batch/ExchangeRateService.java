@@ -25,7 +25,7 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.ExchangeRate;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,33 +40,63 @@ public class ExchangeRateService {
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 
-	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
+	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency, boolean fallbackIfNotFound) throws ApplicationException {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
 		
 		var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
 
+		ExchangeRate exchangeRate;
+		
 		if (rate == null) {
-			LOGGER.warn("No exchange rate found for {} to {} on {}", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
-		} else {
-			var exchangeRateList = exchangeRateRepository.findByAsOfDateAndFromCurrencyAndToCurrency(
-					TimeUtils.toOffsetDateTime(workingBusinessDay), fromCurrency, toCurrency);
-			ExchangeRate exchangeRate;
-			if (CollectionUtils.isEmpty(exchangeRateList)) {
-				exchangeRate = new ExchangeRate();
-				exchangeRate.setAsOfDate(TimeUtils.toOffsetDateTime(workingBusinessDay));
-				exchangeRate.setFromCurrency(CurrencyEnum.USD);
-				exchangeRate.setToCurrency(CurrencyEnum.CAD);
+			var noRateAvailableAtApiMessage = String.format("Exchange rate not available (at external api) for %s to %s on %s", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
+			if (! /* not */ fallbackIfNotFound) {
+				LOGGER.error(noRateAvailableAtApiMessage);
+				throw new ApplicationException(noRateAvailableAtApiMessage);
 			} else {
-				exchangeRate = exchangeRateList.get(0);
+				LOGGER.warn(noRateAvailableAtApiMessage);
+				LOGGER.warn("Will try previous rate from database ...");
+				var exchangeRateList = exchangeRateRepository.findFirstByAsOfDateLessThanEqualAndFromCurrencyAndToCurrencyOrderByAsOfDateDesc(
+						AppTimeUtils.toOffsetDateTime(workingBusinessDay), fromCurrency, toCurrency);
+				if (CollectionUtils.isEmpty(exchangeRateList)) {
+					LOGGER.error("Non found in database.");
+					var message = String.format("Exchange rate not available (at external api or in database) for %s to %s on or before %s", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
+					LOGGER.error(message);
+					throw new ApplicationException(message);
+				} else {
+					exchangeRate = exchangeRateList.get(0);
+					return exchangeRate;
+				}
 			}
-			exchangeRate.setRate(rate);
-			exchangeRateRepository.save(exchangeRate);
 		}
+		
+		var exchangeRateList = exchangeRateRepository.findByAsOfDateAndFromCurrencyAndToCurrency(
+				AppTimeUtils.toOffsetDateTime(workingBusinessDay), fromCurrency, toCurrency);
+		if (CollectionUtils.isEmpty(exchangeRateList)) {
+			exchangeRate = new ExchangeRate();
+			exchangeRate.setAsOfDate(AppTimeUtils.toOffsetDateTime(workingBusinessDay));
+			exchangeRate.setFromCurrency(CurrencyEnum.USD);
+			exchangeRate.setToCurrency(CurrencyEnum.CAD);
+		} else {
+			exchangeRate = exchangeRateList.get(0);
+		}
+		exchangeRate.setRate(rate); // update or set the rate
+		exchangeRateRepository.save(exchangeRate);
+		
+		return exchangeRate;
 	}
 	
+	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
+		return retrieveAndPersistExchangeRate(date, fromCurrency, toCurrency, false);
+	}
+	/**
+	 * If the provided date falls on December 25, January 1, Saturday or a Sunday, it will return the date before.
+	 * Otherwise it will return the same date. 
+	 * @param instant
+	 * @return
+	 */
 	protected Instant getWorkingBusinessDay(Instant instant) {
-		var workingBusinessDay = TimeUtils.toLocalDate(instant);
+		var workingBusinessDay = AppTimeUtils.toLocalDate(instant);
 		
 		while (workingBusinessDay.getMonth().equals(Month.JANUARY) && workingBusinessDay.getDayOfMonth() == 1 ||
 				workingBusinessDay.getMonth().equals(Month.DECEMBER) && workingBusinessDay.getDayOfMonth() == 25 ||
@@ -74,7 +104,7 @@ public class ExchangeRateService {
 			
 			workingBusinessDay = workingBusinessDay.minus(Period.ofDays(1)); 
 		}
-		return TimeUtils.toInstant(workingBusinessDay);
+		return AppTimeUtils.toInstant(workingBusinessDay);
 	}
 	
 	private String callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {

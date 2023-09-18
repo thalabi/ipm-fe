@@ -17,19 +17,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RestControllerExceptionHandler {
 
+	record ErrorBody(String message, String error) {}
+
 	@ExceptionHandler(RecordIntegrityViolationException.class)
-	protected ResponseEntity<RecordIntegrityViolationException.Content> handleRecordIntegrityViolationException(RecordIntegrityViolationException ex) {
+	protected ResponseEntity<String> handleRecordIntegrityViolationException(RecordIntegrityViolationException ex) {
 		var constraintMessage = ex.getConstraintMessage();
 		LOGGER.info("constraintMessage: {}", constraintMessage);
-		var stackTrace = ex.getStackTraceString();
-		LOGGER.info("stackTrace: {}", stackTrace);
-		return new ResponseEntity<>(ex.getContent(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(ex.getMessage() + "(" + constraintMessage + ")", HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(ConcurrentRecordAccessException.class)
-	protected ResponseEntity<String> handleConcurrentRecordAccessException(ConcurrentRecordAccessException ex) {
+	protected ResponseEntity<ErrorBody> handleConcurrentRecordAccessException(ConcurrentRecordAccessException ex) {
 		//return new ResponseEntity<>(NestedExceptionUtils.getMostSpecificCause(ex).getMessage(), HttpStatus.BAD_REQUEST);
-		return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+		//return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+		return new ResponseEntity<>(new ErrorBody(ex.getMessage(), ExceptionUtils.getStackTrace(ex)), HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(EmptyResultDataAccessException.class)
@@ -46,4 +47,5 @@ public class RestControllerExceptionHandler {
 		//return new ResponseEntity<>(NestedExceptionUtils.getMostSpecificCause(ex).getMessage(), HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+
 }

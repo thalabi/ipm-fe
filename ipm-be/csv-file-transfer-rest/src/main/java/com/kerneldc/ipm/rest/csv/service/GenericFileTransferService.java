@@ -9,8 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +38,7 @@ import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.BeanTransformerException;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.CsvTransformerException;
+import com.kerneldc.ipm.util.AppTimeUtils;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -55,7 +54,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class GenericFileTransferService /*implements IFileTransferService*/ {
-	private static final DateTimeFormatter FILE_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("uuuuMMdd-HHmmss.SSS");
 	public static final String TEMP_FILES_PREFIX = "ipm-application";
 	public static final String EXCEPTIONS_FILE_PREFIX = TEMP_FILES_PREFIX + "-" + "file-transfer-service-csv-exceptions-"; 
 	public static final String EXCEPTIONS_FILE_SUFFIX = ".csv";
@@ -303,11 +301,7 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 	}
     private Path createExceptionsFile() throws IOException {
 		long threadId = Thread.currentThread().getId();
-		return Files.createTempFile(EXCEPTIONS_FILE_PREFIX+getNowString()+"-"+threadId, EXCEPTIONS_FILE_SUFFIX);
-	}
-	public static Path createTempFile() throws IOException {
-		long threadId = Thread.currentThread().getId();
-		return Files.createTempFile(GenericFileTransferService.TEMP_FILES_PREFIX+"-"+getNowString()+"-"+threadId, null);
+		return Files.createTempFile(EXCEPTIONS_FILE_PREFIX+AppTimeUtils.getNowString()+"-"+threadId, EXCEPTIONS_FILE_SUFFIX);
 	}
 
     private void populateExceptionsFile(Path exceptionsFile, String clientFilename, String[] columnNames, List<ExceptionsFileLine> exceptionRecordList, ProcessingStats processingStats) throws IOException {
@@ -339,11 +333,6 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
     	return csvLine.length() > 1 ? csvLine.substring(0, csvLine.length() - 1) : StringUtils.EMPTY;
     }
     
-	public static String getNowString() {
-		var now = LocalDateTime.now();
-		return now.format(FILE_TIMESTAMP_FORMAT);
-	}
-	
 	protected CsvException captureMajorException(RuntimeException e) {
 		String messageWithCause = e.getMessage() + (e.getCause() != null ? ", "	+ e.getCause().getMessage() : StringUtils.EMPTY);
 		var csvException = new CsvException(messageWithCause);

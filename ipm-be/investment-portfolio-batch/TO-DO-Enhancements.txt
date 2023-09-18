@@ -8,3 +8,4 @@
 6. redesign pricing. should not continuously add to price table for fixed price instruments   
 7. DONE - remove ticker from instrument_due_v and email
 8. Consider using a context to hold priceHoldingsExceptions in PriceHoldingsService
+9. Make account_number, currency and name in portfolio table and ui as not null

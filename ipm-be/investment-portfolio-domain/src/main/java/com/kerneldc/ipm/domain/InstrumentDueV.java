@@ -1,6 +1,7 @@
 package com.kerneldc.ipm.domain;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -18,6 +19,7 @@ import lombok.Setter;
 public class InstrumentDueV extends AbstractImmutableEntity {
 	
 	private Integer portfolioFi;
+	private String portfolioHolder;
 	@Transient
 	@Setter
 	private String portfolioFiName; // set to FinancialInstitutionEnum name
@@ -37,19 +39,19 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private BigDecimal price;
 	private BigDecimal quantity;
 	private Float interestRate;
-	private String maturityDate;
+	private OffsetDateTime maturityDate;
 	private Float promotionalInterestRate;
-	private String promotionEndDate;
+	private OffsetDateTime promotionEndDate;
 	
 	private String issuerEntity;
 	private String cusip;
 	private Float coupon;
-	private String issueDate;
+	private OffsetDateTime issueDate;
 	private String paymentFrequency;
-	private String nextPaymentDate;
+	private OffsetDateTime nextPaymentDate;
 	
 	private Boolean emailNotification;
-	private String dueDate;
+	private OffsetDateTime dueDate;
 	
 	@Transient
 	@Setter

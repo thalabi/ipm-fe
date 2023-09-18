@@ -14,7 +14,7 @@ import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.domain.instrumentdetail.IFixedPriceInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class FixedPriceService implements IInstrumentPricingService<IFixedPriceI
 		if (price == null) {
 			price = new Price();
 			price.setInstrument(instrument);
-			price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
+			price.setPriceTimestamp(AppTimeUtils.toOffsetDateTime(snapshotInstant));
 			price.setPriceTimestampFromSource(true);
 
 			// check if the price is already in the table
@@ -46,7 +46,7 @@ public class FixedPriceService implements IInstrumentPricingService<IFixedPriceI
 				price.setPrice(instrumentDetail.getPrice());
 			}
 			LOGGER.info("Retrieved price for {}: {} {}", ticker, price.getPrice(),
-					price.getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
+					price.getPriceTimestamp().format(AppTimeUtils.DATE_TIME_FORMATTER));
 			priceCache.put(instrument.getId(), price);
 		
 		} else {

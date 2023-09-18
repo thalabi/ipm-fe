@@ -16,7 +16,7 @@ import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 /**
  * This interface is for pricing instruments that are tradable
@@ -45,7 +45,7 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 				price.setPriceTimestamp(priceQuote.tradeTime);
 				price.setPriceTimestampFromSource(true);
 			} else {
-				price.setPriceTimestamp(TimeUtils.toOffsetDateTime(snapshotInstant));
+				price.setPriceTimestamp(AppTimeUtils.toOffsetDateTime(snapshotInstant));
 				price.setPriceTimestampFromSource(false);
 				LOGGER.warn("PriceTimestamp was not available from source for {} {}. Used current timestamp", ticker,
 						exchange);
@@ -60,7 +60,7 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 				price.setPrice(priceQuote.lastPrice);
 			}
 			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, exchange, price.getPrice(),
-					price.getPriceTimestamp().format(TimeUtils.DATE_TIME_FORMATTER));
+					price.getPriceTimestamp().format(AppTimeUtils.DATE_TIME_FORMATTER));
 			priceCache.put(instrument.getId(), price);
 		} else {
 			LOGGER.info("Found {} {} in price cache", ticker, exchange);

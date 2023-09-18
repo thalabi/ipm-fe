@@ -21,12 +21,12 @@ import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.common.enums.UploadTableEnum;
-import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.rest.csv.service.transformer.CsvFileTransformerService;
 import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
 import com.kerneldc.ipm.rest.csv.service.transformer.TransformationStageEnum;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.AbortFileProcessingException;
 import com.kerneldc.ipm.rest.csv.service.transformer.exception.CsvTransformerException;
+import com.kerneldc.ipm.util.AppFileUtils;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -57,9 +57,9 @@ public class SalesFileTransformerStage1 implements ICsvFileTransformer {
 		Path inputFilePath = null;
 		Path outputFilePath = null;
 		try {
-			inputFilePath = GenericFileTransferService.createTempFile();
+			inputFilePath = AppFileUtils.createTempFile();
 			Files.copy(context.getWorkInProgressFile(), inputFilePath, StandardCopyOption.REPLACE_EXISTING);
-			outputFilePath = GenericFileTransferService.createTempFile();
+			outputFilePath = AppFileUtils.createTempFile();
 		} catch (IOException e) {
 			throw new AbortFileProcessingException(getTransformerName(), e);
 		}

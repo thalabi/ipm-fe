@@ -13,6 +13,8 @@ public interface ExchangeRateRepository extends BaseTableRepository<ExchangeRate
 	
 	List<ExchangeRate> findByAsOfDateAndFromCurrencyAndToCurrency(OffsetDateTime asOfDate, CurrencyEnum fromCurrency, CurrencyEnum toCurrency);
 	
+	List<ExchangeRate> findFirstByAsOfDateLessThanEqualAndFromCurrencyAndToCurrencyOrderByAsOfDateDesc(OffsetDateTime asOfDate, CurrencyEnum fromCurrency, CurrencyEnum toCurrency);
+	
 	@Override
 	default IEntityEnum canHandle() {
 		return InvestmentPortfolioTableEnum.EXCHANGE_RATE;

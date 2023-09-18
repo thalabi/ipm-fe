@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.repository.PortfolioRepository;
 
@@ -34,6 +35,7 @@ class PortfolioRepositoryTest {
 		p.setCurrency(CurrencyEnum.CAD);
 		p.setName("Tarif SDRSP CAD");
 		p.setLogicallyDeleted(false);
+		p.setHolder(HolderEnum.TARIF);
 		portfolioRepository.saveAndFlush(p);
 		System.out.println("Portfolio: " + p);
 		assertThat(p.getId()).isNotNull();

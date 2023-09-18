@@ -34,7 +34,6 @@ public class PortfolioController {
 	private static final String LOG_END = "End ...";
 	private final PortfolioRepository portfolioRepository;
 	private final PortfolioService portfolioService;
-
 	
     @GetMapping("/getPortfoliosWithDependentFlags")
 	public ResponseEntity<List<IPortfolioWithDependentFlags>> getPortfoliosWithDependentFlags() {

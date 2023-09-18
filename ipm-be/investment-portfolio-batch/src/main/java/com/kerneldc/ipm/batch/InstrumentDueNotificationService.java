@@ -3,7 +3,6 @@ package com.kerneldc.ipm.batch;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.InstrumentDueV;
 import com.kerneldc.ipm.repository.InstrumentDueVRepository;
 import com.kerneldc.ipm.util.EmailService;
-import com.kerneldc.ipm.util.TimeUtils;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InstrumentDueNotificationService {
 	private final EmailService emailService;
-	private final InstrumentDueVRepository instrumentInterestBearingRepository;
+	private final InstrumentDueVRepository instrumentDueVRepository;
 	@Value("${instrument.due.days.to.notify:7}")
 	private Long daysToNotify;
 	
@@ -37,7 +36,7 @@ public class InstrumentDueNotificationService {
 		LOGGER.info("daysToNotify: {}", daysToNotify);
 		Preconditions.checkArgument(daysToNotify > 0l, "daysToNotify is %s, Days to notify cannot be negative.", daysToNotify);
 		now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-		var instrumentDueVList = instrumentInterestBearingRepository.findByEmailNotificationOrderByDueDateAscIssuerFiAscTypeAscCurrencyAsc(true);
+		var instrumentDueVList = instrumentDueVRepository.findByEmailNotificationOrderByDueDateAscIssuerFiAscTypeAscCurrencyAsc(true);
 		if (instrumentDueVList.isEmpty()) {
 			return;
 		}
@@ -47,9 +46,8 @@ public class InstrumentDueNotificationService {
 			if (instrumentDueV.getDueDate() == null) {
 				continue;
 			}
-			var dueDate = TimeUtils.offsetDateTimeFromDateString(instrumentDueV.getDueDate(), DateTimeFormatter.ofPattern("uuuu-MM-dd"));
-			Long numberOfDays = TimeUtils.daysBetween(now, dueDate);
-			LOGGER.debug("daysBetween({}, {}) = {}", now, dueDate, numberOfDays);
+			Long numberOfDays = AppTimeUtils.daysBetween(now, instrumentDueV.getDueDate());
+			LOGGER.debug("daysBetween({}, {}) = {}", now, instrumentDueV.getDueDate(), numberOfDays);
 			if (numberOfDays.compareTo(daysToNotify) <= 0) {
 				
 				setDateOverdue(instrumentDueV, numberOfDays);
@@ -60,7 +58,7 @@ public class InstrumentDueNotificationService {
 			}
 		}
 		if (! /* not */ instrumentDueVtoNotifyList.isEmpty()) {
-			var overdueInstrument = instrumentDueVtoNotifyList.stream().filter(instrumentDueV -> instrumentDueV.getOverdue()).findFirst();
+			var overdueInstrument = instrumentDueVtoNotifyList.stream().filter(InstrumentDueV::getOverdue).findFirst();
 			emailService.sendInstrumentDueNotification(daysToNotify, instrumentDueVtoNotifyList, overdueInstrument.isPresent());
 		}
 		LOGGER.info("instrumentDueVtoNotifyList size: {}", instrumentDueVtoNotifyList.size());

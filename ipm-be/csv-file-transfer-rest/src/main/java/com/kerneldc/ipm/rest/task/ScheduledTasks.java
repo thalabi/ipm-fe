@@ -74,6 +74,7 @@ public class ScheduledTasks {
 	public void cleanupTempFiles() {
 		deleteExceptionFiles();
 		deleteTransformerWorkFiles();
+		deleteXlsxFiles();
 
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime nextCleanup = now.plus(fixedDelayThroughReflection, ChronoUnit.MILLIS);
@@ -98,6 +99,17 @@ public class ScheduledTasks {
 		LOGGER.info("Scanning for transformer work files to delete ...");
 		deleteFileList.stream().forEach(fileToDelete -> {    		
 			LOGGER.info("Deleteing transformer work file: {}", fileToDelete);
+			FileUtils.deleteQuietly(fileToDelete);
+		});
+	}
+	private void deleteXlsxFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		IOFileFilter wildcardFileFilter = new WildcardFileFilter(GenericFileTransferService.TEMP_FILES_PREFIX+"*.xlsx");
+		IOFileFilter ageFileFilter = new AgeFileFilter(System.currentTimeMillis() - fixedDelayThroughReflection-1); // files created before last cleanup
+		Collection<File> deleteFileList = FileUtils.listFiles(tempDir, new AndFileFilter(wildcardFileFilter, ageFileFilter), null);
+		LOGGER.info("Scanning for xlsx files to delete ...");
+		deleteFileList.stream().forEach(fileToDelete -> {    		
+			LOGGER.info("Deleteing xlsx file: {}", fileToDelete);
 			FileUtils.deleteQuietly(fileToDelete);
 		});
 	}
@@ -135,7 +147,7 @@ public class ScheduledTasks {
 			instrumentDueNotificationService.checkDueDate();
 		} catch (ApplicationException applicationException) {
 			applicationException.printStackTrace();
-			emailService.sendInstrumentDueFailure(applicationException);
+			emailService.sendInstrumentDueNotificationFailure(applicationException);
 		}
 	}
 }
