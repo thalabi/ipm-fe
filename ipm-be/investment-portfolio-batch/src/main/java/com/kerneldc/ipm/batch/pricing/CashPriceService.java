@@ -32,14 +32,11 @@ public class CashPriceService implements IInstrumentPricingService<IInstrumentDe
 	@Override
 	public Price priceInstrument(Instant snapshotInstant, Instrument instrument, IInstrumentDetail instrumentDetail,
 			Map<Long, Price> priceCache) throws ApplicationException {
-		switch (instrument.getCurrency()) {
-		case CAD:
-			return CASH_CAD_PRICE;
-		case USD:
-			return CASH_USD_PRICE;
-		default:
-			throw new IllegalArgumentException("Currency should be either CAD or USD");
-		}
+		
+		return switch (instrument.getCurrency()) {
+			case CAD -> CASH_CAD_PRICE;
+			case USD -> CASH_USD_PRICE;
+		};
 	}
 	
 	@Override

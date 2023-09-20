@@ -175,77 +175,77 @@ public class InstrumentController {
 			InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
 		var exception = new ApplicationException();
 		switch (instrumentInterestBearingRequest.getType()) {
-		case MONEY_MARKET, CHEQUING, INVESTMENT_SAVINGS:
-			if (instrumentInterestBearingRequest.getTerm() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a term",
-						instrumentInterestBearingRequest.getType()));
+			case MONEY_MARKET, CHEQUING, INVESTMENT_SAVINGS -> {
+				if (instrumentInterestBearingRequest.getTerm() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a term",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getMaturityDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+					exception.addMessage(
+							String.format("%s interest bearing instrument can not have a promotional interestr eate",
+									instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (! /* not */ exception.getMessageList().isEmpty()) {
+					throw exception;
+				}
 			}
-			if (instrumentInterestBearingRequest.getMaturityDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
-						instrumentInterestBearingRequest.getType()));
+			case SAVINGS -> {
+				if (instrumentInterestBearingRequest.getTerm() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a term",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getMaturityDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null
+						&& instrumentInterestBearingRequest.getPromotionEndDate() == null
+						|| instrumentInterestBearingRequest.getPromotionalInterestRate() == null
+								&& instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+					exception.addMessage(String.format(
+							"For a %s interest bearing instrument, if a promotion is in effect, both the promotional interest rate and promotion end date must to be provided",
+							instrumentInterestBearingRequest.getType()));
+				}
 			}
-			if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
-						instrumentInterestBearingRequest.getType()));
+			case GIC, TERM_DEPOSIT -> {
+				if (instrumentInterestBearingRequest.getTerm() == null) {
+					exception.addMessage(String.format("%s interest bearing instrument must have a term",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getMaturityDate() == null) {
+					exception.addMessage(String.format("%s interest bearing instrument must have a maturity date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getNextPaymentDate() == null) {
+					exception.addMessage(String.format("%s interest bearing instrument must have a next payment date",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+					exception.addMessage(
+							String.format("%s interest bearing instrument can not have a promotional interestr eate",
+									instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+							instrumentInterestBearingRequest.getType()));
+				}
 			}
-			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
-				exception.addMessage(
-						String.format("%s interest bearing instrument can not have a promotional interestr eate",
-								instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (! /* not */ exception.getMessageList().isEmpty()) {
-				throw exception;
-			}
-			break;
-		case SAVINGS:
-			if (instrumentInterestBearingRequest.getTerm() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a term",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getMaturityDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a maturity date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getNextPaymentDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null
-					&& instrumentInterestBearingRequest.getPromotionEndDate() == null
-					|| instrumentInterestBearingRequest.getPromotionalInterestRate() == null
-							&& instrumentInterestBearingRequest.getPromotionEndDate() != null) {
-				exception.addMessage(String.format(
-						"For a %s interest bearing instrument, if a promotion is in effect, both the promotional interest rate and promotion end date must to be provided",
-						instrumentInterestBearingRequest.getType()));
-			}
-			break;
-		case GIC, TERM_DEPOSIT:
-			if (instrumentInterestBearingRequest.getTerm() == null) {
-				exception.addMessage(String.format("%s interest bearing instrument must have a term",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getMaturityDate() == null) {
-				exception.addMessage(String.format("%s interest bearing instrument must have a maturity date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getNextPaymentDate() == null) {
-				exception.addMessage(String.format("%s interest bearing instrument must have a next payment date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
-				exception.addMessage(
-						String.format("%s interest bearing instrument can not have a promotional interestr eate",
-								instrumentInterestBearingRequest.getType()));
-			}
-			if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
-				exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
-						instrumentInterestBearingRequest.getType()));
-			}
-			break;
 		}
 	}
 	

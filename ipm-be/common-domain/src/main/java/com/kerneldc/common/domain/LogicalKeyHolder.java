@@ -35,20 +35,16 @@ public class LogicalKeyHolder implements Serializable, ILogicallyKeyed {
 				continue;
 			}
 			switch (keyPart.getClass().getSimpleName()) {
-			case "String":
-				stringKeyParts[i++] = (String)keyPart;
-				break;
-			case "Integer", "Long", "Float", "Double", "BigDecimal":
-				stringKeyParts[i++] = String.valueOf(keyPart);	
-				break;
-			case "LocalDateTime":
-				stringKeyParts[i++] = ((LocalDateTime)keyPart).format(AbstractEntity.LOCAL_DATE_TIME_FORMATTER);
-				break;
-			case "OffsetDateTime":
-				stringKeyParts[i++] = ((OffsetDateTime)keyPart).format(AbstractEntity.OFFSET_DATE_TIME_FORMATTER);
-				break;
-			default:
-				throw new IllegalArgumentException(String.format("Unsupported data type in logical key: %s", keyPart.getClass().getSimpleName()));
+				case "String" ->
+					stringKeyParts[i++] = (String)keyPart;
+				case "Integer", "Long", "Float", "Double", "BigDecimal" ->
+					stringKeyParts[i++] = String.valueOf(keyPart);	
+				case "LocalDateTime" ->
+					stringKeyParts[i++] = ((LocalDateTime)keyPart).format(AbstractEntity.LOCAL_DATE_TIME_FORMATTER);
+				case "OffsetDateTime" ->
+					stringKeyParts[i++] = ((OffsetDateTime)keyPart).format(AbstractEntity.OFFSET_DATE_TIME_FORMATTER);
+				default ->
+					throw new IllegalArgumentException(String.format("Unsupported data type in logical key: %s", keyPart.getClass().getSimpleName()));
 			}
 		}
 		lk.setLogicalKey(concatLogicalKeyParts(stringKeyParts));
