@@ -1,5 +1,7 @@
 package com.kerneldc.ipm.repository;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
@@ -11,9 +13,9 @@ public interface IPortfolioWithDependentFlags {
 		return FinancialInstitutionEnum.financialInstitutionEnumOf(getFinancialInstitutionNumber()).name();
 	}
 	String getName();
-	String getHolder();
+	HolderEnum getHolder();
 	default String getHolderName() {
-		return HolderEnum.valueOf(getHolder()).getName();
+		return getHolder() != null ? getHolder().getName() : StringUtils.EMPTY;
 	}
 	String getAccountNumber();
 	CurrencyEnum getCurrency();
