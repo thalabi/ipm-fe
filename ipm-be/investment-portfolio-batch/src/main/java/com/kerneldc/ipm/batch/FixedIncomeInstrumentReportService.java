@@ -431,7 +431,7 @@ public class FixedIncomeInstrumentReportService {
 		cell.setCellValue("Instrument");
 		
 		cell = row.createCell(ACCOUNT_NUMBER_CELL);
-		cell.setCellValue("Account Number");
+		cell.setCellValue("Portfolio Acc Number");
 		
 		cell = row.createCell(USD_BALANCE_CELL);
 		cell.setCellValue("USD Balance");

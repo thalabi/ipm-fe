@@ -54,4 +54,6 @@
 	<include file="liquibase/investment-portfolio/instrument/add-notes.xml"/>
 	<include file="liquibase/investment-portfolio/portfolio/add-column-holder.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-account-number-and-holder.xml"/>
+
 </databaseChangeLog>

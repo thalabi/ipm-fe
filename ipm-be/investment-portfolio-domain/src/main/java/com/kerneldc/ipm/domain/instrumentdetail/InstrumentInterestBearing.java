@@ -10,6 +10,7 @@ import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.TermEnum;
 import com.opencsv.bean.CsvBindByName;
@@ -52,6 +53,11 @@ public class InstrumentInterestBearing extends AbstractInstrumentDetailEntity im
 	private OffsetDateTime promotionEndDate;
 	@CsvBindByName
 	private Boolean emailNotification;
+	@Enumerated(EnumType.STRING)
+	@CsvBindByName
+	private HolderEnum holder;
+	@CsvBindByName(column = "account_number")
+	private String accountNumber;
 
 	public void setType(InterestBearingTypeEnum type) {
 		this.type = type;

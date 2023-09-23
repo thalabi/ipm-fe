@@ -19,7 +19,7 @@ public abstract class AbstractRepositoryService<T, I> {
 
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
-	private final JpaRepository<T, I> holdingRepository;
+	private final JpaRepository<T, I> jpaRepository;
 
 	/**
 	 * This is a wrapper for the {@link  transactionalSave transactionalSave} method below.
@@ -47,7 +47,7 @@ public abstract class AbstractRepositoryService<T, I> {
 		LOGGER.info("entity: {}", entity);
 		handleEntity(entity);
 		try {
-			holdingRepository.save(entity);
+			jpaRepository.save(entity);
 		} catch (ObjectOptimisticLockingFailureException e) {
 			LOGGER.error("save of entity {} caused: ", entity, e);
 			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.UPDATE_EXCEPTION_MESSAGE, e);
@@ -62,7 +62,7 @@ public abstract class AbstractRepositoryService<T, I> {
 	public void delete(I id) {
 		LOGGER.info(LOG_BEGIN);
 		try {
-			holdingRepository.deleteById(id);
+			jpaRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
 			LOGGER.error("delete of entity id {} caused: ", id, e);
 			throw new ConcurrentRecordAccessException(ConcurrentRecordAccessException.DELETE_EXCEPTION_MESSAGE, e);

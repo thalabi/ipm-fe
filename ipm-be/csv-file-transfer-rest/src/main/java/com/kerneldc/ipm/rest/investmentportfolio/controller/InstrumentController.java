@@ -168,6 +168,8 @@ public class InstrumentController {
     	iib.setPromotionalInterestRate(instrumentInterestBearingRequest.getPromotionalInterestRate());
     	iib.setPromotionEndDate(instrumentInterestBearingRequest.getPromotionEndDate());
     	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
+    	iib.setAccountNumber(instrumentInterestBearingRequest.getAccountNumber());
+    	iib.setHolder(instrumentInterestBearingRequest.getHolder());
     	iib.setVersion(instrumentInterestBearingRequest.getRowVersion());
     	return iib;
     }

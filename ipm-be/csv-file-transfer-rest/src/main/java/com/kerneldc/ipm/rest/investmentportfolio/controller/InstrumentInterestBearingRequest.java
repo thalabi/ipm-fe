@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.TermEnum;
@@ -34,5 +35,9 @@ public class InstrumentInterestBearingRequest {
 	private OffsetDateTime promotionEndDate;
 	@NotNull
 	private Boolean emailNotification;
+	@NotNull
+	private String accountNumber;
+	@NotNull
+	private HolderEnum holder;
 	private Long rowVersion;
 }
