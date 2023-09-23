@@ -35,9 +35,7 @@ public class InstrumentInterestBearingRequest {
 	private OffsetDateTime promotionEndDate;
 	@NotNull
 	private Boolean emailNotification;
-	@NotNull
 	private String accountNumber;
-	@NotNull
 	private HolderEnum holder;
 	private Long rowVersion;
 }

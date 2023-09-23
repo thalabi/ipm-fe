@@ -176,6 +176,32 @@ public class InstrumentController {
 	private void validateInstrumentInterestBearingRequest(
 			InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
 		var exception = new ApplicationException();
+		
+		// TODO refactor to validate each individual field
+		
+		switch (instrumentInterestBearingRequest.getType()) {
+			case MONEY_MARKET, INVESTMENT_SAVINGS -> {
+				if (instrumentInterestBearingRequest.getHolder() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a holder",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getAccountNumber() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have an account number",
+							instrumentInterestBearingRequest.getType()));
+				}
+			}
+			case CHEQUING, SAVINGS, GIC, TERM_DEPOSIT -> {
+				if (instrumentInterestBearingRequest.getHolder() == null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have a holder",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getAccountNumber() == null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have an account number",
+							instrumentInterestBearingRequest.getType()));
+				}
+			}
+		}
+		
 		switch (instrumentInterestBearingRequest.getType()) {
 			case MONEY_MARKET, CHEQUING, INVESTMENT_SAVINGS -> {
 				if (instrumentInterestBearingRequest.getTerm() != null) {
