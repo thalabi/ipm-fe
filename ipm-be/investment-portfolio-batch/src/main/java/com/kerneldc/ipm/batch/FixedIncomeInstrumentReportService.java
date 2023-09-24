@@ -7,9 +7,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellType;
@@ -53,15 +54,17 @@ public class FixedIncomeInstrumentReportService {
 	private static final byte FINANCIAL_INSTITUTION_CELL = 0;
 	private static final byte HOLDER_CELL = 1;
 	private static final byte INSTRUMENT_CELL = 2;
-	private static final byte ACCOUNT_NUMBER_CELL = 3;
-	private static final byte USD_BALANCE_CELL = 4;
-	private static final byte BALANCE_CELL = 5;
-	private static final byte TYPE_CELL = 6;
-	private static final byte TERM_CELL = 7;
-	private static final byte RATE_CELL = 8;
-	private static final byte PROMO_RATE_CELL = 9;
-	private static final byte PROMO_RATE_END_DATE_CELL = 10;
-	private static final byte MATURITY_DATE_CELL = 11;
+	private static final byte INSTRUMENT_ACCOUNT_NUMBER_CELL = 3;
+	private static final byte PORTFOLIO_ACCOUNT_NUMBER_CELL = 4;
+	private static final byte USD_BALANCE_CELL = 5;
+	private static final byte BALANCE_CELL = 6;
+	private static final byte TYPE_CELL = 7;
+	private static final byte TERM_CELL = 8;
+	private static final byte RATE_CELL = 9;
+	private static final byte PROMO_RATE_CELL = 10;
+	private static final byte PROMO_RATE_END_DATE_CELL = 11;
+	private static final byte MATURITY_DATE_CELL = 12;
+	private static final byte NOTES_CELL = 13;
 	
 	@Value("${instrument.due.days.to.notify:7}")
 	private Long daysToNotify;
@@ -108,7 +111,7 @@ public class FixedIncomeInstrumentReportService {
 		
 		File excelFile = null;
 		try {
-			var tempFilePath = AppFileUtils.createTempFile(".xlsx");
+			var tempFilePath = AppFileUtils.createTempFile("fixed-income-report", ".xlsx");
 			LOGGER.info("tempPath: {}", tempFilePath);
 			excelFile = tempFilePath.toFile();
 			var outputStream = new FileOutputStream(excelFile);
@@ -122,20 +125,15 @@ public class FixedIncomeInstrumentReportService {
 	}
 
 	private void autoSizeColumns(PoiContext context) {
-		context.sheet.autoSizeColumn(0);
-		context.sheet.autoSizeColumn(1);
-		context.sheet.autoSizeColumn(2);
-		context.sheet.autoSizeColumn(3);
-		context.sheet.autoSizeColumn(4);
-		context.sheet.autoSizeColumn(5);
-		context.sheet.autoSizeColumn(9);
-		context.sheet.autoSizeColumn(10);
-		context.sheet.autoSizeColumn(11);
+		for (int i=0; i<=13; i++) {
+			context.sheet.autoSizeColumn(i);
+		}
 	}
 	private PoiContext createContext() {
 		var workbook = new XSSFWorkbook();
 		var sheet = workbook.createSheet();
 		sheet.addIgnoredErrors(CellRangeAddress.valueOf("d2:d999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
+		sheet.addIgnoredErrors(CellRangeAddress.valueOf("e2:e999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
 		var format = workbook.createDataFormat();
 		var arialFont = workbook.createFont();
 		arialFont.setFontName(ARIAL_FONT);
@@ -149,7 +147,7 @@ public class FixedIncomeInstrumentReportService {
 		arialFontItalic.setFontHeightInPoints((short)9);
 		arialFontItalic.setItalic(true);
 		
-		Map<HolderEnum, XSSFCellStyle> holderCellStyleMap = new HashMap<>();
+		Map<HolderEnum, XSSFCellStyle> holderCellStyleMap = new EnumMap<>(HolderEnum.class);
 		for (HolderEnum holderEnum : HolderEnum.values()) {
 			var style = workbook.createCellStyle();
 			style.setFont(arialFont);
@@ -200,6 +198,7 @@ public class FixedIncomeInstrumentReportService {
 	
 	private void printDetailLines(Instant now, PoiContext poiContext,	List<InstrumentDueV> instrumentDueVList, ExchangeRate usdToCadExchangeRate) {
 		var balanceFormat = poiContext.format.getFormat("###,##0.00##");
+		var rateFormat = poiContext.format.getFormat("##0.####");
 		var dateFormat = poiContext.format.getFormat("yyyy-mm-dd");
 
 		var arialFontStyle = poiContext.workbook.createCellStyle();
@@ -208,6 +207,12 @@ public class FixedIncomeInstrumentReportService {
 		var balanceStyle = poiContext.workbook.createCellStyle();
 		balanceStyle.setFont(poiContext.arialFont);
 		balanceStyle.setDataFormat(balanceFormat);
+		
+		var rateStyle = poiContext.workbook.createCellStyle();
+		rateStyle.setFont(poiContext.arialFont);
+		rateStyle.setDataFormat(rateFormat);
+		
+		Function<Float, XSSFCellStyle> returnRateStyle = rate -> (rate.intValue() != rate.floatValue() ? rateStyle : arialFontStyle);
 		
 		var dateStyle = poiContext.workbook.createCellStyle();
 		dateStyle.setFont(poiContext.arialFont);
@@ -220,19 +225,6 @@ public class FixedIncomeInstrumentReportService {
 		
 		var boldStyle = poiContext.workbook.createCellStyle();
 		boldStyle.setFont(poiContext.arialFontBold);
-
-//		var tarifStyle = poiContext.workbook.createCellStyle();
-//		tarifStyle.setFont(poiContext.arialFont);
-//		tarifStyle.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
-//		tarifStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-//		var mayStyle = poiContext.workbook.createCellStyle();
-//		mayStyle.setFont(poiContext.arialFont);
-//		mayStyle.setFillForegroundColor(IndexedColors.CORAL.getIndex());
-//		mayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-//		var kdcStyle = poiContext.workbook.createCellStyle();
-//		kdcStyle.setFont(poiContext.arialFont);
-//		kdcStyle.setFillForegroundColor(IndexedColors.MAROON.getIndex());
-//		kdcStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 		var totalBalanceStyle = poiContext.workbook.createCellStyle();
 		totalBalanceStyle.setFont(poiContext.arialFontBold);
@@ -275,11 +267,16 @@ public class FixedIncomeInstrumentReportService {
 			cell = row.createCell(INSTRUMENT_CELL);
 			cell.setCellStyle(arialFontStyle);
 			cell.setCellValue(instrumentDueV.getInstrumentName());
-			
-			// Account Number
-			cell = row.createCell(ACCOUNT_NUMBER_CELL);
+
+			// Instrument Account Number 
+			cell = row.createCell(INSTRUMENT_ACCOUNT_NUMBER_CELL);
 			cell.setCellStyle(arialFontStyle);
-			cell.setCellValue(instrumentDueV.getAccountNumber());
+			cell.setCellValue(instrumentDueV.getInstrumentAccountNumber());
+
+			// Portfolio Account Number
+			cell = row.createCell(PORTFOLIO_ACCOUNT_NUMBER_CELL);
+			cell.setCellStyle(arialFontStyle);
+			cell.setCellValue(instrumentDueV.getPortfolioAccountNumber());
 			
 			var balance = instrumentDueV.getPrice().multiply(instrumentDueV.getQuantity()).doubleValue();
 			
@@ -320,14 +317,14 @@ public class FixedIncomeInstrumentReportService {
 			// Rate
 			if (instrumentDueV.getInterestRate() != null) {
 				cell = row.createCell(RATE_CELL);
-				cell.setCellStyle(arialFontStyle);
+				cell.setCellStyle(returnRateStyle.apply(instrumentDueV.getInterestRate()));
 				cell.setCellValue(instrumentDueV.getInterestRate());
 			}
 			
 			// Promo Rate
 			if (instrumentDueV.getPromotionalInterestRate() != null) {
 				cell = row.createCell(PROMO_RATE_CELL);
-				cell.setCellStyle(arialFontStyle);
+				cell.setCellStyle(returnRateStyle.apply(instrumentDueV.getPromotionalInterestRate()));
 				cell.setCellValue(instrumentDueV.getPromotionalInterestRate());
 			}
 			
@@ -356,7 +353,12 @@ public class FixedIncomeInstrumentReportService {
 				}
 			
 			}
-			
+
+			// Notes 
+			cell = row.createCell(NOTES_CELL);
+			cell.setCellStyle(arialFontStyle);
+			cell.setCellValue(instrumentDueV.getNotes());
+
 			oldFiName = instrumentDueV.getPortfolioFiName();
 			oldHolder = instrumentDueV.getPortfolioHolder();
 			
@@ -399,7 +401,7 @@ public class FixedIncomeInstrumentReportService {
 			cell.setCellStyle(cellStyle);
 		}
 		
-		cell = row.createCell(5);
+		cell = row.createCell(BALANCE_CELL);
 		cell.setCellValue(totalBalance);
 		cell.setCellType(CellType.NUMERIC);
 		cell.setCellStyle(totalBalanceStyle);
@@ -430,8 +432,11 @@ public class FixedIncomeInstrumentReportService {
 		cell = row.createCell(INSTRUMENT_CELL);
 		cell.setCellValue("Instrument");
 		
-		cell = row.createCell(ACCOUNT_NUMBER_CELL);
-		cell.setCellValue("Portfolio Acc Number");
+		cell = row.createCell(INSTRUMENT_ACCOUNT_NUMBER_CELL);
+		cell.setCellValue("Instrument Acc No");
+		
+		cell = row.createCell(PORTFOLIO_ACCOUNT_NUMBER_CELL);
+		cell.setCellValue("Portfolio Acc No");
 		
 		cell = row.createCell(USD_BALANCE_CELL);
 		cell.setCellValue("USD Balance");
@@ -456,6 +461,9 @@ public class FixedIncomeInstrumentReportService {
 		
 		cell = row.createCell(MATURITY_DATE_CELL);
 		cell.setCellValue("Maturity Date");		
+
+		cell = row.createCell(NOTES_CELL);
+		cell.setCellValue("Notes");		
 
 		setRowStyle(row, boldFontGreenBackground);
 		

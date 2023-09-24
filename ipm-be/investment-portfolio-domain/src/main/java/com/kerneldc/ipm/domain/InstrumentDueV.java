@@ -25,8 +25,9 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private String portfolioFiName; // set to FinancialInstitutionEnum name
 	
 	private String portfolioName;
-	private String accountNumber;
+	private String portfolioAccountNumber;
 	private String instrumentName;
+	private String instrumentAccountNumber;
 	private String currency;
 	private String type;
 	
@@ -51,6 +52,7 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private OffsetDateTime nextPaymentDate;
 	
 	private Boolean emailNotification;
+	private String notes;
 	private OffsetDateTime dueDate;
 	
 	@Transient

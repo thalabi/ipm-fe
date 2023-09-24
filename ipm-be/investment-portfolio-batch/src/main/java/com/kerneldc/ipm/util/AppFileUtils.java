@@ -22,6 +22,11 @@ public class AppFileUtils {
 		return Files.createTempFile(TEMP_FILES_PREFIX+"-"+AppTimeUtils.getNowString()+"-"+threadId, suffix);
 	}
 
+	public static Path createTempFile(String includeInPrefix, String suffix) throws IOException{
+		long threadId = Thread.currentThread().getId();
+		return Files.createTempFile(TEMP_FILES_PREFIX+"-"+includeInPrefix+"-"+AppTimeUtils.getNowString()+"-"+threadId, suffix);
+	}
+
 	public static Path createTempFile() throws IOException {
 		return createTempFile(null);
 	}	
