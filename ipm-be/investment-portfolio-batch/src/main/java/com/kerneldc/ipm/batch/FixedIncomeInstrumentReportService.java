@@ -65,6 +65,7 @@ public class FixedIncomeInstrumentReportService {
 	private static final byte PROMO_RATE_END_DATE_CELL = 11;
 	private static final byte MATURITY_DATE_CELL = 12;
 	private static final byte NOTES_CELL = 13;
+	private static final byte NUMBER_OF_COLUMNS = 14;
 	
 	@Value("${instrument.due.days.to.notify:7}")
 	private Long daysToNotify;
@@ -125,7 +126,7 @@ public class FixedIncomeInstrumentReportService {
 	}
 
 	private void autoSizeColumns(PoiContext context) {
-		for (int i=0; i<=13; i++) {
+		for (int i=0; i<=NUMBER_OF_COLUMNS; i++) {
 			context.sheet.autoSizeColumn(i);
 		}
 	}
