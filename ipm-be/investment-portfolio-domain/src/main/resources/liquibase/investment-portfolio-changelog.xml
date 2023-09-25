@@ -119,5 +119,7 @@
 	
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-account-number-and-holder.xml"/>
 	<include file="liquibase/investment-portfolio/instrument-due-v/alter-view-add-inst-account-number-and-notes.xml"/>
+	<include file="liquibase/investment-portfolio/fixed-income-audit/create-table.xml"/>	
+
 
 </databaseChangeLog>

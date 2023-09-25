@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
@@ -12,6 +13,7 @@ import javax.persistence.Transient;
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
+import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
@@ -21,6 +23,7 @@ import lombok.Setter;
 
 @Entity
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "holding_seq", allocationSize = 1)
+@EntityListeners(FixedIncomeListener.class)
 @Getter @Setter
 public class Holding extends AbstractPersistableEntity {
 	

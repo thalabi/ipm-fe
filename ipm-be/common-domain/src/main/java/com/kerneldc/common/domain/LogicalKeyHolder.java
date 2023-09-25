@@ -35,6 +35,8 @@ public class LogicalKeyHolder implements Serializable, ILogicallyKeyed {
 				continue;
 			}
 			switch (keyPart.getClass().getSimpleName()) {
+				case "Boolean" ->
+					stringKeyParts[i++] = ((Boolean)keyPart).toString();
 				case "String" ->
 					stringKeyParts[i++] = (String)keyPart;
 				case "Integer", "Long", "Float", "Double", "BigDecimal" ->

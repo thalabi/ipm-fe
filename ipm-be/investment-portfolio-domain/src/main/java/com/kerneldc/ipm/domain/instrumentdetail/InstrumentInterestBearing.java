@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.SequenceGenerator;
@@ -13,6 +14,7 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
 import com.kerneldc.ipm.domain.TermEnum;
+import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
@@ -21,6 +23,7 @@ import lombok.Setter;
 
 @Entity(name = "inst_interest_bearing")
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_interest_bearing_seq", allocationSize = 1)
+@EntityListeners(FixedIncomeListener.class)
 @Getter @Setter
 public class InstrumentInterestBearing extends AbstractInstrumentDetailEntity implements IFixedPriceInstrumentDetail {
 	

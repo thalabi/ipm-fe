@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.ipm.domain.PaymentFrequencyEnum;
+import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
 import com.opencsv.bean.CsvBindByName;
 
 import lombok.AccessLevel;
@@ -18,6 +20,7 @@ import lombok.Setter;
 
 @Entity(name = "inst_bond")
 @SequenceGenerator(name = "default_seq_gen", sequenceName = "inst_bond_seq", allocationSize = 1)
+@EntityListeners(FixedIncomeListener.class)
 @Getter @Setter
 public class InstrumentBond extends AbstractInstrumentDetailEntity implements IFixedPriceInstrumentDetail {
 	

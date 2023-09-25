@@ -23,8 +23,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
+import com.kerneldc.ipm.repository.FixedIncomeAuditRepository;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.util.EmailService;
 
@@ -42,7 +44,12 @@ public class ScheduledTasks {
 	@Autowired
 	private HoldingPricingService holdingPricingService;
 	@Autowired
+	private FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
+	@Autowired
 	private InstrumentDueNotificationService instrumentDueNotificationService;
+	@Autowired
+	private FixedIncomeAuditRepository fixedIncomeAuditRepository;
+
 	
 	@Autowired
 	private EmailService emailService;
@@ -149,5 +156,22 @@ public class ScheduledTasks {
 			applicationException.printStackTrace();
 			emailService.sendInstrumentDueNotificationFailure(applicationException);
 		}
+	}
+	@Scheduled(cron = "1 0 0 * * *")
+	public void fixedIncomeInstrumentReport() throws ApplicationException {
+		var fixedIncomeAudit = fixedIncomeAuditRepository.findById(1l)
+				.orElseThrow(() -> new IllegalStateException("Entity fixedIncomeAudit does not have a row with id 1."));
+		if (Boolean.TRUE.equals(fixedIncomeAudit.getChange())) {
+			try {
+				fixedIncomeInstrumentReportService.generateAndEmail();
+			} catch (ApplicationException applicationException) {
+				applicationException.printStackTrace();
+				emailService.sendFixedIncomeInstrumentReportFailure(applicationException);
+			}
+			
+			fixedIncomeAudit.setChange(false);
+			fixedIncomeAuditRepository.save(fixedIncomeAudit);
+		}
+
 	}
 }
