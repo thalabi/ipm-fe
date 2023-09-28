@@ -1,7 +1,7 @@
 package com.kerneldc.ipm.domain.instrumentdetail;
 
-import javax.persistence.Entity;
-import javax.persistence.SequenceGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.opencsv.bean.CsvBindByName;

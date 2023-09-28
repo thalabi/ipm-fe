@@ -2,7 +2,7 @@ package com.kerneldc.ipm.rest;
 
 import java.sql.SQLException;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.JDBCException;
 import org.springframework.dao.DataIntegrityViolationException;

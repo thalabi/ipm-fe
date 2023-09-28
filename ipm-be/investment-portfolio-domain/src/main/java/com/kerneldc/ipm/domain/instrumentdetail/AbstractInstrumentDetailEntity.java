@@ -1,9 +1,9 @@
 package com.kerneldc.ipm.domain.instrumentdetail;
 
-import javax.persistence.CascadeType;
-import javax.persistence.JoinColumn;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToOne;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.ipm.domain.Instrument;

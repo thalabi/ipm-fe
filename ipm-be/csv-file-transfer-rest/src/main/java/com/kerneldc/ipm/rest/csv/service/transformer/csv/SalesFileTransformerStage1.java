@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
+//import org.apache.commons.validator.GenericValidator;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.enums.IEntityEnum;

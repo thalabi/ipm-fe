@@ -1,53 +1,38 @@
 package com.kerneldc.ipm.rest.springconfig;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.metamodel.Type;
+import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-public class CorsConfig implements WebMvcConfigurer, RepositoryRestConfigurer {
+public class CorsConfig {
 
     @Value("${application.security.corsFilter.corsUrlsToAllow}")
     private String[] corsUrlsToAllow;
 
     @Value("${application.security.corsFilter.corsMaxAgeInSecs:3600}")
     private long corsMaxAgeInSecs;
-    
-    @Autowired
-    private EntityManager entityManager;
 
-    // configure application
-    @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-    	configCorsRegistry(corsRegistry);
-    }
-    
-    // configure data rest
-    @Override
-    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration repositoryRestConfiguration, CorsRegistry corsRegistry) {
-    	configRepositoryRest(repositoryRestConfiguration);
-    	configCorsRegistry(corsRegistry);
-    }
-    
-    private void configRepositoryRest(RepositoryRestConfiguration repositoryRestConfiguration) {
-    	// expose entity id for JPA data rest
-    	repositoryRestConfiguration.exposeIdsFor(entityManager.getMetamodel().getEntities()
-                .stream().map(Type::getJavaType).toArray(Class[]::new));
-	}
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+      final var configuration = new CorsConfiguration();
 
-	private void configCorsRegistry(CorsRegistry corsRegistry) {
-		corsRegistry.addMapping("/**").allowedOrigins(corsUrlsToAllow).maxAge(corsMaxAgeInSecs)
-		.allowedMethods("GET", "HEAD", "POST", "DELETE", "PUT") // by default GET, HEAD, and POST are allowed
-		//.allowedHeaders("Content-Disposition").exposedHeaders("Content-Disposition")
-		.allowedHeaders("*").exposedHeaders("*")
-		;
+      configuration.setAllowedOrigins(Arrays.asList(corsUrlsToAllow));
+      configuration.setMaxAge(corsMaxAgeInSecs);
+
+      configuration.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "DELETE", "PUT"));
+      configuration.setAllowedHeaders(Arrays.asList("*"));
+      configuration.setExposedHeaders(Arrays.asList("*"));
+      
+      final var source = new UrlBasedCorsConfigurationSource();
+      source.registerCorsConfiguration("/**", configuration);
+
+      return source;
     }
 }

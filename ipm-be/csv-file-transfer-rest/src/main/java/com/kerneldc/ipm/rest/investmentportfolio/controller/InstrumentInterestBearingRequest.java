@@ -3,8 +3,8 @@ package com.kerneldc.ipm.rest.investmentportfolio.controller;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;

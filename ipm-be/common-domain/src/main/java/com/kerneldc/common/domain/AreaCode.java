@@ -1,13 +1,12 @@
 package com.kerneldc.common.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.SequenceGenerator;
-
 import com.kerneldc.common.enums.CountryEnum;
 import com.opencsv.bean.CsvBindByName;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package com.kerneldc.ipm.rest.investmentportfolio.controller;
 
 import java.time.OffsetDateTime;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
 

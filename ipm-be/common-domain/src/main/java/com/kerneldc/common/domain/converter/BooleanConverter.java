@@ -1,6 +1,6 @@
 package com.kerneldc.common.domain.converter;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 // Disable for postgres
 //@Converter(autoApply = true)

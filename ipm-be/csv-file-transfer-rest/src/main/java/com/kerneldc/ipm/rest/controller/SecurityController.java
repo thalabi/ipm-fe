@@ -34,7 +34,7 @@ public class SecurityController {
 			var jwt = (Jwt)jwtAuthenticationToken.getPrincipal();
 			LOGGER.info("jwt id: {}, claims: {}", jwt.getId(), jwt.getClaims());
 			for (Entry<String, Object> entry : jwt.getClaims().entrySet()) {
-				LOGGER.info("jwt, {} = {}", entry.getKey(), entry.getValue());
+				LOGGER.debug("jwt, {} = {}", entry.getKey(), entry.getValue());
 				
 			}
 			Map<String, List<String>> realmAccess = jwt.getClaim("realm_access");

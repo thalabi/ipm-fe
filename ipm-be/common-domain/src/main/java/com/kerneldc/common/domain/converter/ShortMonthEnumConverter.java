@@ -1,10 +1,10 @@
 package com.kerneldc.common.domain.converter;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-
 import com.google.common.base.Preconditions;
 import com.kerneldc.common.enums.ShortMonthEnum;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class ShortMonthEnumConverter implements AttributeConverter<ShortMonthEnum, Integer> {

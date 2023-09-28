@@ -1,13 +1,12 @@
 package com.kerneldc.common.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.SequenceGenerator;
-
 import org.springframework.data.rest.core.annotation.Description;
 
 import com.kerneldc.common.enums.ShortMonthEnum;
 import com.opencsv.bean.CsvBindByName;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;

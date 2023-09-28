@@ -2,7 +2,7 @@ package com.kerneldc.ipm.domain;
 
 
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;

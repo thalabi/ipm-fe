@@ -3,8 +3,8 @@ package com.kerneldc.common.domain;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.SequenceGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.SequenceGenerator;
 
 import org.apache.commons.lang3.StringUtils;
 

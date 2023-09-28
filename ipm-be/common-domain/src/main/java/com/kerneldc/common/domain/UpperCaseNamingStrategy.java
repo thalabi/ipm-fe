@@ -2,9 +2,9 @@ package com.kerneldc.common.domain;
 
 import java.util.List;
 
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
-import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * Add class name to spring.jpa.hibernate.naming.physical-strategy in application.properties
  */
 @Slf4j
-public class UpperCaseNamingStrategy extends SpringPhysicalNamingStrategy {
+public class UpperCaseNamingStrategy extends CamelCaseToUnderscoresNamingStrategy {
 
 	private List<String> entitiesThatNeedUpperCaseTables = List.of("user", "group");
 	

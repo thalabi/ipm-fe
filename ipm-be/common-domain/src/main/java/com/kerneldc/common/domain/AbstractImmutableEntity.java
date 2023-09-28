@@ -1,7 +1,7 @@
 package com.kerneldc.common.domain;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import lombok.Getter;
 import lombok.Setter;

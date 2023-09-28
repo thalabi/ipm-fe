@@ -1,6 +1,6 @@
 package com.kerneldc.ipm.domain;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.hibernate.annotations.Immutable;
 import org.springframework.data.rest.core.annotation.Description;

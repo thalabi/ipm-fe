@@ -3,11 +3,11 @@ package com.kerneldc.ipm.domain.instrumentdetail;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.SequenceGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.SequenceGenerator;
 
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.ipm.domain.PaymentFrequencyEnum;

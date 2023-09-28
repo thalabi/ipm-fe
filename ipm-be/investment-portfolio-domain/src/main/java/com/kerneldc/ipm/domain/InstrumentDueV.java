@@ -3,8 +3,8 @@ package com.kerneldc.ipm.domain;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 
 import org.hibernate.annotations.Immutable;
 
