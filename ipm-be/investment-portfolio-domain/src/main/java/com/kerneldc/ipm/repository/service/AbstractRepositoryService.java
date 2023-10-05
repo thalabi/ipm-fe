@@ -1,7 +1,5 @@
 package com.kerneldc.ipm.repository.service;
 
-import jakarta.transaction.Transactional;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +8,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import com.kerneldc.common.exception.ConcurrentRecordAccessException;
 import com.kerneldc.common.exception.RecordIntegrityViolationException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +21,7 @@ public abstract class AbstractRepositoryService<T, I> {
 	private final JpaRepository<T, I> jpaRepository;
 
 	/**
-	 * This is a wrapper for the {@link  transactionalSave transactionalSave} method below.
+	 * This is a wrapper for the {@link transactionalSave transactionalSave} method below.
 	 * It's purpose to catch the DataIntegrityViolationException as it is only thrown after the transaction has completed.
 	 * 
 	 * @param entity
@@ -45,7 +44,9 @@ public abstract class AbstractRepositoryService<T, I> {
 	private T transactionalSave(T entity) {
 		LOGGER.info(LOG_BEGIN);
 		LOGGER.info("entity: {}", entity);
+		
 		handleEntity(entity);
+		
 		try {
 			jpaRepository.save(entity);
 		} catch (ObjectOptimisticLockingFailureException e) {
@@ -56,6 +57,11 @@ public abstract class AbstractRepositoryService<T, I> {
 		return entity;
 	}
 
+	/**
+	 * Perform special handling of entity before save
+	 * 
+	 * @param entity
+	 */
 	protected abstract void handleEntity(T entity);
 
 	@Transactional

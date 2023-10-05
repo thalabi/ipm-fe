@@ -76,4 +76,21 @@ public class InstrumentInterestBearingRepositoryTest {
 		ib.setEmailNotification(true);
 		return ib;
 	}
+	/**
+	 * @return InstrumentInterestBearing that results in an MD5 that contains a zero byte
+	 */
+	public static InstrumentInterestBearing chequing() {
+		var i = new Instrument();
+		i.setType(InstrumentTypeEnum.INTEREST_BEARING);
+		i.setName("jk8ssl"); // the string "jk8ssl" results in an md5 hash that contains zero bytes
+		i.setCurrency(CurrencyEnum.CAD);
+		var ib = new InstrumentInterestBearing();
+		ib.setInstrument(i);
+		ib.setType(InterestBearingTypeEnum.CHEQUING);
+		ib.setPrice(new BigDecimal("1"));
+		ib.setInterestRate(1f);
+		ib.setEmailNotification(true);
+		ib.setFinancialInstitution(FinancialInstitutionEnum.TANGERINE);
+		return ib;
+	}
 }

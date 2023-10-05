@@ -2,10 +2,8 @@ package com.kerneldc.ipm.repository.service;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -19,19 +17,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InstrumentInterestBearingService extends AbstractRepositoryService<InstrumentInterestBearing, Long>{
 	
-	public InstrumentInterestBearingService(JpaRepository<InstrumentInterestBearing, Long> holdingRepository) {
-		super(holdingRepository);
+	public InstrumentInterestBearingService(JpaRepository<InstrumentInterestBearing, Long> instrumentInterestBearingRepository) {
+		super(instrumentInterestBearingRepository);
 	}
 
 	@Override
 	protected void handleEntity(InstrumentInterestBearing iib) {
 		LOGGER.info("iib: {}", iib);
 		var i = iib.getInstrument();
-		i.setTicker(getTicker(iib.getType(), i.getName(), i.getTicker()));
+		i.setTicker(determineTickerToSet(iib.getType(), i.getName(), i.getTicker()));
 		iib.setPrice(setDefaultPrice(iib.getPrice()));
 	}
 	
-    private String getTicker(InterestBearingTypeEnum type, String name, String ticker) {
+    private String determineTickerToSet(InterestBearingTypeEnum type, String name, String ticker) {
 		if (Arrays.asList(InterestBearingTypeEnum.MONEY_MARKET, InterestBearingTypeEnum.INVESTMENT_SAVINGS)
 				.contains(type)) {
 			return ticker;
@@ -42,15 +40,19 @@ public class InstrumentInterestBearingService extends AbstractRepositoryService<
     }
 
     private static String md5(String name) {
+    	
     	var hashBytes = DigestUtils.md5Digest(name.getBytes());
-    	// Remove null bytes from hash because postgres does not allow nulls in varchar
-    	var noNullHashBytesList = new ArrayList<Byte>();
+    	LOGGER.info("md5 of {} is: {}", name, hashBytes);
+    	// Remove null bytes from hash because postgres does not allow nulls/zeros in varchar
+    	var noZeroHashBytesArray = new byte[hashBytes.length];
+    	var i = 0;
     	for (byte hashByte: hashBytes) {
     		if (hashByte == 0) continue;
-    		noNullHashBytesList.add(hashByte);
+    		noZeroHashBytesArray[i++] = hashByte;
     	}
-    	var noNullHashBytesArray = noNullHashBytesList.toArray(new Byte[noNullHashBytesList.size()]);
-    	return new String(ArrayUtils.toPrimitive(noNullHashBytesArray), StandardCharsets.UTF_8);
+    	var trimmedByteArray = new byte[i];
+    	System.arraycopy(noZeroHashBytesArray, 0, trimmedByteArray, 0, i);
+    	return new String(trimmedByteArray, StandardCharsets.UTF_8);
     }
 
     private BigDecimal setDefaultPrice(BigDecimal price) {
