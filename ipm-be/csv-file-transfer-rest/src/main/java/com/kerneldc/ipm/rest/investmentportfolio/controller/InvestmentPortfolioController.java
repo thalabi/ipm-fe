@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.validation.Valid;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,6 +26,7 @@ import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
 import com.kerneldc.ipm.repository.service.HoldingService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,7 +77,7 @@ public class InvestmentPortfolioController {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("saveHoldingRequest: {}", saveHoldingRequest);
     	var holding = copyToHolding(saveHoldingRequest);
-    	holding = holdingService.save(holding);
+    	holdingService.save(holding);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }
@@ -98,6 +97,7 @@ public class InvestmentPortfolioController {
     	
     	var instrument = new Instrument();
     	instrument.setId(saveHoldingRequest.getInstrumentId());
+    	instrument.setType(saveHoldingRequest.getInstrumentType());
     	instrument.setVersion(0l);
 
     	holding.setInstrument(instrument);

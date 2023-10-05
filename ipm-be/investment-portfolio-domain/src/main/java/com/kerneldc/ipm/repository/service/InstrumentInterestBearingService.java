@@ -47,7 +47,9 @@ public class InstrumentInterestBearingService extends AbstractRepositoryService<
     	var noZeroHashBytesArray = new byte[hashBytes.length];
     	var i = 0;
     	for (byte hashByte: hashBytes) {
-    		if (hashByte == 0) continue;
+    		if (hashByte == 0) {
+    			continue;
+    		}
     		noZeroHashBytesArray[i++] = hashByte;
     	}
     	var trimmedByteArray = new byte[i];
