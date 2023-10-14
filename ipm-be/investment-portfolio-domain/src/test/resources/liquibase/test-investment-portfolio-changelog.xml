@@ -50,4 +50,6 @@
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-account-number-and-holder.xml"/>
 	<include file="liquibase/investment-portfolio/fixed-income-audit/create-table.xml"/>	
 
+	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-registered-account.xml"/>
+
 </databaseChangeLog>

@@ -169,6 +169,7 @@ public class InstrumentController {
     	iib.setEmailNotification(instrumentInterestBearingRequest.getEmailNotification());
     	iib.setAccountNumber(instrumentInterestBearingRequest.getAccountNumber());
     	iib.setHolder(instrumentInterestBearingRequest.getHolder());
+    	iib.setRegisteredAccount(instrumentInterestBearingRequest.getRegisteredAccount());
     	iib.setVersion(instrumentInterestBearingRequest.getRowVersion());
     	return iib;
     }
@@ -186,6 +187,10 @@ public class InstrumentController {
 				}
 				if (instrumentInterestBearingRequest.getAccountNumber() != null) {
 					exception.addMessage(String.format("%s interest bearing instrument can not have an account number",
+							instrumentInterestBearingRequest.getType()));
+				}
+				if (instrumentInterestBearingRequest.getRegisteredAccount() != null) {
+					exception.addMessage(String.format("%s interest bearing instrument can not have an registered account field",
 							instrumentInterestBearingRequest.getType()));
 				}
 			}

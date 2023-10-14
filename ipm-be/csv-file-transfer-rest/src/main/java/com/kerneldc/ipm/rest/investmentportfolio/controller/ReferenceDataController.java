@@ -14,6 +14,7 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
+import com.kerneldc.ipm.domain.RegisteredAccountEnum;
 import com.kerneldc.ipm.domain.TermEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -81,4 +82,13 @@ public class ReferenceDataController {
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(holderNameList);
     }
+
+    @GetMapping("/getRegisteredAccounts")
+	public ResponseEntity<List<RegisteredAccountEnum>> getRegisteredAccounts() {
+    	LOGGER.info(LOG_BEGIN);
+    	var registeredAccounts = Arrays.asList(RegisteredAccountEnum.values());
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(registeredAccounts);
+    }
+
 }

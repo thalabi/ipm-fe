@@ -9,6 +9,7 @@ import org.springframework.data.rest.core.config.Projection;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.RegisteredAccountEnum;
 import com.kerneldc.ipm.domain.TermEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 
@@ -26,12 +27,15 @@ public interface IInstrumentInterestBearingInlineInstrument {
     Float getPromotionalInterestRate();
     OffsetDateTime getPromotionEndDate();
     Boolean getEmailNotification();
+    String getAccountNumber();
+    
     HolderEnum getHolder();
 	default String getHolderName() {
 		return getHolder() != null ? getHolder().getName() : StringUtils.EMPTY;
 	}
 
-    String getAccountNumber();
+    RegisteredAccountEnum getRegisteredAccount();
+    
     Long getRowVersion();
 
 	Instrument getInstrument();

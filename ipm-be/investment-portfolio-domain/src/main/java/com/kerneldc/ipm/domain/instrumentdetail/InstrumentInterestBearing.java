@@ -3,20 +3,20 @@ package com.kerneldc.ipm.domain.instrumentdetail;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
+import com.kerneldc.ipm.domain.HolderEnum;
+import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
+import com.kerneldc.ipm.domain.RegisteredAccountEnum;
+import com.kerneldc.ipm.domain.TermEnum;
+import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
+import com.opencsv.bean.CsvBindByName;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.SequenceGenerator;
-
-import com.kerneldc.common.domain.LogicalKeyHolder;
-import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
-import com.kerneldc.ipm.domain.HolderEnum;
-import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
-import com.kerneldc.ipm.domain.TermEnum;
-import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
-import com.opencsv.bean.CsvBindByName;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,6 +61,9 @@ public class InstrumentInterestBearing extends AbstractInstrumentDetailEntity im
 	private HolderEnum holder;
 	@CsvBindByName(column = "account_number")
 	private String accountNumber;
+	@Enumerated(EnumType.STRING)
+	@CsvBindByName(column = "registered_account")
+	private RegisteredAccountEnum registeredAccount;
 
 	public void setType(InterestBearingTypeEnum type) {
 		this.type = type;

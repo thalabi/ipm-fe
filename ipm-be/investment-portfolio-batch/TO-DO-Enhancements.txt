@@ -9,6 +9,7 @@
 7. DONE - remove ticker from instrument_due_v and email
 8. Consider using a context to hold priceHoldingsExceptions in PriceHoldingsService
 9. Make account_number, currency and name in portfolio table and ui as not null
-10. Add holder and account # to InstrumentInterestBearing 
-11. Add notes to fixed-income-report
-12. Create temp file as ipm-application-fixed-income-reprt-xxxxxx.xls
+10. DONE - Add holder and account # to InstrumentInterestBearing 
+11. DONE - Add notes to fixed-income-report
+12. DONE - Create temp file as ipm-application-fixed-income-reprt-xxxxxx.xls
+13. DONE - Add RegisteredAccountEnum RSP TFSA
