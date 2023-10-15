@@ -3,13 +3,12 @@ package com.kerneldc.ipm.domain;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
-
 import org.hibernate.annotations.Immutable;
 
 import com.kerneldc.common.domain.AbstractImmutableEntity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +27,7 @@ public class InstrumentDueV extends AbstractImmutableEntity {
 	private String portfolioAccountNumber;
 	private String instrumentName;
 	private String instrumentAccountNumber;
+	private String registeredAccount;
 	private String currency;
 	private String type;
 	

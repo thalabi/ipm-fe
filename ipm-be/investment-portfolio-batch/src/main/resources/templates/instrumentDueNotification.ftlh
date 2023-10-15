@@ -50,6 +50,12 @@
 	  </tr>
   </#if>
 
+  <#if ((instrumentDueV.registeredAccount)??)>
+	  <tr>
+	  	<td>Registered:</td> <td><strong>${instrumentDueV.registeredAccount}</strong></td>
+	  </tr>
+  </#if>
+
   <#if ((instrumentDueV.instrumentName)??)>
 	  <tr>
 	  	<td>Instrument:</td> <td><strong>${instrumentDueV.instrumentName}</strong></td>

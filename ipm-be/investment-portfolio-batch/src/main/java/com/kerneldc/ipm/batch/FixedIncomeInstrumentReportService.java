@@ -50,22 +50,23 @@ import lombok.extern.slf4j.Slf4j;
 public class FixedIncomeInstrumentReportService {
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
+	private static final byte NUMBER_OF_COLUMNS = 15;
 	private static final String ARIAL_FONT = "Arial";
 	private static final byte FINANCIAL_INSTITUTION_CELL = 0;
 	private static final byte HOLDER_CELL = 1;
-	private static final byte INSTRUMENT_CELL = 2;
-	private static final byte INSTRUMENT_ACCOUNT_NUMBER_CELL = 3;
-	private static final byte PORTFOLIO_ACCOUNT_NUMBER_CELL = 4;
-	private static final byte USD_BALANCE_CELL = 5;
-	private static final byte BALANCE_CELL = 6;
-	private static final byte TYPE_CELL = 7;
-	private static final byte TERM_CELL = 8;
-	private static final byte RATE_CELL = 9;
-	private static final byte PROMO_RATE_CELL = 10;
-	private static final byte PROMO_RATE_END_DATE_CELL = 11;
-	private static final byte MATURITY_DATE_CELL = 12;
-	private static final byte NOTES_CELL = 13;
-	private static final byte NUMBER_OF_COLUMNS = 14;
+	private static final byte REGISTERED_ACCOUNT_CELL = 2;
+	private static final byte INSTRUMENT_CELL = 3;
+	private static final byte INSTRUMENT_ACCOUNT_NUMBER_CELL = 4;
+	private static final byte PORTFOLIO_ACCOUNT_NUMBER_CELL = 5;
+	private static final byte USD_BALANCE_CELL = 6;
+	private static final byte BALANCE_CELL = 7;
+	private static final byte TYPE_CELL = 8;
+	private static final byte TERM_CELL = 9;
+	private static final byte RATE_CELL = 10;
+	private static final byte PROMO_RATE_CELL = 11;
+	private static final byte PROMO_RATE_END_DATE_CELL = 12;
+	private static final byte MATURITY_DATE_CELL = 13;
+	private static final byte NOTES_CELL = 14;
 	
 	@Value("${instrument.due.days.to.notify:7}")
 	private Long daysToNotify;
@@ -264,6 +265,12 @@ public class FixedIncomeInstrumentReportService {
 			var holderEnum = HolderEnum.valueOf(instrumentDueV.getPortfolioHolder());
 			var holderCellStyleMap = poiContext.getHolderCellStyleMap();
 			cell.setCellStyle(holderCellStyleMap.get(holderEnum));
+			
+			// RegisteredAccount 
+			cell = row.createCell(REGISTERED_ACCOUNT_CELL);
+			cell.setCellStyle(arialFontStyle);
+			cell.setCellValue(instrumentDueV.getRegisteredAccount());
+
 			// Instrument 
 			cell = row.createCell(INSTRUMENT_CELL);
 			cell.setCellStyle(arialFontStyle);
@@ -429,6 +436,9 @@ public class FixedIncomeInstrumentReportService {
 		
 		cell = row.createCell(HOLDER_CELL);
 		cell.setCellValue("Holder");
+		
+		cell = row.createCell(REGISTERED_ACCOUNT_CELL);
+		cell.setCellValue("Reg");
 		
 		cell = row.createCell(INSTRUMENT_CELL);
 		cell.setCellValue("Instrument");

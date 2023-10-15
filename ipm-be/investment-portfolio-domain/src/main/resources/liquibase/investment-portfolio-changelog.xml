@@ -116,5 +116,6 @@
 	<include file="liquibase/investment-portfolio/fixed-income-audit/create-table.xml"/>	
 
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/add-registered-account.xml"/>
+	<include file="liquibase/investment-portfolio/instrument-due-v/add-registered-account.xml"/>
 
 </databaseChangeLog>
