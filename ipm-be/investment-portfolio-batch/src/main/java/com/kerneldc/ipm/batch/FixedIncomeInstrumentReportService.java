@@ -134,8 +134,8 @@ public class FixedIncomeInstrumentReportService {
 	private PoiContext createContext() {
 		var workbook = new XSSFWorkbook();
 		var sheet = workbook.createSheet();
-		sheet.addIgnoredErrors(CellRangeAddress.valueOf("d2:d999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
 		sheet.addIgnoredErrors(CellRangeAddress.valueOf("e2:e999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
+		sheet.addIgnoredErrors(CellRangeAddress.valueOf("f2:f999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
 		var format = workbook.createDataFormat();
 		var arialFont = workbook.createFont();
 		arialFont.setFontName(ARIAL_FONT);
