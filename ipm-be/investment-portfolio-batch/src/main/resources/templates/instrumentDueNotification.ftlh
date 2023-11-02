@@ -98,7 +98,7 @@
 	  </tr>
   </#if>
   
-  <#if ((instrumentDueV.maturityDate)?? && instrumentDueV.type != "BOND")>
+  <#if ((instrumentDueV.maturityDate)??)>
 	  <tr>
 	  	<td>Maturity date:</td> <td class="${checkOverdue(instrumentDueV.overdue)}"><strong>${instrumentDueV.maturityDate[0..9]}</strong></td>
 	  </tr>
