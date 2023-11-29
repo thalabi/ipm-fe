@@ -3,17 +3,16 @@ package com.kerneldc.ipm.domain.instrumentdetail;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.SequenceGenerator;
-
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.ipm.domain.PaymentFrequencyEnum;
 import com.kerneldc.ipm.domain.listener.FixedIncomeListener;
 import com.opencsv.bean.CsvBindByName;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +53,7 @@ public class InstrumentBond extends AbstractInstrumentDetailEntity implements IF
 	
 	@Override
 	protected void setLogicalKeyHolder() {
-		var logicalKeyHolder = LogicalKeyHolder.build(instrument.getTicker());
+		var logicalKeyHolder = LogicalKeyHolder.build(cusip);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

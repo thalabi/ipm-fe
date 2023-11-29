@@ -29,8 +29,10 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.Instrument;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentBond;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
-import com.kerneldc.ipm.repository.service.InstrumentInterestBearingService;
+import com.kerneldc.ipm.repository.service.InstrumentBondRepositoryService;
+import com.kerneldc.ipm.repository.service.InstrumentInterestBearingRepositoryService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -48,7 +50,8 @@ public class InstrumentController {
 
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
-	private final InstrumentInterestBearingService instrumentInterestBearingService;
+	private final InstrumentInterestBearingRepositoryService instrumentInterestBearingRepositoryService;
+	private final InstrumentBondRepositoryService instrumentBondRepositoryService;
 	private final InstrumentDueNotificationService instrumentDueNotificationService;
 	private final FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
 
@@ -88,7 +91,7 @@ public class InstrumentController {
     	LOGGER.info("instrumentInterestBearingRequest: {}", instrumentInterestBearingRequest);
     	validateInstrumentInterestBearingRequest(instrumentInterestBearingRequest);
     	var iib = copyToInstrumentInterestBearing(instrumentInterestBearingRequest);
-    	instrumentInterestBearingService.save(iib);
+    	instrumentInterestBearingRepositoryService.save(iib);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }
@@ -97,12 +100,34 @@ public class InstrumentController {
     public ResponseEntity<Void> deleteInstrumentInterestBearing(@PathVariable Long id) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);
-    	instrumentInterestBearingService.delete(id);
+    	instrumentInterestBearingRepositoryService.delete(id);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }
 	
-    @PostMapping("/generateFixedIncomeInstrumentReport")
+    @PutMapping("/saveInstrumentBond")
+	public ResponseEntity<Void> saveInstrumentBond(
+			@Valid @RequestBody InstrumentBondRequest instrumentBondRequest)
+			throws ApplicationException {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("instrumentBondRequest: {}", instrumentBondRequest);
+    	validateInstrumentBondRequest(instrumentBondRequest);
+    	var ib = copyToInstrumentBond(instrumentBondRequest);
+    	instrumentBondRepositoryService.save(ib);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+    
+	@DeleteMapping("/deleteInstrumentBond/{id}")
+    public ResponseEntity<Void> deleteInstrumentBond(@PathVariable Long id) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("id: {}", id);
+    	instrumentBondRepositoryService.delete(id);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+	
+	@PostMapping("/generateFixedIncomeInstrumentReport")
 	public ResponseEntity<ReportJobResponse> generateFixedIncomeInstrumentReport(@RequestParam @NotNull @Pattern(regexp = "Download|Email", flags = Pattern.Flag.CASE_INSENSITIVE) String reportDisposition) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("reportDisposition: {}", reportDisposition);
@@ -173,6 +198,31 @@ public class InstrumentController {
     	iib.setVersion(instrumentInterestBearingRequest.getRowVersion());
     	return iib;
     }
+
+    private InstrumentBond copyToInstrumentBond(@Valid InstrumentBondRequest instrumentBondRequest) {
+    	var ib = new InstrumentBond();
+    	var i = new Instrument();
+    	i.setId(instrumentBondRequest.getInstrument().getId());
+    	i.setType(instrumentBondRequest.getInstrument().getType());
+    	i.setCurrency( instrumentBondRequest.getInstrument().getCurrency());
+    	i.setName(instrumentBondRequest.getInstrument().getName());
+    	i.setNotes(instrumentBondRequest.getInstrument().getNotes());
+    	i.setVersion(instrumentBondRequest.getInstrument().getRowVersion());
+    	ib.setId(instrumentBondRequest.getId());
+    	ib.setInstrument(i);
+    	ib.setIssuer(instrumentBondRequest.getIssuer());
+    	ib.setCusip(instrumentBondRequest.getCusip());
+    	ib.setPrice(instrumentBondRequest.getPrice());
+    	ib.setCoupon(instrumentBondRequest.getCoupon());
+    	ib.setIssueDate(instrumentBondRequest.getIssueDate());
+    	ib.setNextPaymentDate(instrumentBondRequest.getNextPaymentDate());
+    	ib.setMaturityDate(instrumentBondRequest.getMaturityDate());
+    	ib.setPaymentFrequency(instrumentBondRequest.getPaymentFrequency());
+    	ib.setEmailNotification(instrumentBondRequest.getEmailNotification());
+    	ib.setVersion(instrumentBondRequest.getRowVersion());
+    	return ib;
+    }
+    
 	private void validateInstrumentInterestBearingRequest(
 			InstrumentInterestBearingRequest instrumentInterestBearingRequest) throws ApplicationException {
 		var exception = new ApplicationException();
@@ -220,18 +270,15 @@ public class InstrumentController {
 					exception.addMessage(String.format("%s interest bearing instrument can not have a next payment date",
 							instrumentInterestBearingRequest.getType()));
 				}
-				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
-					exception.addMessage(
-							String.format("%s interest bearing instrument can not have a promotional interestr eate",
-									instrumentInterestBearingRequest.getType()));
-				}
-				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
-					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
-							instrumentInterestBearingRequest.getType()));
-				}
-				if (! /* not */ exception.getMessageList().isEmpty()) {
-					throw exception;
-				}
+//				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+//					exception.addMessage(
+//							String.format("%s interest bearing instrument can not have a promotional interestr eate",
+//									instrumentInterestBearingRequest.getType()));
+//				}
+//				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+//					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+//							instrumentInterestBearingRequest.getType()));
+//				}
 			}
 			case SAVINGS -> {
 				if (instrumentInterestBearingRequest.getTerm() != null) {
@@ -268,17 +315,37 @@ public class InstrumentController {
 					exception.addMessage(String.format("%s interest bearing instrument must have a next payment date",
 							instrumentInterestBearingRequest.getType()));
 				}
-				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
-					exception.addMessage(
-							String.format("%s interest bearing instrument can not have a promotional interestr eate",
-									instrumentInterestBearingRequest.getType()));
-				}
-				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
-					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
-							instrumentInterestBearingRequest.getType()));
+//				if (instrumentInterestBearingRequest.getPromotionalInterestRate() != null) {
+//					exception.addMessage(
+//							String.format("%s interest bearing instrument can not have a promotional interestr eate",
+//									instrumentInterestBearingRequest.getType()));
+//				}
+//				if (instrumentInterestBearingRequest.getPromotionEndDate() != null) {
+//					exception.addMessage(String.format("%s interest bearing instrument can not have a prmotion end date",
+//							instrumentInterestBearingRequest.getType()));
+//				}
+				if (instrumentInterestBearingRequest.getNextPaymentDate().isAfter(instrumentInterestBearingRequest.getMaturityDate())) {
+					exception.addMessage(String.format("Next Payment date %1$tF which should be on or before Maturity date %2$tF",
+							instrumentInterestBearingRequest.getNextPaymentDate(), instrumentInterestBearingRequest.getMaturityDate()));
 				}
 			}
 		}
+		if (! /* not */ exception.getMessageList().isEmpty()) {
+			throw exception;
+		}
+
 	}
 	
+	private void validateInstrumentBondRequest(@Valid InstrumentBondRequest instrumentBondRequest) throws ApplicationException {
+		var exception = new ApplicationException();
+		if (! /* not */ (instrumentBondRequest.getIssueDate().isBefore(instrumentBondRequest.getNextPaymentDate()) && ! /* not */ instrumentBondRequest.getNextPaymentDate().isAfter(instrumentBondRequest.getMaturityDate()))) {
+			exception.addMessage(String.format("Issue date %1$tF should be before Next Payment date %2$tF which should be on or before Maturity date %3$tF",
+					instrumentBondRequest.getIssueDate(), instrumentBondRequest.getNextPaymentDate(), instrumentBondRequest.getMaturityDate()));
+		}
+		if (! /* not */ exception.getMessageList().isEmpty()) {
+			throw exception;
+		}
+		
+	}
 }
+

@@ -24,7 +24,7 @@ import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.IHoldingDetail;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PositionSnapshot;
-import com.kerneldc.ipm.repository.service.HoldingService;
+import com.kerneldc.ipm.repository.service.HoldingRepositoryService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class InvestmentPortfolioController {
 	private static final String LOG_END = "End ...";
 
 	private final HoldingPricingService holdingPricingService;
-	private final HoldingService holdingService;
+	private final HoldingRepositoryService holdingRepositoryService;
 	private final HoldingRepository holdingRepository;
 	private final PositionRepository positionRepository;
 	
@@ -77,7 +77,7 @@ public class InvestmentPortfolioController {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("saveHoldingRequest: {}", saveHoldingRequest);
     	var holding = copyToHolding(saveHoldingRequest);
-    	holdingService.save(holding);
+    	holdingRepositoryService.save(holding);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }
@@ -86,7 +86,7 @@ public class InvestmentPortfolioController {
     public ResponseEntity<Void> deleteHolding(@PathVariable Long id) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);
-    	holdingService.delete(id);
+    	holdingRepositoryService.delete(id);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }

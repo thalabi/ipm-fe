@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import com.kerneldc.ipm.domain.Holding;
 
 @Service
-public class HoldingService extends AbstractRepositoryService<Holding, Long> {
+public class HoldingRepositoryService extends AbstractRepositoryService<Holding, Long> {
 
-	public HoldingService(JpaRepository<Holding, Long> holdingRepository) {
+	public HoldingRepositoryService(JpaRepository<Holding, Long> holdingRepository) {
 		super(holdingRepository);
 	}
 	

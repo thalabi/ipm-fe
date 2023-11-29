@@ -38,7 +38,6 @@ public abstract class AbstractRepositoryService<T, I> {
 		LOGGER.info(LOG_END);
 		return entity;
 	}
-	
 
 	@Transactional
 	private T transactionalSave(T entity) {

@@ -18,7 +18,7 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.repository.IPortfolioWithDependentFlags;
 import com.kerneldc.ipm.repository.PortfolioRepository;
-import com.kerneldc.ipm.repository.service.PortfolioService;
+import com.kerneldc.ipm.repository.service.PortfolioRepositoryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class PortfolioController {
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
 	private final PortfolioRepository portfolioRepository;
-	private final PortfolioService portfolioService;
+	private final PortfolioRepositoryService portfolioRepositoryService;
 	
     @GetMapping("/getPortfoliosWithDependentFlags")
 	public ResponseEntity<List<IPortfolioWithDependentFlags>> getPortfoliosWithDependentFlags() {
@@ -49,7 +49,7 @@ public class PortfolioController {
 			throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("Portfolio: {}", portfolio);
-    	portfolioService.save(portfolio);
+    	portfolioRepositoryService.save(portfolio);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().build();
     }
@@ -58,7 +58,7 @@ public class PortfolioController {
     public ResponseEntity<Void> deletePortfolio(@PathVariable Long id) throws ApplicationException {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("id: {}", id);
-    	portfolioService.delete(id);
+    	portfolioRepositoryService.delete(id);
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().build();
     }

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import com.kerneldc.ipm.domain.Portfolio;
 
 @Service
-public class PortfolioService extends AbstractRepositoryService<Portfolio, Long> {
+public class PortfolioRepositoryService extends AbstractRepositoryService<Portfolio, Long> {
 
-	public PortfolioService(JpaRepository<Portfolio, Long> holdingRepository) {
+	public PortfolioRepositoryService(JpaRepository<Portfolio, Long> holdingRepository) {
 		super(holdingRepository);
 	}
 

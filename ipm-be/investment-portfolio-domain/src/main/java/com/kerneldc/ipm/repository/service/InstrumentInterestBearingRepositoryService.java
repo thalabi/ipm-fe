@@ -15,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class InstrumentInterestBearingService extends AbstractRepositoryService<InstrumentInterestBearing, Long>{
+public class InstrumentInterestBearingRepositoryService extends AbstractRepositoryService<InstrumentInterestBearing, Long>{
 	
-	public InstrumentInterestBearingService(JpaRepository<InstrumentInterestBearing, Long> instrumentInterestBearingRepository) {
+	public InstrumentInterestBearingRepositoryService(JpaRepository<InstrumentInterestBearing, Long> instrumentInterestBearingRepository) {
 		super(instrumentInterestBearingRepository);
 	}
 

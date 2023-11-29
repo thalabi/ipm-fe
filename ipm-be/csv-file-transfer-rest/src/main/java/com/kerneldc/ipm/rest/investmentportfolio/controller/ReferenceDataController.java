@@ -14,6 +14,7 @@ import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.InterestBearingTypeEnum;
+import com.kerneldc.ipm.domain.PaymentFrequencyEnum;
 import com.kerneldc.ipm.domain.RegisteredAccountEnum;
 import com.kerneldc.ipm.domain.TermEnum;
 
@@ -89,6 +90,14 @@ public class ReferenceDataController {
     	var registeredAccounts = Arrays.asList(RegisteredAccountEnum.values());
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(registeredAccounts);
+    }
+
+    @GetMapping("/getPaymentFrequencies")
+	public ResponseEntity<List<PaymentFrequencyEnum>> getPaymentFrequencies() {
+    	LOGGER.info(LOG_BEGIN);
+    	var paymentFrequencies = Arrays.asList(PaymentFrequencyEnum.values());
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(paymentFrequencies);
     }
 
 }

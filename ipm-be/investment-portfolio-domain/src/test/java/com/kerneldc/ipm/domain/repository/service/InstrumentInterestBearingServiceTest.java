@@ -17,12 +17,12 @@ import org.springframework.util.DigestUtils;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.domain.repository.instrumentdetail.InstrumentInterestBearingRepositoryTest;
 import com.kerneldc.ipm.repository.instrumentdetail.InstrumentInterestBearingRepository;
-import com.kerneldc.ipm.repository.service.InstrumentInterestBearingService;
+import com.kerneldc.ipm.repository.service.InstrumentInterestBearingRepositoryService;
 
 @DataJpaTest
 class InstrumentInterestBearingServiceTest {
 
-	private InstrumentInterestBearingService instrumentInterestBearingService;
+	private InstrumentInterestBearingRepositoryService instrumentInterestBearingRepositoryService;
 	
 	@Autowired
 	private InstrumentInterestBearingRepository instrumentInterestBearingRepository;
@@ -31,7 +31,7 @@ class InstrumentInterestBearingServiceTest {
 	
 	@BeforeEach
 	void init() {
-		instrumentInterestBearingService = new InstrumentInterestBearingService(instrumentInterestBearingRepository);
+		instrumentInterestBearingRepositoryService = new InstrumentInterestBearingRepositoryService(instrumentInterestBearingRepository);
 	}
 	
 	@Test
@@ -40,8 +40,8 @@ class InstrumentInterestBearingServiceTest {
 		var iib = InstrumentInterestBearingRepositoryTest.moneyMarket();
 		var iib2 = InstrumentInterestBearingRepositoryTest.moneyMarket();
 
-		instrumentInterestBearingService.save(iib);
-		instrumentInterestBearingService.save(iib2);
+		instrumentInterestBearingRepositoryService.save(iib);
+		instrumentInterestBearingRepositoryService.save(iib2);
 		
 		var exception = assertThrows(DataIntegrityViolationException.class, () -> {
 			// have to use JpaRepository instead of EntityManager since it wraps the ConstraintViolationException with DataIntegrityViolationException
@@ -56,7 +56,7 @@ class InstrumentInterestBearingServiceTest {
 		
 		var iib = InstrumentInterestBearingRepositoryTest.chequing();
 
-		instrumentInterestBearingService.save(iib);
+		instrumentInterestBearingRepositoryService.save(iib);
 		
 		// assert that the md5 of the name contains a zero byte
 		var md5Digest = DigestUtils.md5Digest(iib.getInstrument().getName().getBytes());
