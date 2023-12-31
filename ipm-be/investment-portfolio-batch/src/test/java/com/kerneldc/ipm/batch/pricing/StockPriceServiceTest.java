@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.kerneldc.common.exception.ApplicationException;
@@ -38,6 +39,7 @@ class StockPriceServiceTest {
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
+	@Disabled // temporarily because exceeded 25 quotes per day  
 	@Test
 	void TestAlphaVantageQuoteMultipleTimes() throws ApplicationException {
 		var instrument = new Instrument();
