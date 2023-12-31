@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kerneldc.ipm.domain.CurrencyEnum;
+import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.HolderEnum;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
@@ -98,6 +99,14 @@ public class ReferenceDataController {
     	var paymentFrequencies = Arrays.asList(PaymentFrequencyEnum.values());
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok(paymentFrequencies);
+    }
+
+    @GetMapping("/getExchanges")
+	public ResponseEntity<List<ExchangeEnum>> getExchanges() {
+    	LOGGER.info(LOG_BEGIN);
+    	var exchanges = Arrays.asList(ExchangeEnum.values());
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok(exchanges);
     }
 
 }

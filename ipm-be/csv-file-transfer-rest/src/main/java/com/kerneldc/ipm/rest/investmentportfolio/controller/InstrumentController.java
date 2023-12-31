@@ -30,9 +30,15 @@ import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentBond;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentEtf;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMutualFund;
+import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 import com.kerneldc.ipm.repository.service.InstrumentBondRepositoryService;
+import com.kerneldc.ipm.repository.service.InstrumentEtfRepositoryService;
 import com.kerneldc.ipm.repository.service.InstrumentInterestBearingRepositoryService;
+import com.kerneldc.ipm.repository.service.InstrumentMutualFundRepositoryService;
+import com.kerneldc.ipm.repository.service.InstrumentStockRepositoryService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -52,6 +58,9 @@ public class InstrumentController {
 	private static final String LOG_END = "End ...";
 	private final InstrumentInterestBearingRepositoryService instrumentInterestBearingRepositoryService;
 	private final InstrumentBondRepositoryService instrumentBondRepositoryService;
+	private final InstrumentEtfRepositoryService instrumentEtfRepositoryService;
+	private final InstrumentStockRepositoryService instrumentStockRepositoryService;
+	private final InstrumentMutualFundRepositoryService instrumentMutualFundRepositoryService;
 	private final InstrumentDueNotificationService instrumentDueNotificationService;
 	private final FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
 
@@ -126,7 +135,71 @@ public class InstrumentController {
     	LOGGER.info(LOG_END);
     	return ResponseEntity.ok().body(null);
     }
-	
+
+    @PutMapping("/saveInstrumentEtf")
+	public ResponseEntity<Void> saveInstrumentEtf(
+			@Valid @RequestBody InstrumentDetailRequest instrumentDetailRequest)
+			throws ApplicationException {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("instrumentDetailRequest: {}", instrumentDetailRequest);
+    	var ietf = copyToInstrumentEtf(instrumentDetailRequest);
+    	instrumentEtfRepositoryService.save(ietf);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+    
+	@DeleteMapping("/deleteInstrumentEtf/{id}")
+    public ResponseEntity<Void> deleteInstrumentEtf(@PathVariable Long id) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("id: {}", id);
+    	instrumentEtfRepositoryService.delete(id);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+
+    @PutMapping("/saveInstrumentStock")
+	public ResponseEntity<Void> saveInstrumentStock(
+			@Valid @RequestBody InstrumentDetailRequest instrumentDetailRequest)
+			throws ApplicationException {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("instrumentDetailRequest: {}", instrumentDetailRequest);
+    	var is = copyToInstrumentStock(instrumentDetailRequest);
+    	instrumentStockRepositoryService.save(is);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+    
+	@DeleteMapping("/deleteInstrumentStock/{id}")
+    public ResponseEntity<Void> deleteInstrumentStock(@PathVariable Long id) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("id: {}", id);
+    	instrumentStockRepositoryService.delete(id);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+
+    @PutMapping("/saveInstrumentMutualFund")
+	public ResponseEntity<Void> saveInstrumentMutualFund(
+			@Valid @RequestBody InstrumentMutualFundRequest instrumentMutualFundRequest)
+			throws ApplicationException {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("instrumentMutualFundRequest: {}", instrumentMutualFundRequest);
+    	var imf = copyToInstrumentMutualFund(instrumentMutualFundRequest);
+    	instrumentMutualFundRepositoryService.save(imf);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+    
+	@DeleteMapping("/deleteInstrumentMutualFund/{id}")
+    public ResponseEntity<Void> deleteInstrumentMutualFund(@PathVariable Long id) {
+    	LOGGER.info(LOG_BEGIN);
+    	LOGGER.info("id: {}", id);
+    	instrumentMutualFundRepositoryService.delete(id);
+    	LOGGER.info(LOG_END);
+    	return ResponseEntity.ok().body(null);
+    }
+
+
 	@PostMapping("/generateFixedIncomeInstrumentReport")
 	public ResponseEntity<ReportJobResponse> generateFixedIncomeInstrumentReport(@RequestParam @NotNull @Pattern(regexp = "Download|Email", flags = Pattern.Flag.CASE_INSENSITIVE) String reportDisposition) {
     	LOGGER.info(LOG_BEGIN);
@@ -204,6 +277,7 @@ public class InstrumentController {
     	var i = new Instrument();
     	i.setId(instrumentBondRequest.getInstrument().getId());
     	i.setType(instrumentBondRequest.getInstrument().getType());
+    	i.setTicker(instrumentBondRequest.getInstrument().getTicker());
     	i.setCurrency( instrumentBondRequest.getInstrument().getCurrency());
     	i.setName(instrumentBondRequest.getInstrument().getName());
     	i.setNotes(instrumentBondRequest.getInstrument().getNotes());
@@ -221,6 +295,57 @@ public class InstrumentController {
     	ib.setEmailNotification(instrumentBondRequest.getEmailNotification());
     	ib.setVersion(instrumentBondRequest.getRowVersion());
     	return ib;
+    }
+
+    private InstrumentEtf copyToInstrumentEtf(@Valid InstrumentDetailRequest instrumentDetailRequest) {
+    	var ietf = new InstrumentEtf();
+    	var i = new Instrument();
+    	i.setId(instrumentDetailRequest.getInstrument().getId());
+    	i.setType(instrumentDetailRequest.getInstrument().getType());
+    	i.setTicker(instrumentDetailRequest.getInstrument().getTicker());
+    	i.setCurrency(instrumentDetailRequest.getInstrument().getCurrency());
+    	i.setName(instrumentDetailRequest.getInstrument().getName());
+    	i.setNotes(instrumentDetailRequest.getInstrument().getNotes());
+    	i.setVersion(instrumentDetailRequest.getInstrument().getRowVersion());
+    	ietf.setId(instrumentDetailRequest.getId());
+    	ietf.setInstrument(i);
+    	ietf.setExchange(instrumentDetailRequest.getExchange());
+    	ietf.setVersion(instrumentDetailRequest.getRowVersion());
+    	return ietf;
+    }
+    
+    private InstrumentStock copyToInstrumentStock(@Valid InstrumentDetailRequest instrumentDetailRequest) {
+    	var is = new InstrumentStock();
+    	var i = new Instrument();
+    	i.setId(instrumentDetailRequest.getInstrument().getId());
+    	i.setType(instrumentDetailRequest.getInstrument().getType());
+    	i.setTicker(instrumentDetailRequest.getInstrument().getTicker());
+    	i.setCurrency(instrumentDetailRequest.getInstrument().getCurrency());
+    	i.setName(instrumentDetailRequest.getInstrument().getName());
+    	i.setNotes(instrumentDetailRequest.getInstrument().getNotes());
+    	i.setVersion(instrumentDetailRequest.getInstrument().getRowVersion());
+    	is.setId(instrumentDetailRequest.getId());
+    	is.setInstrument(i);
+    	is.setExchange(instrumentDetailRequest.getExchange());
+    	is.setVersion(instrumentDetailRequest.getRowVersion());
+    	return is;
+    }
+    
+    private InstrumentMutualFund copyToInstrumentMutualFund(@Valid InstrumentMutualFundRequest instrumentMutualFundRequest) {
+    	var imf = new InstrumentMutualFund();
+    	var i = new Instrument();
+    	i.setId(instrumentMutualFundRequest.getInstrument().getId());
+    	i.setType(instrumentMutualFundRequest.getInstrument().getType());
+    	i.setTicker(instrumentMutualFundRequest.getInstrument().getTicker());
+    	i.setCurrency(instrumentMutualFundRequest.getInstrument().getCurrency());
+    	i.setName(instrumentMutualFundRequest.getInstrument().getName());
+    	i.setNotes(instrumentMutualFundRequest.getInstrument().getNotes());
+    	i.setVersion(instrumentMutualFundRequest.getInstrument().getRowVersion());
+    	imf.setId(instrumentMutualFundRequest.getId());
+    	imf.setInstrument(i);
+    	imf.setCompany(instrumentMutualFundRequest.getCompany());
+    	imf.setVersion(instrumentMutualFundRequest.getRowVersion());
+    	return imf;
     }
     
 	private void validateInstrumentInterestBearingRequest(

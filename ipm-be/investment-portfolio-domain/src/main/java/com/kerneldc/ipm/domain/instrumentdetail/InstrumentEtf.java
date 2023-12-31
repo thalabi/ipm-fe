@@ -1,11 +1,13 @@
 package com.kerneldc.ipm.domain.instrumentdetail;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
-
 import com.kerneldc.common.domain.LogicalKeyHolder;
+import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.opencsv.bean.CsvBindByName;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,20 +19,12 @@ public class InstrumentEtf extends AbstractInstrumentDetailEntity implements ILi
 	
 	private static final long serialVersionUID = 1L;
 
-//	@OneToOne(cascade = CascadeType.ALL, optional = false)
-//    @JoinColumn(name = "instrument_id")
-//	@Setter(AccessLevel.NONE)
-//    private Instrument instrument;
-	
+	@Enumerated(EnumType.STRING)
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
-	private String exchange;
+	private ExchangeEnum exchange;
 
-//	public void setInstrument(Instrument instrument) {
-//		this.instrument = instrument;
-//		setLogicalKeyHolder();
-//	}
-	public void setExchange(String exchange) {
+	public void setExchange(ExchangeEnum exchange) {
 		this.exchange = exchange;
 		setLogicalKeyHolder();
 	}

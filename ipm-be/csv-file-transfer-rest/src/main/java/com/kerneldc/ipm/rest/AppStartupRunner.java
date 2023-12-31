@@ -7,6 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.CurrencyEnum;
+import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
@@ -75,7 +76,7 @@ public class AppStartupRunner implements ApplicationRunner {
 		Optional<InstrumentStock> isOptional = instrumentStockRepository.findById(88l);
 		isOptional.ifPresent(is -> {
 			LOGGER.info(is.toString());
-			is.setExchange(is.getExchange()+"+");
+			//is.setExchange(is.getExchange()+"+");
 			var i = is.getInstrument();
 			i.setName(i.getName() + "+");
 			instrumentStockRepository.save(is);
@@ -97,7 +98,7 @@ public class AppStartupRunner implements ApplicationRunner {
 		i1.setName("BCE Inc");
 		i1.setTicker("BCE");
 		i1.setCurrency(CurrencyEnum.CAD);
-		is1.setExchange("TSE");
+		is1.setExchange(ExchangeEnum.TSE);
 		instrumentRepository.save(i1);
 		instrumentStockRepository.save(is1);
 		var instrumentList = instrumentRepository.findAll();

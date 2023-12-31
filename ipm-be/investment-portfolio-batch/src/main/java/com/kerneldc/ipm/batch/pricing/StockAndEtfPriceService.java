@@ -93,7 +93,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		var exchange = instrumentStock.getExchange();
 		
 		var alphavantageSymbol = ticker;
-		if (Arrays.asList("TSE","CNSX").contains(exchange)) {
+		if (Arrays.asList("TSE","CNSX").contains(exchange.toString())) {
 			alphavantageSymbol = ticker.replace(".", "-") + ".TO";
 		}
 		var urlString = String.format(ALPHAVANTAGE_URL_TEMPLATE, alphavantageApiKey, alphavantageSymbol);
