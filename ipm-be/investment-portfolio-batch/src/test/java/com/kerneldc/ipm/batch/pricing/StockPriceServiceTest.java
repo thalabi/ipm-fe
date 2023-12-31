@@ -29,6 +29,7 @@ class StockPriceServiceTest {
 		stockAndEtfPriceService = new StockAndEtfPriceService(null, apiKey);
 	}
 
+	@Disabled // temporarily because exceeded 25 quotes per day  
 	@Test
 	void TestAlphaVantageQuoteOnce() throws ApplicationException {
 		var instrument = new Instrument();
