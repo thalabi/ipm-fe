@@ -268,12 +268,20 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 					|| /* not */ exception.getCause() instanceof NumberFormatException
 							? NestedExceptionUtils.getMostSpecificCause(exception).getMessage()
 							: exception.getMessage());
-			var csvData = String.join(",", exception.getLine());
+			var csvData = String.join(",", escapeCsvFields(exception.getLine()));
 			
 			return new ExceptionsFileLine(exception.getLineNumber(), exceptionMessage, csvData, StringUtils.EMPTY, "CSV file to beans(opencsv)");
 		}).toList();
 	}
 	
+	private String[] escapeCsvFields(String[] line) {
+		String[] escapedLine = new String[line.length];
+		for (int i=0; i<line.length; i++) {
+			escapedLine[i] = StringEscapeUtils.escapeCsv(line[i]);
+		}
+		return escapedLine;
+	}
+
 	private List<ExceptionsFileLine> transformBeanExceptionsToExceptionsFileLineList(List<BeanTransformerException> transformerExceptionList) {
 		return transformerExceptionList.stream().map(exception -> {
 			var exceptionMessage = NestedExceptionUtils.getMostSpecificCause(exception).getMessage();
