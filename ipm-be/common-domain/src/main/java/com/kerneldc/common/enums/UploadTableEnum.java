@@ -8,6 +8,7 @@ import com.kerneldc.common.domain.AreaCode;
 import com.kerneldc.common.domain.BioStats;
 import com.kerneldc.common.domain.HydroUsage;
 import com.kerneldc.common.domain.Sales;
+import com.kerneldc.common.domain.SunshineList;
 
 public enum UploadTableEnum implements IEntityEnum {
 	SALES(Sales.class),
@@ -17,6 +18,7 @@ public enum UploadTableEnum implements IEntityEnum {
 	//INSTRUMENT(Instrument.class, new String[] {"TICKER","EXCHANGE","CURRENCY"}),
 	//PORTFOLIO(Portfolio.class, new String[] {"INSTITUTION","ACCOUNT_NUMBER","CURRENCY"}),
 	//HOLDING(Holding.class, new String[] {"AS_OF_DATE","TICKER","EXCHANGE","QUANTITY","INSTITUTION","ACCOUNT_NUMBER"})
+	SUNSHINE_LIST(SunshineList.class),
 	;
 	
 	Class<? extends AbstractPersistableEntity> entity;

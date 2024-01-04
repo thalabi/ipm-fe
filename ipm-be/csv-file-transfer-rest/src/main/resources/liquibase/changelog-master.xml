@@ -27,4 +27,7 @@
 	
 	<include file="liquibase/investment-portfolio-changelog.xml"/>
 
+	<include file="liquibase/fileTransfer/sunshine-list/create-table.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-1.xml"/>
 </databaseChangeLog>

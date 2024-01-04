@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+	<!-- Tables -->
+    <changeSet id="sunshine_list_table" author="thalabi">
+    	<createSequence sequenceName="sunshine_list_seq"/>
+        <createTable tableName="sunshine_list">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="lk" type="varchar(255)"> 
+                <constraints nullable="false"/> 
+            </column> 
+            <column name="version" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sector" type="varchar(64)"/> 
+            <column name="last_name" type="varchar(64)"/>
+            <column name="first_name" type="varchar(64)"/> 
+            <column name="salary" type="decimal"/> 
+            <column name="benefits" type="decimal"/>
+            <column name="employer" type="varchar(512)"/> 
+            <column name="job_title" type="varchar(512)"/>
+            <column name="year" type="smallint"/> 
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -25,34 +25,12 @@ public class CsvFileTransformerService {
 
 	public static final String SOURCE_CSV_LINE_NUMBER = "sourceCsvLineNumber";
 	private final Collection<ICsvFileTransformer> csvFileTransformerCollection;
-	
-//	public record CsvFileTransformerResult(Path transformedFile, long sourceCsvDataRowsCount, String[] sourceCsvHeaderColumns,
-//			List<CsvTransformerException> csvTransformerExceptionList) {
-//		public CsvFileTransformerResult() {
-//			this(Paths.get(""), 0, new String[0], new ArrayList<CsvTransformerException>());
-//		}
-//		public CsvFileTransformerResult(Path transformedFile, long sourceCsvDataRowsCount) {
-//			this(transformedFile, sourceCsvDataRowsCount, new String[0], new ArrayList<CsvTransformerException>());
-//		}
-//		public CsvFileTransformerResult(Path transformedFile, List<CsvTransformerException> csvTransformerExceptionList) {
-//			this(transformedFile, 0, new String[0], csvTransformerExceptionList);
-//		}
-//		public CsvFileTransformerResult withTransformedFileAndCsvTransformerExceptionList(Path transformedFile, List<CsvTransformerException> csvTransformerExceptionList) {
-//			return new CsvFileTransformerResult(transformedFile, sourceCsvDataRowsCount(), sourceCsvHeaderColumns(), csvTransformerExceptionList);
-//		}
-//		public CsvFileTransformerResult withSourceCsvDataRowsCount(long sourceCsvDataRowsCount) {
-//			return new CsvFileTransformerResult(transformedFile(), sourceCsvDataRowsCount, sourceCsvHeaderColumns(), csvTransformerExceptionList());
-//		}
-//	}
-	
+		
 	public void applyTransformers(InputStream inputStream, FileProcessingContext context) throws IOException, AbortFileProcessingException {
 		
-		//var context = FileProcessingContext.get();
 		var pathAndLineCount = copyToFilePrefixingLineNumber(inputStream);
 		context.setWorkInProgressFile(pathAndLineCount.filePath());
 		context.setSourceCsvDataRowsCount(pathAndLineCount.lineCount());
-		//var csvFileTransformerResult = context.getCsvFileTransformerResult();
-		//csvFileTransformerResult = new CsvFileTransformerResult(pathAndLineCount.filePath(), pathAndLineCount.lineCount());
 
 		for (ICsvFileTransformer transformer: csvFileTransformerCollection) {
 			for (TransformationStageEnum stage : TransformationStageEnum.values())
@@ -62,11 +40,7 @@ public class CsvFileTransformerService {
 						LOGGER.info("transformedFile: {}", context.getWorkInProgressFile().toString());
 				}
 		}
-		//return csvFileTransformerResult;
 	}
-//	private FileProcessingContext getContext() {
-//		return FileProcessingContext.get();
-//	}
 	
 	public record PathAndLineCount(Path filePath, long lineCount) {}
 	/**
