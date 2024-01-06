@@ -15,7 +15,8 @@ public enum FinancialInstitutionEnum {
 	TANGERINE(614),
 	EQ_BANK(623),
 	OAKEN_HOME_TRUST(627),
-	DUCA(828)
+	DUCA(828), // transit number 21962
+	SAVEN(9999), //transit number 65012
 	;
 	
 	private int institutionNumber;
