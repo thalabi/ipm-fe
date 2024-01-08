@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="inst-interest-bearing-alter-column-financial-institution-1" author="thalabi">
+
+        <modifyDataType tableName="inst_interest_bearing"
+            columnName="financial_institution" newDataType="decimal(8)"/>
+             
+    </changeSet>
+
+    <changeSet id="inst-interest-bearing-alter-column-financial-institution-2" author="thalabi">
+		<sql>
+		<![CDATA[
+		update inst_interest_bearing 
+		set financial_institution = 82821962
+		where financial_institution = 828;
+
+		update inst_interest_bearing 
+		set financial_institution = 82865012
+		where financial_institution = 9999;
+		
+		update inst_interest_bearing 
+		set financial_institution = financial_institution * 100000
+		where financial_institution != 82821962 and financial_institution != 82865012;
+		]]>         
+		</sql>
+    </changeSet>
+
+    <changeSet id="inst-interest-bearing-alter-column-financial-institution-4" author="thalabi">
+		<sql>
+		<![CDATA[
+		update inst_interest_bearing 
+		set lk = (select i.ticker from instrument i where i.id = instrument_id) || '|' || type || '|' || financial_institution || '|' || price || '|' || interest_rate || '|' || coalesce(term,'');
+		]]>         
+		</sql>
+    </changeSet>
+
+</databaseChangeLog>
