@@ -16,7 +16,7 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<parentProjectVersion>3.3-RELEASE</parentProjectVersion>
+		<parentProjectVersion>3.4.0-SNAPSHOT</parentProjectVersion>
 		<java.version>17</java.version>
 		<repo-url>http://localhost:8081</repo-url>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
