@@ -59,7 +59,7 @@ public class GenericFileTransferService /*implements IFileTransferService*/ {
 	public static final String EXCEPTIONS_FILE_SUFFIX = ".csv";
 	
 
-	private final EntityRepositoryFactory entityRepositoryFactory;
+	private final EntityRepositoryFactory<?, ?> entityRepositoryFactory;
 	private final CsvFileTransformerService csvFileTransformerService;
 	private final BeanTransformerService beanTransformerService;
 	private final BeanReferentialEntityEnrichmentService beanReferentialEntityEnrichmentService;

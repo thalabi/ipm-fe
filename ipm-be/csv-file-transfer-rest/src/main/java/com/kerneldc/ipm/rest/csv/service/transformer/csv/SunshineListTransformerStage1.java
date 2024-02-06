@@ -105,8 +105,8 @@ public class SunshineListTransformerStage1 implements ICsvFileTransformer {
 			if (StringUtils.equalsAnyIgnoreCase(headerTitles[i], SunshineList.ALTERNATE_LAST_NAME)) {
 				headerTitles[i] = SunshineList.LAST_NAME;
 			}
-			if (StringUtils.equalsAnyIgnoreCase(headerTitles[i], SunshineList.ALTERNATE_YEAR)) {
-				headerTitles[i] = SunshineList.YEAR;
+			if (StringUtils.equalsAnyIgnoreCase(headerTitles[i], SunshineList.ALTERNATE_CALENDAR_YEAR)) {
+				headerTitles[i] = SunshineList.CALENDAR_YEAR;
 			}
 			if (StringUtils.equalsAnyIgnoreCase(headerTitles[i], SunshineList.ALTERNATE_BENEFITS)) {
 				headerTitles[i] = SunshineList.BENEFITS;

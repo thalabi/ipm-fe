@@ -3,14 +3,14 @@ package com.kerneldc.common.domain;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.rest.core.annotation.Description;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,9 +29,11 @@ public class Sales extends AbstractPersistableEntity {
 	private LocalDateTime transactionDate;
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
+	@Description("filterable=true,type=text")
 	private String product;
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
+	@Description("filterable=true,type=numeric")
 	private Double price;
 	@CsvBindByName(column = "Payment_Type")
 	@Setter(AccessLevel.NONE)
@@ -52,6 +54,7 @@ public class Sales extends AbstractPersistableEntity {
 	@CsvDate("M/d/y H:m")
 	private LocalDateTime lastLogin;
 	@CsvBindByName
+	@Description("filterable=true,type=numeric")
 	private Float latitude;
 	@CsvBindByName
 	private Float longitude;	

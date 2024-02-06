@@ -51,12 +51,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @ExtendWith(SpringExtension.class)
 @Slf4j
-public class GenericFileTransferServiceTest {
+class GenericFileTransferServiceTest {
 	
 	private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
 	@MockBean
-	private EntityRepositoryFactory entityRepositoryFactory;
+	private EntityRepositoryFactory<?, ?> entityRepositoryFactory;
 	@MockBean
 	private CsvFileTransformerService csvFileTransformerService;
 	@MockBean
@@ -66,7 +66,7 @@ public class GenericFileTransferServiceTest {
 	@MockBean
 	private BaseTableRepository<AbstractPersistableEntity, Serializable> tableRepository;
 	@MockBean
-	private BaseEntityRepository<AbstractEntity, Serializable> repository;
+	private BaseEntityRepository<AbstractEntity, Serializable> entityRepository;
 
 	@InjectMocks
 	private GenericFileTransferService genericFileTransferService = new GenericFileTransferService(entityRepositoryFactory, csvFileTransformerService, beanTransformerService, beanReferentialEntityEnrichmentService);
@@ -431,11 +431,12 @@ public class GenericFileTransferServiceTest {
 		var csvFileTransformerService = new CsvFileTransformerService(csvFileTransformerList);
 		var beanTransformerService = new BeanTransformerService(beanTransformerList);
 		GenericFileTransferService genericFileTransferService = new GenericFileTransferService(entityRepositoryFactory, csvFileTransformerService, beanTransformerService, beanReferentialEntityEnrichmentService);
-		when(entityRepositoryFactory.getTableRepository(any())).thenReturn(tableRepository);
 		// Use doReturn() which type unsafe instead of when() becuase when as below line does not compile
-		//when(entityRepositoryFactory.getRepository(UploadTableEnum.SALES)).thenReturn(repository);
-		doReturn(repository).when(entityRepositoryFactory).getRepository(any());
-		when(repository.count()).thenReturn(0l);
+		//when(entityRepositoryFactory.getTableRepository(any())).thenReturn((BaseTableRepository<AbstractPersistableEntity, Serializable>)tableRepository);
+		doReturn(tableRepository).when(entityRepositoryFactory).getTableRepository(any());
+		//when(entityRepositoryFactory.getRepository(UploadTableEnum.SALES)).thenReturn(entityRepository);
+		doReturn(entityRepository).when(entityRepositoryFactory).getRepository(any());
+		when(entityRepository.count()).thenReturn(0l);
 		return genericFileTransferService;
 	}
 }

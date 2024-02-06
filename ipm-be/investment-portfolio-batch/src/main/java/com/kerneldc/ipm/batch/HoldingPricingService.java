@@ -16,8 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.transaction.Transactional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +35,10 @@ import com.kerneldc.ipm.repository.HoldingPriceInterdayVRepository;
 import com.kerneldc.ipm.repository.HoldingRepository;
 import com.kerneldc.ipm.repository.PositionRepository;
 import com.kerneldc.ipm.repository.PriceRepository;
-import com.kerneldc.ipm.util.EmailService;
 import com.kerneldc.ipm.util.AppTimeUtils;
+import com.kerneldc.ipm.util.EmailService;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -47,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 	private static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
-	private final EntityRepositoryFactory entityRepositoryFactory;
+	private final EntityRepositoryFactory<?, ?> entityRepositoryFactory;
 	private final EntityRepositoryFactoryHelper entityRepositoryFactoryHelper;
 	private final ExchangeRateService exchangeRateService;
 	private final EmailService emailService;
@@ -66,7 +65,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 
 	public HoldingPricingService(
 			Collection<? extends IInstrumentPricingService<? extends IInstrumentDetail>> pricingServiceCollection,
-			EntityRepositoryFactory entityRepositoryFactory,
+			EntityRepositoryFactory<?, ?> entityRepositoryFactory,
 			EntityRepositoryFactoryHelper entityRepositoryFactoryHelper, ExchangeRateService exchangeRateService,
 			EmailService emailService) {
 

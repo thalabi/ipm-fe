@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="alter-column-salary-and-benefits" author="thalabi">
+
+        <modifyDataType tableName="sunshine_list"
+            columnName="salary" newDataType="decimal(12,4)"/>
+        <modifyDataType tableName="sunshine_list"
+            columnName="benefits" newDataType="decimal(12,4)"/>
+
+		<sql>
+		<![CDATA[
+		alter table sunshine_list add column salary_2 decimal(12,4);
+		alter table sunshine_list add column benefits_2 decimal(12,4);
+		update sunshine_list set salary_2 = salary, benefits_2 = benefits;
+		alter table sunshine_list drop column salary;
+		alter table sunshine_list drop column benefits;
+		alter table sunshine_list rename column salary_2 to salary;
+		alter table sunshine_list rename column benefits_2 to benefits;
+		]]>         
+		</sql>
+    
+    </changeSet>
+</databaseChangeLog>

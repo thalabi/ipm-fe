@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="
+    	http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+	<include file="liquibase/fileTransfer/sales/create-table.xml"/>
+	<include file="liquibase/fileTransfer/sales/create-unique-constraint-1.xml"/>
+	<include file="liquibase/fileTransfer/sales/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/fileTransfer/sales/alter-columns-price-latitude-and-longitude.xml"/>
+
+	<include file="liquibase/fileTransfer/sunshine-list/create-table.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-1.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-lk.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/rename-year-column.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/alter-column-salary-and-benefits.xml"/>
+
+</databaseChangeLog>

@@ -1,3 +1,5 @@
 ﻿ipm-be/common-services/bin/.project
 ipm-be/csv-file-transfer-rest/.classpath
 ipm-be/csv-file-transfer-rest/.classpath
+*.classpath
+*.prefs

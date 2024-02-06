@@ -22,49 +22,41 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class EntityRepositoryFactory {
+public class EntityRepositoryFactory <T extends AbstractEntity, ID extends Serializable>{
 
-	private Map<IEntityEnum, BaseEntityRepository<? extends AbstractEntity, ? extends Serializable>> baseEntityRepositoryMap = new HashMap<>();
-	private Map<IEntityEnum, BaseInstrumentDetailRepository<? extends AbstractEntity, ? extends Serializable>> instrumentDetailRepositoryMap = new HashMap<>();
+	private Map<IEntityEnum, BaseEntityRepository<T, ID>> baseEntityRepositoryMap = new HashMap<>();
 
-	public EntityRepositoryFactory(
-			Collection<BaseEntityRepository<? extends AbstractEntity, ? extends Serializable>> baseEntityRepositories,
-			Collection<BaseInstrumentDetailRepository<? extends AbstractEntity, ? extends Serializable>> baseInstrumentDetailRepositories) {
+	public EntityRepositoryFactory(Collection<BaseEntityRepository<T, ID>> baseEntityRepositories) {
 		
-		LOGGER.debug("Loading baseEntityRepositoryMap with:");
+		LOGGER.info("Loading baseEntityRepositoryMap with:");
 		baseEntityRepositoryMap = baseEntityRepositories.stream().collect(Collectors.toMap(BaseEntityRepository::canHandle, r -> r));
-		baseEntityRepositoryMap.forEach((entityEnum, repository) -> LOGGER.debug("[{}, {}, {}]", entityEnum,
+		baseEntityRepositoryMap.forEach((entityEnum, repository) -> LOGGER.info("[{}, {}, {}]", entityEnum,
 				entityEnum.getEntity().getSimpleName(),
 				entityEnum.isImmutable() ? "immutable entity" : "mutable entity"));
-		LOGGER.debug("Loading instrumentDetailRepositoryMap with:");
-		instrumentDetailRepositoryMap = baseInstrumentDetailRepositories.stream().collect(Collectors.toMap(BaseInstrumentDetailRepository::canHandle, r -> r));
-		instrumentDetailRepositoryMap.forEach((entityEnum, repository) -> LOGGER.debug("[{}, {}, {}]", entityEnum,
-				entityEnum.getEntity().getSimpleName(),
-				entityEnum.isImmutable() ? "immutable entity" : "mutable entity"));
-
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public BaseTableRepository<AbstractPersistableEntity, Serializable> getTableRepository(IEntityEnum entityEnum) {
+	public BaseTableRepository<AbstractPersistableEntity, ID> getTableRepository(IEntityEnum entityEnum) {
 		Preconditions.checkArgument(! /* not */ entityEnum.isImmutable(), "getTableRepository() called with %s as argument when argument is immutable", entityEnum);
-		return (BaseTableRepository<AbstractPersistableEntity, Serializable>)getRepository(entityEnum);
+		return (BaseTableRepository<AbstractPersistableEntity, ID>)getRepository(entityEnum);
 	}
 
 	@SuppressWarnings("unchecked")
-	public BaseViewRepository<AbstractImmutableEntity, Serializable> getViewRepository(IEntityEnum entityEnum) {
+	public BaseViewRepository<AbstractImmutableEntity, ID> getViewRepository(IEntityEnum entityEnum) {
 		Preconditions.checkArgument(entityEnum.isImmutable(), "getTableRepository() called with %s as argument when argument is mutable", entityEnum);
-		return (BaseViewRepository<AbstractImmutableEntity, Serializable>)getRepository(entityEnum);
+		return (BaseViewRepository<AbstractImmutableEntity, ID>)getRepository(entityEnum);
 	}
 
-	public BaseEntityRepository<? extends AbstractEntity, ? extends Serializable> getRepository(IEntityEnum entityEnum) {
+	public BaseEntityRepository<T, ID> getRepository(IEntityEnum entityEnum) {
+		BaseEntityRepository<T, ID> repository = baseEntityRepositoryMap.get(entityEnum);
+		Preconditions.checkArgument(repository != null, "Can not find a repository to handle: %s", entityEnum);
+		return repository;
+	}
+
+	@SuppressWarnings("unchecked")
+	public BaseInstrumentDetailRepository<AbstractPersistableEntity, ID> getBaseInstrumentRepository(IEntityEnum entityEnum) {
 		var repository = baseEntityRepositoryMap.get(entityEnum);
 		Preconditions.checkArgument(repository != null, "Can not find a repository to handle: %s", entityEnum);
-		return repository;
-	}
-
-	public BaseInstrumentDetailRepository<? extends AbstractEntity, ? extends Serializable> getBaseInstrumentRepository(IEntityEnum entityEnum) {
-		var repository = instrumentDetailRepositoryMap.get(entityEnum);
-		Preconditions.checkArgument(repository != null, "Can not find a repository to handle: %s", entityEnum);
-		return repository;
+		return (BaseInstrumentDetailRepository<AbstractPersistableEntity, ID>)repository;
 	}
 }

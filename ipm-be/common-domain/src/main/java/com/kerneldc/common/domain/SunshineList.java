@@ -3,6 +3,8 @@ package com.kerneldc.common.domain;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.springframework.data.rest.core.annotation.Description;
+
 import com.opencsv.bean.CsvBindByName;
 
 import jakarta.persistence.Entity;
@@ -30,42 +32,42 @@ public class SunshineList extends AbstractPersistableEntity {
 	public static final String ALTERNATE_BENEFITS = "Benefits";
 	public static final String JOB_TITLE = "Job Title";
 	public static final String ALTERNATE_JOB_TITLE = "Position";
-	public static final String YEAR = "Calendar Year";
-	public static final String ALTERNATE_YEAR = "Year";
+	public static final String CALENDAR_YEAR = "Calendar Year";
+	public static final String ALTERNATE_CALENDAR_YEAR = "Year";
 
-	//@CsvBindByPosition(position = 0)
 	@CsvBindByName
+	@Description("columnDisplayOrder=8")
 	private String sector;
 	
-	//@CsvBindByPosition(position = 1)
 	@CsvBindByName(column = LAST_NAME)
 	@Setter(AccessLevel.NONE)
+	@Description("columnDisplayOrder=3,filterable=true,type=text")
 	private String lastName;
 	
-	//@CsvBindByPosition(position = 2)
 	@CsvBindByName(column = "First Name")
 	@Setter(AccessLevel.NONE)
+	@Description("columnDisplayOrder=2,filterable=true,type=text")
 	private String firstName;
 	
-	//@CsvBindByPosition(position = 3)
 	@CsvBindByName(column = SALARY)
+	@Description("columnDisplayOrder=4,format=currency,filterable=true,type=numeric,fractionDigits=2")
 	private BigDecimal salary;
 	
-	//@CsvBindByPosition(position = 4)
 	@CsvBindByName(column = BENEFITS)
+	@Description("columnDisplayOrder=5,format=currency,filterable=true,type=numeric,fractionDigits=2")
 	private BigDecimal benefits;
 	
-	//@CsvBindByPosition(position = 5)
 	@CsvBindByName
+	@Description("columnDisplayOrder=6")
 	private String employer;
 	
-	//@CsvBindByPosition(position = 6)
 	@CsvBindByName(column = JOB_TITLE)
+	@Description("columnDisplayOrder=7")
 	private String jobTitle;
 	
-	//@CsvBindByPosition(position = 7)
-	@CsvBindByName(column = YEAR)
-	private short year;
+	@CsvBindByName(column = CALENDAR_YEAR)
+	@Description("columnDisplayOrder=1,filterable=true,type=numeric")
+	private Short calendarYear;
 	
 	public void setLastName(String lastName) {
 		this.lastName = lastName;

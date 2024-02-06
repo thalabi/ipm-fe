@@ -10,10 +10,10 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
 
-<!--
 	<include file="liquibase/fileTransfer/sales/create-table.xml"/>
 	<include file="liquibase/fileTransfer/sales/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/fileTransfer/sales/create-unique-constraint-1.xml"/>
+	<include file="liquibase/fileTransfer/sales/alter-columns-price-latitude-and-longitude.xml"/>
 	<include file="liquibase/fileTransfer/bio-stats/create-table.xml"/>
 	<include file="liquibase/fileTransfer/bio-stats/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/fileTransfer/bio-stats/create-unique-constraint-1.xml"/>
@@ -25,12 +25,11 @@
 	<include file="liquibase/fileTransfer/hydro-usage/create-table.xml"/>
 	<include file="liquibase/fileTransfer/hydro-usage/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/fileTransfer/hydro-usage/create-unique-constraint-1.xml"/>
-
+	
 	<include file="liquibase/fileTransfer/sunshine-list/create-table.xml"/>
 	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-lk.xml"/>
 	<include file="liquibase/fileTransfer/sunshine-list/create-unique-constraint-1.xml"/>
--->	
-	<include file="liquibase/common-domain-changelog.xml"/>
-	<include file="liquibase/investment-portfolio-changelog.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/rename-year-column.xml"/>
+	<include file="liquibase/fileTransfer/sunshine-list/alter-column-salary-and-benefits.xml"/>
 
 </databaseChangeLog>
