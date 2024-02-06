@@ -66,7 +66,7 @@ public class SunshineList extends AbstractPersistableEntity {
 	private String jobTitle;
 	
 	@CsvBindByName(column = CALENDAR_YEAR)
-	@Description("columnDisplayOrder=1,filterable=true,type=numeric")
+	@Description("columnDisplayOrder=1,filterable=true,type=numeric,sortOrder=1,sortDirection=desc")
 	private Short calendarYear;
 	
 	public void setLastName(String lastName) {
