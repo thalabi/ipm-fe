@@ -17,6 +17,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
+import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
@@ -38,14 +39,14 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	private final String alphavantageApiKey;
 	private final PriceRepository priceRepository;
 	
-	private Table<String, String, Float> fallbackPriceLookupTable = HashBasedTable.create();
+	private Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
 	
 	public StockAndEtfPriceService(PriceRepository priceRepository, @Value("${alphavantage.api.key}") String alphavantageApiKey) {
 		this.priceRepository = priceRepository;
 		this.alphavantageApiKey = alphavantageApiKey;
 		
-		fallbackPriceLookupTable.put("SENS", "CNSX", 0.01f);
-		fallbackPriceLookupTable.put("BHCC", "CNSX", 0.025f);
+		fallbackPriceLookupTable.put("SENS", ExchangeEnum.CNSX, 0.01f);
+		fallbackPriceLookupTable.put("BHCC", ExchangeEnum.CNSX, 0.025f);
 	}
 
 	@Override
@@ -145,7 +146,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		}
 		
 		if (quote == null || quote.getPrice() == null) {
-			var fallbackPrice = fallbackPriceLookupTable.get(instrument.getTicker(), instrumentStock.getExchange());
+			var fallbackPrice = fallbackPriceLookupTable.get(ticker, exchange);
 			if (fallbackPrice != null) {
 				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
 				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());
