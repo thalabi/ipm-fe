@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,6 +21,8 @@ import com.kerneldc.ipm.domain.InstrumentDueV;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -128,7 +127,7 @@ public class EmailService {
 			mimeMessageHelper.setTo(InternetAddress.parse(fixedIncomeInstrumentReportTo));
 			mimeMessageHelper.setSubject(FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT);
 			mimeMessageHelper.setText(processFixedIncomeInstrumentReportTemplate(), true);
-			mimeMessageHelper.addAttachment(excelFile.getPath(), excelFile);
+			mimeMessageHelper.addAttachment(excelFile.getName(), excelFile);
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException | IOException | TemplateException e) {
 			var message = "Exception while sending fixed income instrument report email."; 
