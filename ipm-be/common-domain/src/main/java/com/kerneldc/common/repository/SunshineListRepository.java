@@ -10,7 +10,6 @@ import com.kerneldc.common.enums.UploadTableEnum;
 
 public interface SunshineListRepository extends BaseTableRepository<SunshineList, Long> {
 
-//	List<SunshineList> findByCalendarYear(Short calendarYear);
 	List<SunshineList> findBySalary(BigDecimal salary);
 	List<SunshineList> findByBenefits(BigDecimal benefits);
 	

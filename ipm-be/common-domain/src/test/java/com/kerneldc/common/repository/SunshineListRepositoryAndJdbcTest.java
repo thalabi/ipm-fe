@@ -20,7 +20,7 @@ import com.kerneldc.common.domain.SunshineList;
 
 @DataJpaTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-class SunshineListJdbcTest extends AbstractBaseTest {
+class SunshineListRepositoryAndJdbcTest extends AbstractBaseTest {
 	
 	@Autowired
 	private SunshineListRepository sunshineListRepository;

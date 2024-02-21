@@ -26,6 +26,7 @@ public class Sales extends AbstractPersistableEntity {
 	@CsvBindByName(column = "Transaction_date")
 	@CsvDate("M/d/y H:m")
 	@Setter(AccessLevel.NONE)
+	@Description("filterable=true,type=date")
 	private LocalDateTime transactionDate;
 	@CsvBindByName
 	@Setter(AccessLevel.NONE)
