@@ -97,19 +97,19 @@ public class FixedIncomeInstrumentReportService {
 		var instrumentDueVList = instrumentDueVRepository.findByOrderByPortfolioFiAscPortfolioHolderAscCurrencyAscPortfolioNameAsc();
 		LOGGER.info("instrumentDueVList.size(): {}", instrumentDueVList.size());
 		
-		var context = createContext();
+		var poiContext = createPoiContext();
 
-		printHeader(context);
+		printHeader(poiContext);
 		
 		for (var instrumentDueV : instrumentDueVList) {
 			setFinancialInstitutionName(instrumentDueV);
 		}
 		
-		printDetailLines(now, context, instrumentDueVList, usdToCadExchangeRate);
+		printDetailLines(now, poiContext, instrumentDueVList, usdToCadExchangeRate);
 
-		printExchangeRateFootnote(context, usdToCadExchangeRate);
+		printExchangeRateFootnote(poiContext, usdToCadExchangeRate);
 
-		autoSizeColumns(context);
+		autoSizeColumns(poiContext);
 		
 		File excelFile = null;
 		try {
@@ -117,7 +117,7 @@ public class FixedIncomeInstrumentReportService {
 			LOGGER.info("tempPath: {}", tempFilePath);
 			excelFile = tempFilePath.toFile();
 			var outputStream = new FileOutputStream(excelFile);
-			context.workbook.write(outputStream);
+			poiContext.workbook.write(outputStream);
 		} catch (IOException e) {
 			throw new ApplicationException("Unable to open ByteArrayOutputStream", e);
 		}
@@ -131,7 +131,7 @@ public class FixedIncomeInstrumentReportService {
 			context.sheet.autoSizeColumn(i);
 		}
 	}
-	private PoiContext createContext() {
+	private PoiContext createPoiContext() {
 		var workbook = new XSSFWorkbook();
 		var sheet = workbook.createSheet();
 		sheet.addIgnoredErrors(CellRangeAddress.valueOf("e2:e999"), IgnoredErrorType.NUMBER_STORED_AS_TEXT);
