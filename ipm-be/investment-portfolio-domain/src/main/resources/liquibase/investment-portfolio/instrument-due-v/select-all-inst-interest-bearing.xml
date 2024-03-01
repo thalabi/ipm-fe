@@ -21,7 +21,7 @@
 						select max(h.as_of_date) as_of_date, h.instrument_id, h.portfolio_id from holding h group by instrument_id, portfolio_id
 				)
 			)	
-			select i.id, p.financial_institution as portfolio_fi, p.holder as portfolio_holder, p.name portfolio_name, p.account_number portfolio_account_number,
+			select h.id, p.financial_institution as portfolio_fi, p.holder as portfolio_holder, p.name portfolio_name, p.account_number portfolio_account_number,
 				i.name instrument_name, iib.account_number instrument_account_number, iib.registered_account,
 				i.currency, iib.type, iib.financial_institution as issuer_fi,
 				substr(iib.term, 6) term, iib.price, h.quantity, iib.interest_rate, cast(iib.maturity_date as timestamp(3) with time zone),
@@ -43,7 +43,7 @@
 			join latest_as_of_date_holding_inst_ids hi on hi.instrument_id = i.id
 			join portfolio p on h.portfolio_id = p.id
 			union
-			select i.id, p.financial_institution as portfolio_fi, p.holder as portfolio_holder, p.name portfolio_name, p.account_number portfolio_account_number,
+			select h.id, p.financial_institution as portfolio_fi, p.holder as portfolio_holder, p.name portfolio_name, p.account_number portfolio_account_number,
 				i.name instrument_name, cast(null as varchar(16)) as instrument_account_number, cast(null as varchar(4)) as registered_account,
 				i.currency, cast('BOND' as varchar(255)) as type, cast(null as numeric(4)) as issuer_fi,
 				cast(null as varchar(6)) as term, ib.price, h.quantity, cast(null as numeric(7,4)) as interest_rate, cast(ib.maturity_date as timestamp(3) with time zone),
