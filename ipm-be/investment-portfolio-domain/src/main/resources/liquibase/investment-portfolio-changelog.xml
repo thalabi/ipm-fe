@@ -121,5 +121,7 @@
 	<include file="liquibase/investment-portfolio/instrument-due-v/add-registered-account.xml"/>
 
 	<include file="liquibase/investment-portfolio/instrument-detail/inst-interest-bearing/alter-colum-financial-institution.xml"/>
+	
+	<include file="liquibase/investment-portfolio/instrument-due-v/select-all-inst-interest-bearing.xml"/>
 
 </databaseChangeLog>
