@@ -16,7 +16,7 @@ public class InstrumentByAccountV extends AbstractImmutableEntity {
 	
 	@CsvBindByName(column = "ticker_exchange")
 	@Description("columnDisplayOrder=1,title=Ticker,sortOrder=1,filterable=true,type=text") // sortDirection=desc is also available to specify direction
-	private String tickerExchange;
+	private String ticker;
 	@CsvBindByName(column = "instrument_name,filterable=true,type=text")
 	@Description("columnDisplayOrder=2")
 	private String instrumentName;

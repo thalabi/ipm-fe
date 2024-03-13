@@ -124,4 +124,6 @@
 	
 	<include file="liquibase/investment-portfolio/instrument-due-v/select-all-inst-interest-bearing.xml"/>
 
+	<include file="liquibase/investment-portfolio/instrument-by-account-v/drop-exchange-2.xml"/>
+
 </databaseChangeLog>
