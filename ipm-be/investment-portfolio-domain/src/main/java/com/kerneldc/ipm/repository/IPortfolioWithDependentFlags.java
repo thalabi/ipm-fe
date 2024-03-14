@@ -17,7 +17,7 @@ public interface IPortfolioWithDependentFlags {
 	default String getHolderName() {
 		return getHolder() != null ? getHolder().getName() : StringUtils.EMPTY;
 	}
-	String getAccountNumber();
+	String getAccountId();
 	CurrencyEnum getCurrency();
 	Boolean  getLogicallyDeleted();
 	Boolean getHasHoldings();

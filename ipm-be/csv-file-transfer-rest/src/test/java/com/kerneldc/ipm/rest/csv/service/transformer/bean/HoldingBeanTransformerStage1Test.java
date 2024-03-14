@@ -68,7 +68,7 @@ class HoldingBeanTransformerStage1Test {
 		
 		var portfolio1 = new Portfolio();
 		portfolio1.setFinancialInstitution(INSTITUTION1);
-		portfolio1.setAccountNumber(ACCOUNT_NUMBER1);
+		portfolio1.setAccountId(ACCOUNT_NUMBER1);
 		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getFinancialInstitution().getInstitutionNumber(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
 
 		try {
@@ -94,7 +94,7 @@ class HoldingBeanTransformerStage1Test {
 		when(instrumentRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getTicker(), holding1.getExchange()))).thenReturn(List.of());
 		var portfolio1 = new Portfolio();
 		portfolio1.setFinancialInstitution(INSTITUTION1);
-		portfolio1.setAccountNumber(ACCOUNT_NUMBER1);
+		portfolio1.setAccountId(ACCOUNT_NUMBER1);
 		when(portfolioRepository.findByLogicalKeyHolder(LogicalKeyHolder.build(holding1.getFinancialInstitution().getInstitutionNumber(), holding1.getAccountNumber()))).thenReturn(List.of(portfolio1));
 		
 		try {

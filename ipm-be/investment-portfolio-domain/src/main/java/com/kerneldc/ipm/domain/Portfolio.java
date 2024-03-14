@@ -1,14 +1,13 @@
 package com.kerneldc.ipm.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.SequenceGenerator;
-
 import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.opencsv.bean.CsvBindByName;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,9 +27,9 @@ public class Portfolio extends AbstractPersistableEntity {
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
 	private HolderEnum holder;
-	@CsvBindByName(column = "account_number")
+	@CsvBindByName(column = "account_id")
 	@Setter(AccessLevel.NONE)
-	private String accountNumber;
+	private String accountId;
 	@CsvBindByName
 	private String name;
 	@Enumerated(EnumType.STRING)
@@ -44,8 +43,8 @@ public class Portfolio extends AbstractPersistableEntity {
 		this.financialInstitution = financialInstitution;
 		setLogicalKeyHolder();
 	}
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
+	public void setAccountId(String accountId) {
+		this.accountId = accountId;
 		setLogicalKeyHolder();
 	}
 	
@@ -53,7 +52,7 @@ public class Portfolio extends AbstractPersistableEntity {
 	protected void setLogicalKeyHolder() {
 		LOGGER.info("setLogicalKeyHolder(), financialInstitution: {}", financialInstitution);
 		var financialInstitutionNumber = financialInstitution == null ? 0 : financialInstitution.getInstitutionNumber();
-		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitutionNumber, accountNumber);
+		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitutionNumber, accountId);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }
