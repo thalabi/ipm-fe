@@ -21,8 +21,11 @@
 		]]>         
 		</sql>
 
+        <modifyDataType tableName="portfolio"
+            columnName="account_number" newDataType="varchar(64)"/>
+
         <renameColumn tableName="portfolio"
-            oldColumnName="account_number" newColumnName="account_id" columnDataType="varchar(64)"/>
+            oldColumnName="account_number" newColumnName="portfolio_id"/>
              
     </changeSet>
 

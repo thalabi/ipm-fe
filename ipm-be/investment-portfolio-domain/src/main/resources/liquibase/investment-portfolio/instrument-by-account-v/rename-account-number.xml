@@ -25,7 +25,7 @@ select row_number() over (order by i.ticker) id,
            when i.type = 'STOCK' or i.type = 'ETF' then i.ticker
            else 'N/A'
        end ticker,
-       i.name instrument_name, h.quantity, p.account_id, p.name account_name
+       i.name instrument_name, h.quantity, p.portfolio_id, p.name account_name
   from holding h join instrument i on h.instrument_id = i.id 
   join portfolio p on h.portfolio_id = p.id
  where i.ticker != 'CASH'

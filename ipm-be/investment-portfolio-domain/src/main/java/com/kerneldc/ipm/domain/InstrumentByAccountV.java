@@ -23,9 +23,9 @@ public class InstrumentByAccountV extends AbstractImmutableEntity {
 	@CsvBindByName
 	@Description("columnDisplayOrder=3,title=Qty")
 	private Float quantity;
-	@CsvBindByName(column = "account_id")
-	@Description("columnDisplayOrder=4,title=Acc ID,sortOrder=2,filterable=true,type=text")
-	private String accountId;
+	@CsvBindByName(column = "portfolio_id")
+	@Description("columnDisplayOrder=4,title=Portfolio ID,sortOrder=2,filterable=true,type=text")
+	private String portfolioId;
 	@CsvBindByName(column = "account_name")
 	@Description("columnDisplayOrder=5,title=Acc Name,filterable=true,type=text")
 	private String accountName;

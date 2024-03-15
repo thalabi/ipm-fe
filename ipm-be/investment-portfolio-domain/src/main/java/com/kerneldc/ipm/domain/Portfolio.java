@@ -27,9 +27,9 @@ public class Portfolio extends AbstractPersistableEntity {
 	@Enumerated(EnumType.STRING)
 	@CsvBindByName
 	private HolderEnum holder;
-	@CsvBindByName(column = "account_id")
+	@CsvBindByName(column = "portfolio_id")
 	@Setter(AccessLevel.NONE)
-	private String accountId;
+	private String portfolioId;
 	@CsvBindByName
 	private String name;
 	@Enumerated(EnumType.STRING)
@@ -43,8 +43,8 @@ public class Portfolio extends AbstractPersistableEntity {
 		this.financialInstitution = financialInstitution;
 		setLogicalKeyHolder();
 	}
-	public void setAccountId(String accountId) {
-		this.accountId = accountId;
+	public void setPortfolioId(String portfolioId) {
+		this.portfolioId = portfolioId;
 		setLogicalKeyHolder();
 	}
 	
@@ -52,7 +52,7 @@ public class Portfolio extends AbstractPersistableEntity {
 	protected void setLogicalKeyHolder() {
 		LOGGER.info("setLogicalKeyHolder(), financialInstitution: {}", financialInstitution);
 		var financialInstitutionNumber = financialInstitution == null ? 0 : financialInstitution.getInstitutionNumber();
-		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitutionNumber, accountId);
+		var logicalKeyHolder = LogicalKeyHolder.build(financialInstitutionNumber, portfolioId);
 		setLogicalKeyHolder(logicalKeyHolder);
 	}
 }

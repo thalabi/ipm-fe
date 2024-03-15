@@ -31,7 +31,7 @@ class PortfolioRepositoryTest {
 		var td = FinancialInstitutionEnum.TD;
 		p.setFinancialInstitution(td);
 		var accountNumber = "597904S";
-		p.setAccountId(accountNumber);
+		p.setPortfolioId(accountNumber);
 		p.setCurrency(CurrencyEnum.CAD);
 		p.setName("Tarif SDRSP CAD");
 		p.setLogicallyDeleted(false);
@@ -46,7 +46,7 @@ class PortfolioRepositoryTest {
 	void testInsertPortfolioRepository_logicallyDeletedNotSet_throwsException() {
 		var p = new Portfolio();
 		p.setFinancialInstitution(FinancialInstitutionEnum.TD);
-		p.setAccountId("597904S");
+		p.setPortfolioId("597904S");
 		p.setCurrency(CurrencyEnum.CAD);
 		p.setName("Tarif SDRSP CAD");
 		

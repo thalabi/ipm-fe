@@ -12,7 +12,7 @@ import com.kerneldc.ipm.domain.Portfolio;
 public interface PortfolioRepository extends BaseTableRepository<Portfolio, Long> {
 	
 	@Query(value = """
-			select p.id, p.financial_institution as financialInstitutionNumber, p.name, p.holder, p.account_id as accountId, p.currency, p.logically_deleted as logicallyDeleted,
+			select p.id, p.financial_institution as financialInstitutionNumber, p.name, p.holder, p.portfolio_id as portfolioId, p.currency, p.logically_deleted as logicallyDeleted,
 				case when (select count(h.*) from holding h where h.portfolio_id = p.id) > 0 then true else false end as hasHoldings,
 				case when (select count(po.*) from position po where po.portfolio_id = p.id) > 0 then true else false end as hasPositions,
 				p.version
