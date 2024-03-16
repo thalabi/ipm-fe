@@ -22,11 +22,11 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 			select h2.id
 			from holding h2
 			where (h2.as_of_date, h2.instrument_id, h2.portfolio_id) in (
-					select max(as_of_date) as_of_date, instrument_id, portfolio_id
+					select max(as_of_date) as_of_date, instrument_id, h.portfolio_id
 					  from holding h
 					  join portfolio p on p.id = h.portfolio_id 
 					 where p.logically_deleted = false
-					 group by instrument_id, portfolio_id
+					 group by instrument_id, h.portfolio_id
 			)
 			""", nativeQuery = true)
 	List<Long> findLatestAsOfDateHoldingIds();
