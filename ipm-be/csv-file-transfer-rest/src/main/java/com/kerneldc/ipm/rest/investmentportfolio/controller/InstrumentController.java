@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
+import com.kerneldc.ipm.batch.HoldingsReportService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentBond;
@@ -62,7 +62,7 @@ public class InstrumentController {
 	private final InstrumentStockRepositoryService instrumentStockRepositoryService;
 	private final InstrumentMutualFundRepositoryService instrumentMutualFundRepositoryService;
 	private final InstrumentDueNotificationService instrumentDueNotificationService;
-	private final FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
+	private final HoldingsReportService holdingsReportService;
 
 	@Value("${instrument.due.days.to.notify}")
 	private Long daysToNotify;
@@ -206,8 +206,8 @@ public class InstrumentController {
     	LOGGER.info("reportDisposition: {}", reportDisposition);
     	var reportJobResponse = new ReportJobResponse();
     	try {
-			var report = reportDisposition.equalsIgnoreCase("Download") ? fixedIncomeInstrumentReportService.generate()
-					: fixedIncomeInstrumentReportService.generateAndEmail();
+			var report = reportDisposition.equalsIgnoreCase("Download") ? holdingsReportService.generate()
+					: holdingsReportService.generateAndEmail();
 			reportJobResponse.setFilename(report.getName());
 			reportJobResponse.setTimestamp(LocalDateTime.now());
 		} catch (ApplicationException e) {

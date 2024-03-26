@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.FixedIncomeInstrumentReportService;
+import com.kerneldc.ipm.batch.HoldingsReportService;
 import com.kerneldc.ipm.batch.HoldingPricingService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.repository.FixedIncomeAuditRepository;
@@ -43,7 +43,7 @@ public class ScheduledTasks {
 	@Autowired
 	private HoldingPricingService holdingPricingService;
 	@Autowired
-	private FixedIncomeInstrumentReportService fixedIncomeInstrumentReportService;
+	private HoldingsReportService holdingsReportService;
 	@Autowired
 	private InstrumentDueNotificationService instrumentDueNotificationService;
 	@Autowired
@@ -162,7 +162,7 @@ public class ScheduledTasks {
 				.orElseThrow(() -> new IllegalStateException("Entity fixedIncomeAudit does not have a row with id 1."));
 		if (Boolean.TRUE.equals(fixedIncomeAudit.getChange())) {
 			try {
-				fixedIncomeInstrumentReportService.generateAndEmail();
+				holdingsReportService.generateAndEmail();
 			} catch (ApplicationException applicationException) {
 				applicationException.printStackTrace();
 				emailService.sendFixedIncomeInstrumentReportFailure(applicationException);

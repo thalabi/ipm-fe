@@ -40,15 +40,13 @@ import com.kerneldc.ipm.util.AppFileUtils;
 import com.kerneldc.ipm.util.AppTimeUtils;
 import com.kerneldc.ipm.util.EmailService;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FixedIncomeInstrumentReportService {
+public class HoldingsReportService {
 	private static final String LOG_BEGIN = "Begin ...";
 	private static final String LOG_END = "End ...";
 	private static final byte FI_NUMBER_OF_COLUMNS = 15;
@@ -95,24 +93,21 @@ public class FixedIncomeInstrumentReportService {
 	
 	private enum SheetNameEnum {FIXED_INCOME, EQUITY, SUMMARY}
 
-	@Data
-	@AllArgsConstructor
-	private class PoiContext {
-		private Map<SheetNameEnum, Integer> rowNumberMap;
-		private XSSFWorkbook workbook;
-		private Map<SheetNameEnum, XSSFSheet> sheetMap;
-		private XSSFFont arialFontBold;
-		private XSSFFont arialFontItalic;
-		private XSSFCellStyle boldFontGreenBackground;
-		private XSSFCellStyle arialFontStyle;
-		private XSSFCellStyle amountStyle;
-		private XSSFCellStyle rateStyle;
-		private XSSFCellStyle dateStyle;
-		private XSSFCellStyle dateStylePink;
-		private XSSFCellStyle boldStyle;
-		private XSSFCellStyle totalAmountStyle;
-		private Map<HolderEnum, XSSFCellStyle> holderCellStyleMap;
-	}
+	private record PoiContext (
+		Map<SheetNameEnum, Integer> rowNumberMap,
+		XSSFWorkbook workbook,
+		Map<SheetNameEnum, XSSFSheet> sheetMap,
+		XSSFFont arialFontBold,
+		XSSFFont arialFontItalic,
+		XSSFCellStyle boldFontGreenBackground,
+		XSSFCellStyle arialFontStyle,
+		XSSFCellStyle amountStyle,
+		XSSFCellStyle rateStyle,
+		XSSFCellStyle dateStyle,
+		XSSFCellStyle dateStylePink,
+		XSSFCellStyle boldStyle,
+		XSSFCellStyle totalAmountStyle,
+		Map<HolderEnum, XSSFCellStyle> holderCellStyleMap) {}
 	
 	private record Total (double total, double cadTotal) {}
 	
