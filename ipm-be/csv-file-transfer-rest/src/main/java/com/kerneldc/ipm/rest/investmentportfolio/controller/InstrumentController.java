@@ -200,8 +200,8 @@ public class InstrumentController {
     }
 
 
-	@PostMapping("/generateFixedIncomeInstrumentReport")
-	public ResponseEntity<ReportJobResponse> generateFixedIncomeInstrumentReport(@RequestParam @NotNull @Pattern(regexp = "Download|Email", flags = Pattern.Flag.CASE_INSENSITIVE) String reportDisposition) {
+	@PostMapping("/generateHoldinsgReport")
+	public ResponseEntity<ReportJobResponse> generateHoldinsgReport(@RequestParam @NotNull @Pattern(regexp = "Download|Email", flags = Pattern.Flag.CASE_INSENSITIVE) String reportDisposition) {
     	LOGGER.info(LOG_BEGIN);
     	LOGGER.info("reportDisposition: {}", reportDisposition);
     	var reportJobResponse = new ReportJobResponse();

@@ -146,7 +146,7 @@ public class HoldingsReportService {
 		
 		File excelFile = null;
 		try {
-			var tempFilePath = AppFileUtils.createTempFile("fixed-income-report", ".xlsx");
+			var tempFilePath = AppFileUtils.createTempFile("holdings-report", ".xlsx");
 			LOGGER.info("tempPath: {}", tempFilePath);
 			excelFile = tempFilePath.toFile();
 			var outputStream = new FileOutputStream(excelFile);
