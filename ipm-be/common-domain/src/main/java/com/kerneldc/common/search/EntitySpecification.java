@@ -84,7 +84,7 @@ public class EntitySpecification<T> implements Specification<T> {
 		case "String" -> {
 			return handleStringFieldType(inputFilter, field, value);
 		}
-		case "Double", "Float", "BigDecimal" -> {
+		case "Double", "Float", "BigDecimal", "Short" -> {
 			return handleNumberFieldType(inputFilter, field, value);
 		}
 		case "LocalDateTime" -> {
