@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class RunOsCommandTest extends AbstractBaseTest { // TODO fix to use com.kerneldc.common.AbstractBaseTest 
 
-	private static final String TEST_RESOURCES = "src/test/resources";
-	private static final String WEB_SERVER_DIRECTORY = TEST_RESOURCES + "/web-server";
-	private static final String WEB_SERVER_WINDOWS_EXE = WEB_SERVER_DIRECTORY + "/mongoose_windows.exe";
-	private static final String WEB_SERVER_LINUX_EXE = "./mongoose_linux";
+	private static final String TEST_RESOURCES_DIRECTORY = "src/test/resources";
+	private static final String WEB_SERVER_DIRECTORY = TEST_RESOURCES_DIRECTORY + "/web-server";
+	private static final String WEB_SERVER_WINDOWS_EXE = "mongoose_windows.exe";
+	private static final String WEB_SERVER_LINUX_EXE = "mongoose_linux";
 	private Process process;
 	
 	@AfterAll
@@ -101,11 +101,11 @@ class RunOsCommandTest extends AbstractBaseTest { // TODO fix to use com.kerneld
 	private String getOsExecutable() {
 		LOGGER.info("OS: {}", System.getProperty("os.name"));
 		if (StringUtils.containsIgnoreCase(System.getProperty("os.name"), "windows")) {
-			return WEB_SERVER_WINDOWS_EXE;
+			return WEB_SERVER_DIRECTORY + "/" + WEB_SERVER_WINDOWS_EXE;
 		} else {
-			var exe = new File(WEB_SERVER_LINUX_EXE);
+			var exe = new File(WEB_SERVER_DIRECTORY + "/" + WEB_SERVER_LINUX_EXE);
 			exe.setExecutable(true);
-			return WEB_SERVER_LINUX_EXE;
+			return "./" + WEB_SERVER_LINUX_EXE;
 		}
 	}
 }
