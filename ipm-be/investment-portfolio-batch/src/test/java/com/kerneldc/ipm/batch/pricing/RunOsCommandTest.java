@@ -25,7 +25,7 @@ class RunOsCommandTest extends AbstractBaseTest { // TODO fix to use com.kerneld
 	private static final String TEST_RESOURCES = "src/test/resources";
 	private static final String WEB_SERVER_DIRECTORY = TEST_RESOURCES + "/web-server";
 	private static final String WEB_SERVER_WINDOWS_EXE = WEB_SERVER_DIRECTORY + "/mongoose_windows.exe";
-	private static final String WEB_SERVER_LINUX_EXE = "mongoose_linux";
+	private static final String WEB_SERVER_LINUX_EXE = "./mongoose_linux";
 	private Process process;
 	
 	@AfterAll
