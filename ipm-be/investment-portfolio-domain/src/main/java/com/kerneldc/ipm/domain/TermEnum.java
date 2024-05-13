@@ -2,7 +2,7 @@ package com.kerneldc.ipm.domain;
 
 public enum TermEnum {
 	TERM_1_YEAR,
-	TERM_15_MONTH,
+	TERM_18_MONTH,
 	TERM_2_YEAR,
 	TERM_3_YEAR,
 	TERM_4_YEAR,
