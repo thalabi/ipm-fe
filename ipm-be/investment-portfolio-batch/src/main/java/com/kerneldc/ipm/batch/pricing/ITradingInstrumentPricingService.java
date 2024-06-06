@@ -29,6 +29,7 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 	
 	PriceQuote quote(Instrument instrument, D instrumentDetail) throws ApplicationException;
 	
+	@Override
 	default Price priceInstrument(Instant snapshotInstant, Instrument instrument, D instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException {
 		var price = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();

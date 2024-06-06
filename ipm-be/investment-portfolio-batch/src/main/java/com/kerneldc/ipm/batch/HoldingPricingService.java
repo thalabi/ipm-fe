@@ -128,6 +128,10 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			} catch (ApplicationException e) {
 				LOGGER.warn(e.getMessage());
 				priceHoldingsExceptions.addMessage(e.getMessage());
+				
+				
+				// get previous price and mark position as stale
+				
 			}
         }
         persistPrices();
