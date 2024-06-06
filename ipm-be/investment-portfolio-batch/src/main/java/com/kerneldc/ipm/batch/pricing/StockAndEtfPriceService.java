@@ -7,7 +7,11 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,7 @@ import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
+import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
 import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.AppTimeUtils;
@@ -34,28 +39,58 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 
 	private enum STOCK_PRICE_SERVICE { YAHOO, ALPAVANTAGE };
 	private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.ALPAVANTAGE;
-	private static final String ALPHAVANTAGE_URL_TEMPLATE =  "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=%s&symbol=%s";
+//	private static final String ALPHAVANTAGE_URL_TEMPLATE = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&apikey=%s&symbol=%s";
+//	private static final String ALPHAVANTAGE_TEST_URL_TEMPLATE = "http://localhost:8000/%s.html";
 	
 	private final String alphavantageApiKey;
+	private final String alphavantageApiUrlTemplate;
 	private final PriceRepository priceRepository;
 	
-	private Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
+	protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
+	private Map<Long, Price> latestPriceByInstrumentId;
 	
-	public StockAndEtfPriceService(PriceRepository priceRepository, @Value("${alphavantage.api.key}") String alphavantageApiKey) {
+	public StockAndEtfPriceService(PriceRepository priceRepository,
+			@Value("${alphavantage.api.url.template}") String alphavantageApiUrlTemplate,
+			@Value("${alphavantage.api.key}") String alphavantageApiKey) {
+		
+		LOGGER.info("alphavantageApiUrlTemplate: {}", alphavantageApiUrlTemplate);
+		LOGGER.info("alphavantageApiKey: {}", alphavantageApiKey);
+		
 		this.priceRepository = priceRepository;
 		this.alphavantageApiKey = alphavantageApiKey;
+		this.alphavantageApiUrlTemplate = alphavantageApiUrlTemplate;
 		
 		fallbackPriceLookupTable.put("SENS", ExchangeEnum.CNSX, 0.01f);
 		fallbackPriceLookupTable.put("BHCC", ExchangeEnum.CNSX, 0.025f);
+		
+		latestPriceByInstrumentId = priceRepository.findLatestPriceList().stream()
+				.collect(Collectors.toMap(p -> p.getInstrument().getId(), Function.identity()));
+	}
+	@Override
+	public PriceQuote quote(Instrument instrument, IListedInstrumentDetail instrumentStock) {
+		try {
+			if (ENABLED_STOCK_PRICE_SERVICE == STOCK_PRICE_SERVICE.YAHOO) {
+				return yahooFinanceQuoteService(instrument, instrumentStock);
+			} else {
+				return alphaVantageQuoteService(instrument, instrumentStock);
+			}
+		} catch (ApplicationException e) {
+			LOGGER.warn(e.getMessage());
+			return fallBackToLatestAvailablePrice(instrument);
+		}
 	}
 
-	@Override
-	public PriceQuote quote(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
-		if (ENABLED_STOCK_PRICE_SERVICE == STOCK_PRICE_SERVICE.YAHOO) {
-			return yahooFinanceQuoteService(instrument, instrumentStock);
-		} else {
-			return alphaVantageQuoteService(instrument, instrumentStock);
+	private PriceQuote fallBackToLatestAvailablePrice(Instrument instrument) {
+		LOGGER.warn("Attempting to set price of instrument [{}] to the latest price available.", instrument);
+		var latestPrice = latestPriceByInstrumentId.get(instrument.getId());
+		if (latestPrice == null) {
+			LOGGER.error(
+					"Could not find instrument id [{}] in list of latest instrument ids [{}] with latest price. Setting price to zero.",
+					instrument.getId(), latestPriceByInstrumentId.keySet());
+			return new PriceQuote(BigDecimal.ZERO, null);
 		}
+		LOGGER.warn("Found price of [{}] with price timestamp of [{}].", latestPrice.getPrice(), latestPrice.getPriceTimestamp());
+		return new PriceQuote(latestPrice.getPrice(), latestPrice.getPriceTimestamp());
 	}
 
 	private PriceQuote yahooFinanceQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
@@ -64,7 +99,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		Stock stock;
 		// For instruments in the TSE and CNSX exchanges try appending .TO and then .CN to the symbol 
 		try {
-			if (Arrays.asList("TSE","CNSX").contains(exchange)) {
+			if (Arrays.asList("TSE","CNSX").contains(exchange.name())) {
 				ticker = ticker.replace(".", "-");
 				stock = YahooFinance.get(ticker + ".TO");
 				if (stock == null) {
@@ -98,7 +133,13 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		if (Arrays.asList("TSE","CNSX").contains(exchange.toString())) {
 			alphavantageSymbol = ticker.replace(".", "-") + ".TO";
 		}
-		var urlString = String.format(ALPHAVANTAGE_URL_TEMPLATE, alphavantageApiKey, alphavantageSymbol);
+		String urlString;
+		if (StringUtils.isEmpty(alphavantageApiKey)) {
+			// if alphavantageApiKey is empty then this is called during a JUnit test and we are testing against Mongoose server
+			urlString = String.format(alphavantageApiUrlTemplate, alphavantageSymbol);
+		} else {
+			urlString = String.format(alphavantageApiUrlTemplate, alphavantageApiKey, alphavantageSymbol);
+		}
 		
 		GlobalQuote quote = null;
 		try {
@@ -126,7 +167,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 						var wait = noteText.contains("call frequency");
 						if (wait) {
 							LOGGER.info("Sleeping one minute before requesting qoute from Alpha Vantage ...");
-							Thread.sleep(60*1000);
+							Thread.sleep(60*1000L);
 							continue;
 						}
 					}
@@ -156,7 +197,8 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 				throw new ApplicationException(message);
 			}
 		} else {
-			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())), AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
+			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())),
+					AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
 		}
 	}
 	
