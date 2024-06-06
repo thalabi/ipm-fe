@@ -54,4 +54,21 @@ public abstract class AbstractPersistableEntity extends AbstractEntity implement
 	private String[] sourceCsvLine;
 	
     protected abstract void setLogicalKeyHolder();
+    
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(getLogicalKeyHolder().getLogicalKey());
+//	}
+//	@Override
+//	public boolean equals(Object entity) {
+//		if (this == entity)
+//			return true;
+//		if (entity == null)
+//			return false;
+//		if (getClass() != entity.getClass())
+//			return false;
+//		AbstractPersistableEntity other = (AbstractPersistableEntity) entity;
+//		return Objects.equals(getLogicalKeyHolder().getLogicalKey(), other.getLogicalKeyHolder().getLogicalKey());
+//	}
+
 }
