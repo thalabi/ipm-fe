@@ -1,0 +1,7 @@
+Steps to import Keycloak ssl cert into Java key store.
+
+- Hit the keycloak web page
+- Export to file keycloak.crt as ‘Base64-encoded ASCII, single certificate (*.pem, *.crt)’
+- Open a CMD window as admin
+- Import the cert using the following command, when prompted the password is "changeit":
+	keytool -import -alias keycloak -file keycloak.crt -keystore "C:\Program Files\Java\jdk-17.0.1\lib\security\cacerts"
