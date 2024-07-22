@@ -10,12 +10,13 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,13 +24,14 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.pricing.ITradingInstrumentPricingService.PriceQuote;
+import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Price;
@@ -52,8 +54,10 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 
 	private static StockAndEtfPriceService stockAndEtfPriceService;
 
-	@MockBean
+	@Mock
 	private PriceRepository priceRepository;
+	@Mock
+	private UrlContentUtil urlContentUtil;
 	
 	@Value("${alphavantage.api.url.template}")
 	private String alphavantageApiUrlTemplate;
@@ -67,35 +71,67 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		var latestPriceList = List.of(price1, price2);
 		when(priceRepository.findLatestPriceList()).thenReturn(latestPriceList);
 		
-		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository,
+		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, urlContentUtil,
 				alphavantageApiUrlTemplate, alphavantageApiKey);
 		
-		spinupWebServer();
+		//spinupWebServer();
 	}
 
 	@Test
-	void testAlphaVantageQuoteOnce_Success(TestInfo testInfo) throws ApplicationException {
+	void testAlphaVantageQuoteOnce_Success(TestInfo testInfo) throws ApplicationException, MalformedURLException, IOException {
 		printTestName(testInfo);
 		var instrument = new Instrument();
 		var instrumentStock = new InstrumentStock();
 		instrumentStock.setInstrument(instrument);
 		instrument.setTicker("BCE");
 		instrumentStock.setExchange(ExchangeEnum.TSE);
+		
+		var urlContent = """
+			{
+		    "Global Quote": {
+		        "01. symbol": "BCE",
+		        "02. open": "17.5900",
+		        "03. high": "17.7100",
+		        "04. low": "17.4900",
+		        "05. price": "17.6100",
+		        "06. volume": "35255306",
+		        "07. latest trading day": "2024-04-03",
+		        "08. previous close": "17.5200",
+		        "09. change": "0.0900",
+		        "10. change percent": "0.5137%"
+				}
+			}
+		""";
+//		InputStream inputStream = new ByteArrayInputStream(urlContent.getBytes(StandardCharsets.UTF_8));
+		
+//		URL mockUrl = mock(URL.class);
+//		HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
+//		when(mockUrl.openConnection()).thenReturn(mockHttpURLConnection);
+//	    when(mockHttpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
+//	    when(mockHttpURLConnection.getInputStream()).thenReturn(inputStream);
+	    
+	    //when(urlContentUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
+	    when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
+		
+//	    when(stockAndEtfPriceService.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 
 	@Test
-	void testQuoteThatFailsAndUsesLatestPrice(TestInfo testInfo) throws ApplicationException {
+	void testQuoteThatFailsAndUsesLatestPrice(TestInfo testInfo) throws ApplicationException, MalformedURLException, IOException {
 		printTestName(testInfo);
 		var instrumentStock = new InstrumentStock();
 		instrumentStock.setInstrument(instrument2);
 		instrumentStock.setExchange(ExchangeEnum.NYSE);
+		
+		when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/T.html"))).thenThrow(IOException.class);
+		
 		var priceQuote = stockAndEtfPriceService.quote(instrument2, instrumentStock);
 		System.out.println(priceQuote);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
-
+	
 	@Disabled
 	@Test
 	void testAlphaVantageQuoteMultipleTimes(TestInfo testInfo) throws ApplicationException {
@@ -128,7 +164,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	}
 
 	@Test
-	void testBhccIsUsingFallbackTable() throws ApplicationException {
+	void testBhccIsUsingFallbackTable() throws ApplicationException, MalformedURLException, IOException {
 		float bhccFallbackPrice = stockAndEtfPriceService.fallbackPriceLookupTable.get("BHCC", ExchangeEnum.CNSX);
 		
 		var instrument = new Instrument();
@@ -136,6 +172,26 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		instrumentStock.setInstrument(instrument);
 		instrument.setTicker("BHCC");
 		instrumentStock.setExchange(ExchangeEnum.CNSX);
+		
+		//0.025
+		var urlContent = """
+				{
+			    "Global Quote": {
+			        "01. symbol": "BHCC",
+			        "02. open": "0.025",
+			        "03. high": "0.025",
+			        "04. low": "0.025",
+			        "05. price": "0.025",
+			        "06. volume": "35255306",
+			        "07. latest trading day": "2024-04-03",
+			        "08. previous close": "0.025",
+			        "09. change": "0.0900",
+			        "10. change percent": "0.0007%"
+					}
+				}
+			""";
+	    when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/BHCC.TO.html"))).thenReturn(urlContent);
+
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), is(not(nullValue())));
 		assertThat(priceQuote.lastPrice(), is(new BigDecimal(Float.toString(bhccFallbackPrice))));
@@ -161,13 +217,13 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		price2.setPriceTimestamp(OffsetDateTime.of(2024, 04, 29, 07, 07, 07, 07, ZoneOffset.UTC));
 	}
 
-	@AfterAll
-	public void afterAll() {
-		LOGGER.info("afterAll()");
-		var pid = process.pid();
-		LOGGER.info("killing web server pid: {}", pid);
-		process.destroy();
-	}
+//	@AfterAll
+//	public void afterAll() {
+//		LOGGER.info("afterAll()");
+//		var pid = process.pid();
+//		LOGGER.info("killing web server pid: {}", pid);
+//		process.destroy();
+//	}
 
 	private void spinupWebServer() throws IOException {
 		var pb = new ProcessBuilder(getOsExecutable());

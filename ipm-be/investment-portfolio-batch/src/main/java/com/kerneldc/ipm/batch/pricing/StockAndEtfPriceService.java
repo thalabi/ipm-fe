@@ -21,6 +21,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.GlobalQuote;
+import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
@@ -45,11 +46,11 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	private final String alphavantageApiKey;
 	private final String alphavantageApiUrlTemplate;
 	private final PriceRepository priceRepository;
+	private final UrlContentUtil urlContentUtil;
 	
 	protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
 	private Map<Long, Price> latestPriceByInstrumentId;
-	
-	public StockAndEtfPriceService(PriceRepository priceRepository,
+	public StockAndEtfPriceService(PriceRepository priceRepository, UrlContentUtil urlContentUtil,
 			@Value("${alphavantage.api.url.template}") String alphavantageApiUrlTemplate,
 			@Value("${alphavantage.api.key}") String alphavantageApiKey) {
 		
@@ -57,6 +58,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		LOGGER.info("alphavantageApiKey: {}", alphavantageApiKey);
 		
 		this.priceRepository = priceRepository;
+		this.urlContentUtil = urlContentUtil;
 		this.alphavantageApiKey = alphavantageApiKey;
 		this.alphavantageApiUrlTemplate = alphavantageApiUrlTemplate;
 		
@@ -149,7 +151,9 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 				var objectMapper = new ObjectMapper();
 				objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
 				
-				var jsonNode = objectMapper.readTree(url);
+				var urlContent = urlContentUtil.getUrlContent(url);
+				//var jsonNode = objectMapper.readTree(url);
+				var jsonNode = objectMapper.readTree(urlContent);
 				
 				var globalQuoteJson = jsonNode.get("Global Quote");
 				if (globalQuoteJson != null && globalQuoteJson.isContainerNode()) { 
@@ -201,6 +205,19 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 					AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
 		}
 	}
+//	private String getUrlContent2(URL url) throws IOException {
+//		return IOUtils.toString(url, Charset.defaultCharset());
+//	}
+//	private String getUrlContent(URL url) throws IOException {
+//		HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
+//		//httpUrlConnection.connect();
+//		var httpStatusCode = httpUrlConnection.getResponseCode();
+//		if (httpStatusCode != HttpURLConnection.HTTP_OK) {
+//			var message = String.format("Fetching contents of URL [%s], returned Http status code [%d]", url.toString(), httpStatusCode);
+//			throw new IOException(message);
+//		}
+//		return IOUtils.toString(httpUrlConnection.getInputStream(), Encoding.DEFAULT_CHARSET);
+//	}
 	
 	@Override
 	public Collection<InstrumentTypeEnum> canHandle() {
