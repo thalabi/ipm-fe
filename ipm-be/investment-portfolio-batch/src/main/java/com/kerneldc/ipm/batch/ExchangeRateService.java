@@ -44,6 +44,7 @@ public class ExchangeRateService {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
 		
+		LOGGER.info("Fetching exchange rate for [{}] to [{}] on business day [{}] ...", fromCurrency, toCurrency, workingBusinessDay);
 		var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
 
 		ExchangeRate exchangeRate;

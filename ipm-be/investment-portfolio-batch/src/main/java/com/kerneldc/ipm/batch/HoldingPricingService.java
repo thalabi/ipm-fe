@@ -97,7 +97,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	}
 	
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
-		LOGGER.info("{} start", this.getClass().getSuperclass());
+    	LOGGER.info("Begin ...");
         snapshotInstant = Instant.now();
         now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
         var priceHoldingsExceptions = new ApplicationException();
@@ -152,7 +152,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         if (priceHoldingsExceptions!= null && CollectionUtils.isNotEmpty(priceHoldingsExceptions.getMessageList())) {
         	throw priceHoldingsExceptions;
         }
-		LOGGER.info("{} end", this.getClass().getSuperclass());
+    	LOGGER.info("End ...");
 	}
 
 	/**
