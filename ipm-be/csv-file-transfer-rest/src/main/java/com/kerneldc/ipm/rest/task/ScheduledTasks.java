@@ -21,8 +21,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.HoldingsReportService;
 import com.kerneldc.ipm.batch.HoldingPricingService;
+import com.kerneldc.ipm.batch.HoldingsReportService;
 import com.kerneldc.ipm.batch.InstrumentDueNotificationService;
 import com.kerneldc.ipm.repository.FixedIncomeAuditRepository;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
@@ -157,7 +157,7 @@ public class ScheduledTasks {
 		}
 	}
 	@Scheduled(cron = "1 0 0 * * *")
-	public void fixedIncomeInstrumentReport() throws ApplicationException {
+	public void holdingsReport() throws ApplicationException {
 		var fixedIncomeAudit = fixedIncomeAuditRepository.findById(1l)
 				.orElseThrow(() -> new IllegalStateException("Entity fixedIncomeAudit does not have a row with id 1."));
 		if (Boolean.TRUE.equals(fixedIncomeAudit.getChange())) {
@@ -171,6 +171,31 @@ public class ScheduledTasks {
 			fixedIncomeAudit.setChange(false);
 			fixedIncomeAuditRepository.save(fixedIncomeAudit);
 		}
+	}
+	
+	@Scheduled(initialDelay = 3000, fixedDelayString = "100000")
+	public void testTaskInSeparateThread() throws InterruptedException {
+		taskIncrementingThreadLocal();
+	}
 
+	@Scheduled(initialDelay = 5000, fixedDelayString = "100000")
+	public void testTaskInSeparateThread2() throws InterruptedException {
+		taskIncrementingThreadLocal();
+	}
+
+	private static final ThreadLocal<Integer> context = new ThreadLocal<>();
+	private void taskIncrementingThreadLocal() throws InterruptedException {
+		LOGGER.info("Begin ...");
+		LOGGER.info("Current thread name: {}, thread ID: {}", Thread.currentThread().getName(), Thread.currentThread().getId());
+		Thread.sleep(1000);
+		if (context.get() == null) {
+			context.set(1);
+		} else {
+			context.set(context.get()+1);
+		}
+		LOGGER.info("context: {}", context.get());
+		Thread.sleep(5000);
+		context.remove();
+		LOGGER.info("End ...");
 	}
 }
