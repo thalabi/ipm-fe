@@ -860,7 +860,7 @@ public class HoldingsReportService {
 	public File generateAndEmail() throws ApplicationException {
 		LOGGER.info(LOG_BEGIN);
 		var excelFile = generate();
-		emailService.sendFixedIncomeInstrumentReport(excelFile);
+		emailService.sendHoldingsReport(excelFile);
 		LOGGER.info(LOG_END);
 		return excelFile;
 	}

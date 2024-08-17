@@ -44,10 +44,10 @@ public class EmailService {
 	@Value("${application.email.instrumentDueNotificationTo}")
 	private String instrumentDueNotificationTo;
 	
-	@Value("${application.email.fixedIncomeInstrumentReportFrom}")
-	private String fixedIncomeInstrumentReportFrom;
-	@Value("${application.email.fixedIncomeInstrumentReportTo}")
-	private String fixedIncomeInstrumentReportTo;
+	@Value("${application.email.holdingsReportFrom}")
+	private String holdingsReportFrom;
+	@Value("${application.email.holdingsReportFrom}")
+	private String holdingsReportTo;
 
 	
 	private static final String DAILY_MARKET_VALUE_NOTIFICATION_SUBJECT = "Daily Market Value";
@@ -55,8 +55,8 @@ public class EmailService {
 	private static final String DAILY_MARKET_VALUE_FAILURE_TEMPLATE = "dailyMarketValueFailure.ftlh";
 	private static final String INSTRUMENT_DUE_NOTIFICATION_SUBJECT = "Instrument(s) Due";
 	private static final String INSTRUMENT_DUE_NOTIFICATION_TEMPLATE = "instrumentDueNotification.ftlh";
-	private static final String FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT = "Fixed Income Instrument Report";
-	private static final String FIXED_INCOME_INSTRUMENT_REPORT_TEMPLATE = "fixedIncomeInstrumentReport.ftlh";
+	private static final String HOLDINGS_REPORT_SUBJECT = "Holdings Report";
+	private static final String HOLDINGS_REPORT_TEMPLATE = "holdingsReport.ftlh";
 	private JavaMailSender javaMailSender;
 	private Configuration freeMarkerConfiguration;
 	
@@ -119,13 +119,13 @@ public class EmailService {
 		LOGGER.info("Sent instrument due notification failure email to: {}", instrumentDueNotificationTo);
 	}
 
-	public void sendFixedIncomeInstrumentReport(File excelFile) throws ApplicationException {
+	public void sendHoldingsReport(File excelFile) throws ApplicationException {
 		var mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			var mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-			mimeMessageHelper.setFrom(fixedIncomeInstrumentReportFrom);
-			mimeMessageHelper.setTo(InternetAddress.parse(fixedIncomeInstrumentReportTo));
-			mimeMessageHelper.setSubject(FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT);
+			mimeMessageHelper.setFrom(holdingsReportFrom);
+			mimeMessageHelper.setTo(InternetAddress.parse(holdingsReportTo));
+			mimeMessageHelper.setSubject(HOLDINGS_REPORT_SUBJECT);
 			mimeMessageHelper.setText(processFixedIncomeInstrumentReportTemplate(), true);
 			mimeMessageHelper.addAttachment(excelFile.getName(), excelFile);
 			javaMailSender.send(mimeMessage);
@@ -135,12 +135,12 @@ public class EmailService {
 			throw new ApplicationException(message + " (" + e.getMessage() + ")");
 			
 		}
-		LOGGER.info("Sent fixed income instrument report email to: {}", fixedIncomeInstrumentReportTo);
+		LOGGER.info("Sent fixed income instrument report email to: {}", holdingsReportTo);
 	}
 
 	public void sendFixedIncomeInstrumentReportFailure(ApplicationException fixedIncomeInstrumentReportExceptions) throws ApplicationException {
-		sendFailureEmail(fixedIncomeInstrumentReportExceptions, fixedIncomeInstrumentReportFrom, fixedIncomeInstrumentReportTo, FIXED_INCOME_INSTRUMENT_REPORT_SUBJECT);
-		LOGGER.info("Sent fixed income instrument report failure email to: {}", fixedIncomeInstrumentReportTo);
+		sendFailureEmail(fixedIncomeInstrumentReportExceptions, holdingsReportFrom, holdingsReportTo, HOLDINGS_REPORT_SUBJECT);
+		LOGGER.info("Sent fixed income instrument report failure email to: {}", holdingsReportTo);
 	}
 
 
@@ -185,7 +185,7 @@ public class EmailService {
 	}
 	
 	private String processFixedIncomeInstrumentReportTemplate() throws IOException, TemplateException {
-		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(FIXED_INCOME_INSTRUMENT_REPORT_TEMPLATE), null);
+		return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfiguration.getTemplate(HOLDINGS_REPORT_TEMPLATE), null);
 	}
 
 
