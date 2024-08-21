@@ -40,7 +40,7 @@ public class ExchangeRateService {
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 
-	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency, boolean fallbackIfNotFound) throws ApplicationException {
+	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency, boolean methodHasToReturnExchangeRate) throws ApplicationException {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
 		
@@ -51,7 +51,7 @@ public class ExchangeRateService {
 		
 		if (rate == null) {
 			var noRateAvailableAtApiMessage = String.format("Exchange rate not available (at external api) for %s to %s on %s", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
-			if (! /* not */ fallbackIfNotFound) {
+			if (! /* not */ methodHasToReturnExchangeRate) {
 				LOGGER.error(noRateAvailableAtApiMessage);
 				throw new ApplicationException(noRateAvailableAtApiMessage);
 			} else {
@@ -87,8 +87,8 @@ public class ExchangeRateService {
 		return exchangeRate;
 	}
 	
-	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
-		return retrieveAndPersistExchangeRate(date, fromCurrency, toCurrency, false);
+	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
+		retrieveAndPersistExchangeRate(date, fromCurrency, toCurrency, false);
 	}
 	/**
 	 * If the provided date falls on December 25, January 1, Saturday or a Sunday, it will return the date before.
@@ -109,6 +109,7 @@ public class ExchangeRateService {
 	}
 	
 	private String callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {
+		// TODO refactor to use this application UrlContentUtil
 		var client = HttpClient.newHttpClient();
 		//var dateString = date.format(dateTimeFormatter);
 		var dateString = dateTimeFormatter.format(date);
