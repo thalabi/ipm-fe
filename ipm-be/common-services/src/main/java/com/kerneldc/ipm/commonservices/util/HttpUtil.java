@@ -17,12 +17,12 @@ import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 
 @Service
-public class UrlContentUtil {
+public class HttpUtil {
 
 	private final String bankOfCanadaUrlTemplate;
 	private final String yahooFinanceApiUrlTemplate;
 	
-	public UrlContentUtil(@Value("${bank.of.canada.url.template}")String bankOfCanadaUrlTemplate, @Value("${yahoo.finance.api.url.template}") String yahooFinanceApiUrlTemplate) {
+	public HttpUtil(@Value("${bank.of.canada.url.template}")String bankOfCanadaUrlTemplate, @Value("${yahoo.finance.api.url.template}") String yahooFinanceApiUrlTemplate) {
 		this.bankOfCanadaUrlTemplate = bankOfCanadaUrlTemplate;
 		this.yahooFinanceApiUrlTemplate = yahooFinanceApiUrlTemplate;
 	}

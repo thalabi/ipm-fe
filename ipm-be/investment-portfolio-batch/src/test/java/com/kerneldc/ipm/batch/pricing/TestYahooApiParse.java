@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.YahooApiQuote;
-import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
+import com.kerneldc.ipm.commonservices.util.HttpUtil;
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
@@ -32,8 +32,8 @@ class TestYahooApiParse {
 		var objectMapper = new ObjectMapper();
 		//objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
 		
-		UrlContentUtil urlContentUtil = new UrlContentUtil(null, yahooFinanceApiUrlTemplate);
-		var urlContent = urlContentUtil.yahooFinanceApiContent("BCE.TO");
+		HttpUtil httpUtil = new HttpUtil(null, yahooFinanceApiUrlTemplate);
+		var urlContent = httpUtil.yahooFinanceApiContent("BCE.TO");
 		assertThat(urlContent, is(notNullValue()));
 		LOGGER.info("urlContent: {}", urlContent);
 		
@@ -53,9 +53,9 @@ class TestYahooApiParse {
 	
 	@Test
 	void testInvalidTicker() throws IOException {
-		UrlContentUtil urlContentUtil = new UrlContentUtil(null, yahooFinanceApiUrlTemplate);
+		HttpUtil httpUtil = new HttpUtil(null, yahooFinanceApiUrlTemplate);
 		ApplicationException exception = assertThrows(ApplicationException.class, () -> {
-			urlContentUtil.yahooFinanceApiContent("INVALID");
+			httpUtil.yahooFinanceApiContent("INVALID");
 		});
 		var message = exception.getMessage();
 		LOGGER.info("message: {}", message);

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
+import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
 import com.kerneldc.ipm.util.AppTimeUtils;
 
@@ -16,12 +16,12 @@ class ExchangeRateServiceTest {
 
 	private ExchangeRateRepository exchangeRateRepository;
 	private ExchangeRateService exchangeRateService;
-	private UrlContentUtil urlContentUtil;
+	private HttpUtil httpUtil;
 
 	@BeforeEach
 	void setup() {
-		urlContentUtil = new UrlContentUtil(StringUtils.EMPTY, StringUtils.EMPTY);
-		exchangeRateService =  new ExchangeRateService(exchangeRateRepository, urlContentUtil);
+		httpUtil = new HttpUtil(StringUtils.EMPTY, StringUtils.EMPTY);
+		exchangeRateService =  new ExchangeRateService(exchangeRateRepository, httpUtil);
 	}
 	@Test
 	void testGetWorkingBusinessDay_JanuaryFirst_Success () {

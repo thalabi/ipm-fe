@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.pricing.ITradingInstrumentPricingService.PriceQuote;
-import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
+import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Price;
@@ -55,7 +55,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	@Mock
 	private PriceRepository priceRepository;
 	@Mock
-	private UrlContentUtil urlContentUtil;
+	private HttpUtil httpUtil;
 	
 	@Value("${alphavantage.api.url.template}")
 	private String alphavantageApiUrlTemplate;
@@ -71,7 +71,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		var latestPriceList = List.of(price1, price2);
 		when(priceRepository.findLatestPriceList()).thenReturn(latestPriceList);
 		
-		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, urlContentUtil,
+		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, httpUtil,
 				alphavantageApiUrlTemplate, alphavantageApiKey);
 		
 		//spinupWebServer();
@@ -110,8 +110,8 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 //	    when(mockHttpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
 //	    when(mockHttpURLConnection.getInputStream()).thenReturn(inputStream);
 	    
-	    //when(urlContentUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
-	    when(urlContentUtil.getUrlContent("http://localhost:8000/BCE.TO.html")).thenReturn(urlContent);
+	    //when(httpUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
+	    when(httpUtil.getUrlContent("http://localhost:8000/BCE.TO.html")).thenReturn(urlContent);
 		
 //	    when(stockAndEtfPriceService.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
@@ -125,7 +125,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		instrumentStock.setInstrument(instrument2);
 		instrumentStock.setExchange(ExchangeEnum.NYSE);
 		
-		when(urlContentUtil.getUrlContent("http://localhost:8000/T.html")).thenThrow(ApplicationException.class);
+		when(httpUtil.getUrlContent("http://localhost:8000/T.html")).thenThrow(ApplicationException.class);
 		
 		var priceQuote = stockAndEtfPriceService.quote(instrument2, instrumentStock);
 		System.out.println(priceQuote);
@@ -190,7 +190,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 					}
 				}
 			""";
-	    when(urlContentUtil.getUrlContent("http://localhost:8000/BHCC.TO.html")).thenReturn(urlContent);
+	    when(httpUtil.getUrlContent("http://localhost:8000/BHCC.TO.html")).thenReturn(urlContent);
 
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), is(not(nullValue())));

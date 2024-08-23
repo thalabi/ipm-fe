@@ -21,7 +21,7 @@ import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.alphavantage.AlphavantageQuote;
 import com.kerneldc.ipm.batch.alphavantage.YahooApiQuote;
-import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
+import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
@@ -47,11 +47,11 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	private final String alphavantageApiKey;
 	private final String alphavantageApiUrlTemplate;
 	private final PriceRepository priceRepository;
-	private final UrlContentUtil urlContentUtil;
+	private final HttpUtil httpUtil;
 	
 	protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
 	private Map<Long, Price> latestPriceByInstrumentId;
-	public StockAndEtfPriceService(PriceRepository priceRepository, UrlContentUtil urlContentUtil,
+	public StockAndEtfPriceService(PriceRepository priceRepository, HttpUtil httpUtil,
 			@Value("${alphavantage.api.url.template}") String alphavantageApiUrlTemplate,
 			@Value("${alphavantage.api.key}") String alphavantageApiKey) {
 		
@@ -59,7 +59,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		LOGGER.info("alphavantageApiKey: {}", alphavantageApiKey);
 		
 		this.priceRepository = priceRepository;
-		this.urlContentUtil = urlContentUtil;
+		this.httpUtil = httpUtil;
 		this.alphavantageApiKey = alphavantageApiKey;
 		this.alphavantageApiUrlTemplate = alphavantageApiUrlTemplate;
 		
@@ -164,7 +164,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 				var objectMapper = new ObjectMapper();
 				objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
 				
-				var urlContent = urlContentUtil.getUrlContent(urlString);
+				var urlContent = httpUtil.getUrlContent(urlString);
 				//var jsonNode = objectMapper.readTree(url);
 				var jsonNode = objectMapper.readTree(urlContent);
 				
@@ -229,12 +229,12 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 			if (Arrays.asList("TSE", "CNSX").contains(exchange.name())) {
 				ticker = ticker.replace(".", "-");
 				try {
-					urlContent = urlContentUtil.yahooFinanceApiContent(ticker + ".TO");
+					urlContent = httpUtil.yahooFinanceApiContent(ticker + ".TO");
 				} catch (ApplicationException exception) {
-					urlContent = urlContentUtil.yahooFinanceApiContent(ticker + ".CN");
+					urlContent = httpUtil.yahooFinanceApiContent(ticker + ".CN");
 				}
 			} else {
-				urlContent = urlContentUtil.yahooFinanceApiContent(ticker);
+				urlContent = httpUtil.yahooFinanceApiContent(ticker);
 			}
 
 			if (urlContent == null) {

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
+import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.ExchangeRate;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
@@ -39,7 +39,7 @@ public class ExchangeRateService {
 
 	private static final String BANK_OF_CANADA_URL_TEMPLATE = "https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s"; 
 	private final ExchangeRateRepository exchangeRateRepository;
-	private final UrlContentUtil urlContentUtil;
+	private final HttpUtil httpUtil;
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 
@@ -50,7 +50,7 @@ public class ExchangeRateService {
 		LOGGER.info("Fetching exchange rate for [{}] to [{}] on business day [{}] ...", fromCurrency, toCurrency, workingBusinessDay);
 		//var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
 		String urlContent = StringUtils.EMPTY;
-		urlContent = urlContentUtil.bankOfCanadaContent(workingBusinessDay, fromCurrency, toCurrency);
+		urlContent = httpUtil.bankOfCanadaContent(workingBusinessDay, fromCurrency, toCurrency);
 		var rate = parseRate(urlContent);
 
 		ExchangeRate exchangeRate;
@@ -114,8 +114,8 @@ public class ExchangeRateService {
 		return AppTimeUtils.toInstant(workingBusinessDay);
 	}
 	
+	@Deprecated(since = "3.5", forRemoval = true)
 	private String callApi(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException  {
-		// TODO refactor to use this application UrlContentUtil
 		var client = HttpClient.newHttpClient();
 		//var dateString = date.format(dateTimeFormatter);
 		var dateString = dateTimeFormatter.format(date);
