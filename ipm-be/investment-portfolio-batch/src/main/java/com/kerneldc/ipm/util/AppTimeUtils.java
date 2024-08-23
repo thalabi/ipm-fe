@@ -50,6 +50,15 @@ public class AppTimeUtils {
 
 	}
 	
+	public static OffsetDateTime toOffsetDateTime(Long epochSecond) {
+		if (epochSecond == null) {
+			return null;
+		}
+		
+		var instant = Instant.ofEpochSecond(epochSecond);
+		return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+	}
+	
 	public static OffsetDateTime toOffsetDateTime(Calendar calendar) {
 		return calendar == null ? null : toOffsetDateTime(calendar.toInstant());
 	}

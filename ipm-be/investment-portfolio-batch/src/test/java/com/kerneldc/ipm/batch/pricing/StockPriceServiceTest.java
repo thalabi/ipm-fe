@@ -63,7 +63,9 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	private String alphavantageApiUrlTemplate;
 	@Value("${alphavantage.api.key}")
 	private String alphavantageApiKey;
-
+	@Value("${yahoo.finance.api.url.template}")
+	private String yahooFinanceApiUrlTemplate;
+	
 	@BeforeAll
 	public void beforeAll() throws IOException {
 		LOGGER.info("beforeAll()");

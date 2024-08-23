@@ -116,7 +116,7 @@ public class HoldingsReportService {
 		LOGGER.info(LOG_BEGIN);
 		var now = Instant.now();
 		
-		var usdToCadExchangeRate = exchangeRateService.retrieveAndPersistExchangeRate(now, CurrencyEnum.USD, CurrencyEnum.CAD, true);
+		var usdToCadExchangeRate = exchangeRateService.fetchAndPersistExchangeRate(now, CurrencyEnum.USD, CurrencyEnum.CAD, true);
 		var fixedIncomeList = instrumentDueVRepository.findByOrderByPortfolioFiAscPortfolioHolderAscCurrencyAscPortfolioNameAsc();
 		var equityList = positionRepository.equityReport();
 		LOGGER.info("fixedIncomeList.size(): {}", fixedIncomeList.size());

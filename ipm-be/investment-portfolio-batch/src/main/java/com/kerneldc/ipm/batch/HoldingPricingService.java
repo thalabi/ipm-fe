@@ -2,9 +2,7 @@ package com.kerneldc.ipm.batch;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -56,10 +54,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private PriceRepository priceRepository;
 	private HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
 	
-	private Instant snapshotInstant;
-	private OffsetDateTime now;
-	
-	private Map<Long, Price> priceCache = new HashMap<>();
+	//private Map<Long, Price> priceCache = new HashMap<>();
 	
 	private EnumMap<InstrumentTypeEnum, IInstrumentPricingService<IInstrumentDetail>> instrumentPricingServiceMap = new EnumMap<>(InstrumentTypeEnum.class);
 
@@ -96,11 +91,16 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		}
 	}
 	
+//	private record PriceHoldingsContext(Instant snapshotInstant, OffsetDateTime snapshotDateTime, ApplicationException applicationException) {};
+//	private static final ThreadLocal<PriceHoldingsContext> priceHoldingsContext = new ThreadLocal<>();
+	private PriceHoldingsContext priceHoldingsContext;
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
     	LOGGER.info("Begin ...");
-        snapshotInstant = Instant.now();
-        now = OffsetDateTime.ofInstant(Instant.now(), ZoneId.systemDefault());
-        var priceHoldingsExceptions = new ApplicationException();
+//    	var snapshotInstant = Instant.now();
+//        var snapshotDateTime = OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault());
+//        priceHoldingsContext.set(new PriceHoldingsContext(snapshotInstant, snapshotDateTime, new ApplicationException()));
+    	priceHoldingsContext = new PriceHoldingsContext();
+    	var priceHoldingsExceptions = new ApplicationException();
 
 		try {
 			getAndPersistExchangeRates();
@@ -114,7 +114,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         var holdingList= holdingRepository.findByIdIn(holdingIdList);
         enrichHoldingList(holdingList);
         
-        priceCache.clear();
+        priceHoldingsContext.getPriceCache().clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
         	Position position = null;
@@ -140,7 +140,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         	try {
 				sendPriceHoldingsNotifications(priceHoldingsExceptions);
 				if (batchProcessing) {
-					priceHoldingsExceptions = null; // in batch mode, clear exceptions raised so far as they are now included in the email sent
+					priceHoldingsExceptions = null; // in batch mode, clear exceptions raised so far as they are snapshotDateTime included in the email sent
 				}
 			} catch (ApplicationException e) {
 				var message = String.format("Unable to send price holdings notification: %s", e.getMessage());
@@ -152,6 +152,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         if (priceHoldingsExceptions!= null && CollectionUtils.isNotEmpty(priceHoldingsExceptions.getMessageList())) {
         	throw priceHoldingsExceptions;
         }
+        priceHoldingsContext.removeContext();
     	LOGGER.info("End ...");
 	}
 
@@ -194,7 +195,8 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		if (position.getInstrument().getType().equals(InstrumentTypeEnum.CASH)) {
 			return priceHoldingsExceptions;
 		}
-		if (AppTimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), now) == -1) {
+		
+		if (AppTimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), priceHoldingsContext.getSnapshotDateTime()) == -1) {
 			var exceptionMessage = String.format(
 					"Stale price retrieved for ticker: %s. Price date is as of %s",
 					position.getInstrument().getTicker(), 
@@ -242,7 +244,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		var price = getPrice(instrument, instrumentDetail);
 
 		var position = new Position();
-		position.setPositionSnapshot(OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault()));
+		position.setPositionSnapshot(priceHoldingsContext.getSnapshotDateTime());
 		position.setInstrument(instrument);
 		position.setPortfolio(holding.getPortfolio());
 		position.setQuantity(holding.getQuantity());
@@ -253,7 +255,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	}
 
 	private void persistPrices() throws ApplicationException {
-		var priceCollection = priceCache.values();
+		var priceCollection = priceHoldingsContext.getPriceCache().values();
 		LOGGER.info("Price cache count: {}", priceCollection.size());
 		List<Price> savedPriceList;	
 		try {
@@ -268,7 +270,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		
 		var fromCurrency = CurrencyEnum.USD;
 		var toCurrency = CurrencyEnum.CAD;
-		exchangeRateService.retrieveAndPersistExchangeRate(snapshotInstant, fromCurrency, toCurrency);
+		exchangeRateService.fetchAndPersistExchangeRate(priceHoldingsContext.getSnapshotInstant(), fromCurrency, toCurrency);
 	}
 
 	private Price getPrice(Instrument instrument, IInstrumentDetail instrumentDetail) throws ApplicationException {
@@ -279,7 +281,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			throw new IllegalArgumentException(String.format("Supported instrument types are [%s]", String.join(", ", typeList)));
 		}
 		
-		return instrumentPricingService.priceInstrument(snapshotInstant, instrument, instrumentDetail, priceCache);
+		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotInstant(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
 	}
 	
 	

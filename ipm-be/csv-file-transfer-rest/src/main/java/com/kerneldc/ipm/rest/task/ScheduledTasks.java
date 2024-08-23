@@ -173,29 +173,32 @@ public class ScheduledTasks {
 		}
 	}
 	
+	@Autowired
+	private IncrementingIntegerComponent incrementingIntegerComponent;
+	
 	@Scheduled(initialDelay = 3000, fixedDelayString = "100000")
 	public void testTaskInSeparateThread() throws InterruptedException {
-		taskIncrementingThreadLocal();
+		incrementingIntegerComponent.taskIncrementingSomeInteger();
 	}
 
 	@Scheduled(initialDelay = 5000, fixedDelayString = "100000")
 	public void testTaskInSeparateThread2() throws InterruptedException {
-		taskIncrementingThreadLocal();
+		incrementingIntegerComponent.taskIncrementingSomeInteger();
 	}
 
-	private static final ThreadLocal<Integer> context = new ThreadLocal<>();
-	private void taskIncrementingThreadLocal() throws InterruptedException {
-		LOGGER.info("Begin ...");
-		LOGGER.info("Current thread name: {}, thread ID: {}", Thread.currentThread().getName(), Thread.currentThread().getId());
-		Thread.sleep(1000);
-		if (context.get() == null) {
-			context.set(1);
-		} else {
-			context.set(context.get()+1);
-		}
-		LOGGER.info("context: {}", context.get());
-		Thread.sleep(5000);
-		context.remove();
-		LOGGER.info("End ...");
-	}
+//	private static final ThreadLocal<Integer> context = new ThreadLocal<>();
+//	private void taskIncrementingSomeInteger() throws InterruptedException {
+//		LOGGER.info("Begin ...");
+//		LOGGER.info("Current thread name: {}, thread ID: {}", Thread.currentThread().getName(), Thread.currentThread().getId());
+//		Thread.sleep(1000);
+//		if (context.get() == null) {
+//			context.set(1);
+//		} else {
+//			context.set(context.get()+1);
+//		}
+//		LOGGER.info("context: {}", context.get());
+//		Thread.sleep(5000);
+//		context.remove();
+//		LOGGER.info("End ...");
+//	}
 }

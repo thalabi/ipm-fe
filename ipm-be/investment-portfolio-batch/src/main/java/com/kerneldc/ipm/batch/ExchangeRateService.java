@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.ExchangeRate;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
@@ -37,24 +39,25 @@ public class ExchangeRateService {
 
 	private static final String BANK_OF_CANADA_URL_TEMPLATE = "https://www.bankofcanada.ca/valet/observations/FX%s%s/json?start_date=%s"; 
 	private final ExchangeRateRepository exchangeRateRepository;
+	private final UrlContentUtil urlContentUtil;
 	
 	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withZone(ZoneId.systemDefault());
 
-	public ExchangeRate retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency, boolean methodHasToReturnExchangeRate) throws ApplicationException {
+	public ExchangeRate fetchAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency, boolean methodHasToReturnExchangeRate) throws ApplicationException {
 
 		var workingBusinessDay = getWorkingBusinessDay(date);
 		
 		LOGGER.info("Fetching exchange rate for [{}] to [{}] on business day [{}] ...", fromCurrency, toCurrency, workingBusinessDay);
-		var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
+		//var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
+		String urlContent = StringUtils.EMPTY;
+		urlContent = urlContentUtil.bankOfCanadaContent(workingBusinessDay, fromCurrency, toCurrency);
+		var rate = parseRate(urlContent);
 
 		ExchangeRate exchangeRate;
 		
 		if (rate == null) {
 			var noRateAvailableAtApiMessage = String.format("Exchange rate not available (at external api) for %s to %s on %s", fromCurrency, toCurrency, dateTimeFormatter.format(workingBusinessDay));
-			if (! /* not */ methodHasToReturnExchangeRate) {
-				LOGGER.error(noRateAvailableAtApiMessage);
-				throw new ApplicationException(noRateAvailableAtApiMessage);
-			} else {
+			if (methodHasToReturnExchangeRate) {
 				LOGGER.warn(noRateAvailableAtApiMessage);
 				LOGGER.warn("Will try previous rate from database ...");
 				var exchangeRateList = exchangeRateRepository.findFirstByAsOfDateLessThanEqualAndFromCurrencyAndToCurrencyOrderByAsOfDateDesc(
@@ -68,6 +71,9 @@ public class ExchangeRateService {
 					exchangeRate = exchangeRateList.get(0);
 					return exchangeRate;
 				}
+			} else {
+				LOGGER.error(noRateAvailableAtApiMessage);
+				throw new ApplicationException(noRateAvailableAtApiMessage);
 			}
 		}
 		
@@ -87,8 +93,8 @@ public class ExchangeRateService {
 		return exchangeRate;
 	}
 	
-	public void retrieveAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
-		retrieveAndPersistExchangeRate(date, fromCurrency, toCurrency, false);
+	public void fetchAndPersistExchangeRate(Instant date, CurrencyEnum fromCurrency, CurrencyEnum toCurrency) throws ApplicationException {
+		fetchAndPersistExchangeRate(date, fromCurrency, toCurrency, false);
 	}
 	/**
 	 * If the provided date falls on December 25, January 1, Saturday or a Sunday, it will return the date before.

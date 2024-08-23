@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @JsonRootName(value = "Global Quote")
-public class GlobalQuote {
+public class AlphavantageQuote {
 
 	@JsonProperty("01. symbol")
 	private String symbol;
