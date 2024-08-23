@@ -10,8 +10,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -80,7 +78,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	}
 
 	@Test
-	void testAlphaVantageQuoteOnce_Success(TestInfo testInfo) throws ApplicationException, MalformedURLException, IOException {
+	void testAlphaVantageQuoteOnce_Success(TestInfo testInfo) throws ApplicationException {
 		printTestName(testInfo);
 		var instrument = new Instrument();
 		var instrumentStock = new InstrumentStock();
@@ -113,7 +111,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 //	    when(mockHttpURLConnection.getInputStream()).thenReturn(inputStream);
 	    
 	    //when(urlContentUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
-	    when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
+	    when(urlContentUtil.getUrlContent("http://localhost:8000/BCE.TO.html")).thenReturn(urlContent);
 		
 //	    when(stockAndEtfPriceService.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
@@ -121,13 +119,13 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	}
 
 	@Test
-	void testQuoteThatFailsAndUsesLatestPrice(TestInfo testInfo) throws ApplicationException, MalformedURLException, IOException {
+	void testQuoteThatFailsAndUsesLatestPrice(TestInfo testInfo) throws ApplicationException {
 		printTestName(testInfo);
 		var instrumentStock = new InstrumentStock();
 		instrumentStock.setInstrument(instrument2);
 		instrumentStock.setExchange(ExchangeEnum.NYSE);
 		
-		when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/T.html"))).thenThrow(IOException.class);
+		when(urlContentUtil.getUrlContent("http://localhost:8000/T.html")).thenThrow(ApplicationException.class);
 		
 		var priceQuote = stockAndEtfPriceService.quote(instrument2, instrumentStock);
 		System.out.println(priceQuote);
@@ -166,7 +164,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 	}
 
 	@Test
-	void testBhccIsUsingFallbackTable() throws ApplicationException, MalformedURLException, IOException {
+	void testBhccIsUsingFallbackTable() throws ApplicationException {
 		float bhccFallbackPrice = stockAndEtfPriceService.fallbackPriceLookupTable.get("BHCC", ExchangeEnum.CNSX);
 		
 		var instrument = new Instrument();
@@ -192,7 +190,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 					}
 				}
 			""";
-	    when(urlContentUtil.getUrlContent(new URL("http://localhost:8000/BHCC.TO.html"))).thenReturn(urlContent);
+	    when(urlContentUtil.getUrlContent("http://localhost:8000/BHCC.TO.html")).thenReturn(urlContent);
 
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), is(not(nullValue())));

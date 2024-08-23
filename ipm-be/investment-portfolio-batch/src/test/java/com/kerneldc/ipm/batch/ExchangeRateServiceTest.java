@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.kerneldc.ipm.commonservices.util.UrlContentUtil;
 import com.kerneldc.ipm.repository.ExchangeRateRepository;
 import com.kerneldc.ipm.util.AppTimeUtils;
 
@@ -14,10 +16,12 @@ class ExchangeRateServiceTest {
 
 	private ExchangeRateRepository exchangeRateRepository;
 	private ExchangeRateService exchangeRateService;
+	private UrlContentUtil urlContentUtil;
 
 	@BeforeEach
 	void setup() {
-		exchangeRateService =  new ExchangeRateService(exchangeRateRepository);
+		urlContentUtil = new UrlContentUtil(StringUtils.EMPTY, StringUtils.EMPTY);
+		exchangeRateService =  new ExchangeRateService(exchangeRateRepository, urlContentUtil);
 	}
 	@Test
 	void testGetWorkingBusinessDay_JanuaryFirst_Success () {
