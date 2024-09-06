@@ -7,34 +7,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.kerneldc.common.exception.ApplicationException;
+import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.Price;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public class PriceHoldingsContext {
 
-	private record PriceHoldingsContextRecord(Instant snapshotInstant, OffsetDateTime snapshotDateTime, Map<Long, Price> priceCache, ApplicationException applicationException) {};
-	private static final ThreadLocal<PriceHoldingsContextRecord> priceHoldingsContext = new ThreadLocal<>();
+	@Getter
+	private Instant snapshotInstant;
+	@Getter
+	private OffsetDateTime snapshotDateTime;
+	@Getter
+	private Map<Long, Price> priceCache;
+	@Getter
+	private ApplicationException priceHoldingsExceptions;
+	
+	@Getter @Setter
+	private Holding currentHolding;
+//	@Getter @Setter
+//	private Instrument currentInstrument;
+//	@Getter @Setter
+//	private IInstrumentDetail currentInstrumentDetail;
+	
 
 	public PriceHoldingsContext() {
-    	var snapshotInstant = Instant.now();
-        var snapshotDateTime = OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault());
-        priceHoldingsContext.set(new PriceHoldingsContextRecord(snapshotInstant, snapshotDateTime, new HashMap<>(), new ApplicationException()));
-	}
-	public Instant getSnapshotInstant() {
-		return priceHoldingsContext.get().snapshotInstant();
-	}
-	public OffsetDateTime getSnapshotDateTime() {
-		return priceHoldingsContext.get().snapshotDateTime();
-	}
-	public Map<Long, Price> getPriceCache() {
-		return priceHoldingsContext.get().priceCache();
-	}
-	public ApplicationException getApplicationException() {
-		return priceHoldingsContext.get().applicationException();
-	}
-	
-	
-	
-	public void removeContext() {
-        priceHoldingsContext.remove();
+    	snapshotInstant = Instant.now();
+        snapshotDateTime = OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault());
+        priceCache = new HashMap<>();
+        priceHoldingsExceptions = new ApplicationException();
 	}
 }
