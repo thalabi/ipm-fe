@@ -15,7 +15,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -49,8 +48,7 @@ public class ExchangeRateService {
 		
 		LOGGER.info("Fetching exchange rate for [{}] to [{}] on business day [{}] ...", fromCurrency, toCurrency, workingBusinessDay);
 		//var rate = parseRate(callApi(workingBusinessDay, fromCurrency, toCurrency));
-		String urlContent = StringUtils.EMPTY;
-		urlContent = httpUtil.bankOfCanadaContent(workingBusinessDay, fromCurrency, toCurrency);
+		var urlContent = httpUtil.bankOfCanadaContent(workingBusinessDay, fromCurrency, toCurrency);
 		var rate = parseRate(urlContent);
 
 		ExchangeRate exchangeRate;
