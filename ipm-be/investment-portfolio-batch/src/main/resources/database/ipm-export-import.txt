@@ -1,12 +1,13 @@
 Login in to sr22
 sudo su - postgres
 cd /var/lib/pgsql/15/backups
- pg_dump -U postgres --schema=ipm > ipm
+ pg_dump -U postgres --schema=ipm > ipm.bak-yyyy-mm-dd
  mv ipm ipm.bak-2023-08-14
 
  
  Transfer ipm file to windows
+ cd C:\Users\Tarif Halabi\Documents\portfolio-batch-springboot-app-test-files\ipm-backup
  psql -U postgres -d postgres
  drop schema ipm cascade\g
  
- psql -U postgres -d postgres < ipm
+ psql -U postgres -d postgres < ipm.bak-yyyy-mm-dd
