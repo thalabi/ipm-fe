@@ -82,12 +82,22 @@ public class AppTimeUtils {
 		return localDateTime == null ? null :  Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
 	
-	public static int compareDatePart(OffsetDateTime date1, OffsetDateTime date2) {
+//	public static int compareDatePart(OffsetDateTime date1, OffsetDateTime date2) {
+//		Preconditions.checkArgument(date1 != null, "date1 must not be null");
+//		Preconditions.checkArgument(date2 != null, "date2 must not be null");
+//		var date1Date = date1.truncatedTo(ChronoUnit.DAYS);
+//		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
+//		return date1Date.compareTo(date2Date);
+//	}
+	private static final long SECONDS_IN_24_HRS = 24*60*60L;
+	public static boolean differenceIsMoreThanOneDay(OffsetDateTime date1, OffsetDateTime date2) {
 		Preconditions.checkArgument(date1 != null, "date1 must not be null");
 		Preconditions.checkArgument(date2 != null, "date2 must not be null");
-		var date1Date = date1.truncatedTo(ChronoUnit.DAYS);
-		var date2Date = date2.truncatedTo(ChronoUnit.DAYS);
-		return date1Date.compareTo(date2Date);
+		//LOGGER.info("date1: {}, date2: {}", date1, date2);
+		var e1 = date1.toEpochSecond();
+		var e2 = date2.toEpochSecond();
+		//LOGGER.info("e1 - e2: {}, SECONDS_IN_24_HRS: {}", Math.abs(e1 - e2), SECONDS_IN_24_HRS);
+		return Math.abs(e1 - e2) > SECONDS_IN_24_HRS;
 	}
 	
 	public static OffsetDateTime offsetDateFromDateString(String date, DateTimeFormatter dateTimeFormatter) {
