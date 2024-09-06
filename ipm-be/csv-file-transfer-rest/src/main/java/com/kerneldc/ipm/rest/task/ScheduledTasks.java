@@ -176,12 +176,12 @@ public class ScheduledTasks {
 	@Autowired
 	private IncrementingIntegerComponent incrementingIntegerComponent;
 	
-	@Scheduled(initialDelay = 3000, fixedDelayString = "100000")
+	//@Scheduled(initialDelay = 3000, fixedDelayString = "100000")
 	public void testTaskInSeparateThread() throws InterruptedException {
 		incrementingIntegerComponent.taskIncrementingSomeInteger();
 	}
 
-	@Scheduled(initialDelay = 5000, fixedDelayString = "100000")
+	//@Scheduled(initialDelay = 5000, fixedDelayString = "100000")
 	public void testTaskInSeparateThread2() throws InterruptedException {
 		incrementingIntegerComponent.taskIncrementingSomeInteger();
 	}
