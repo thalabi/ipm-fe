@@ -24,7 +24,6 @@ import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactoryHelper;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
-import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.domain.Price;
@@ -53,8 +52,6 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private PositionRepository positionRepository;
 	private PriceRepository priceRepository;
 	private HoldingPriceInterdayVRepository holdingPriceInterdayVRepository;
-	
-	//private Map<Long, Price> priceCache = new HashMap<>();
 	
 	private EnumMap<InstrumentTypeEnum, IInstrumentPricingService<IInstrumentDetail>> instrumentPricingServiceMap = new EnumMap<>(InstrumentTypeEnum.class);
 
@@ -96,11 +93,8 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private PriceHoldingsContext priceHoldingsContext;
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
     	LOGGER.info("Begin ...");
-//    	var snapshotInstant = Instant.now();
-//        var snapshotDateTime = OffsetDateTime.ofInstant(snapshotInstant, ZoneId.systemDefault());
-//        priceHoldingsContext.set(new PriceHoldingsContext(snapshotInstant, snapshotDateTime, new ApplicationException()));
     	priceHoldingsContext = new PriceHoldingsContext();
-    	var priceHoldingsExceptions = new ApplicationException();
+    	var priceHoldingsExceptions = priceHoldingsContext.getPriceHoldingsExceptions();
 
 		try {
 			getAndPersistExchangeRates();
@@ -114,16 +108,16 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         var holdingList= holdingRepository.findByIdIn(holdingIdList);
         enrichHoldingList(holdingList);
         
-        priceHoldingsContext.getPriceCache().clear();
         var positionList = new ArrayList<Position>();
         for (Holding holding : holdingList) {
         	Position position = null;
         	try {
-        		position = getHoldingPrice(holding);
+        		priceHoldingsContext.setCurrentHolding(holding);
+        		position = getHoldingPrice(priceHoldingsContext);
 				positionList.add(position);
 
 				// Check that the price is not stale ie is as of today.
-				priceHoldingsExceptions = checkStalePrice(position, priceHoldingsExceptions);
+				checkStalePrice(position, priceHoldingsExceptions);
 				
 			} catch (ApplicationException e) {
 				LOGGER.warn(e.getMessage());
@@ -152,7 +146,6 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         if (priceHoldingsExceptions!= null && CollectionUtils.isNotEmpty(priceHoldingsExceptions.getMessageList())) {
         	throw priceHoldingsExceptions;
         }
-        priceHoldingsContext.removeContext();
     	LOGGER.info("End ...");
 	}
 
@@ -191,12 +184,14 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         
 	}
 
-	private ApplicationException checkStalePrice(Position position, ApplicationException priceHoldingsExceptions) {
+	private void checkStalePrice(Position position, ApplicationException priceHoldingsExceptions) {
 		if (position.getInstrument().getType().equals(InstrumentTypeEnum.CASH)) {
-			return priceHoldingsExceptions;
+			return;
 		}
 		
-		if (AppTimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), priceHoldingsContext.getSnapshotDateTime()) == -1) {
+		//if (AppTimeUtils.compareDatePart(position.getPrice().getPriceTimestamp(), priceHoldingsContext.getSnapshotDateTime()) == -1) {
+		if (AppTimeUtils.differenceIsMoreThanOneDay(position.getPrice().getPriceTimestamp(), priceHoldingsContext.getSnapshotDateTime())) {
+			
 			var exceptionMessage = String.format(
 					"Stale price retrieved for ticker: %s. Price date is as of %s",
 					position.getInstrument().getTicker(), 
@@ -206,7 +201,6 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 				priceHoldingsExceptions.addMessage(exceptionMessage);
 			}
 		}
-		return priceHoldingsExceptions;
 	}
 	
 	private void sendPriceHoldingsNotifications(ApplicationException priceHoldingsExceptions) throws ApplicationException {
@@ -238,16 +232,14 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		LOGGER.info("Saved {} position records", savedPositionList.size());
 	}
 
-	private Position getHoldingPrice(Holding holding) throws ApplicationException {
-		var instrument = holding.getInstrument();
-		var instrumentDetail = holding.getInstrumentDetail();
-		var price = getPrice(instrument, instrumentDetail);
+	private Position getHoldingPrice(PriceHoldingsContext priceHoldingsContext) throws ApplicationException {
+		var price = getPrice(priceHoldingsContext);
 
 		var position = new Position();
 		position.setPositionSnapshot(priceHoldingsContext.getSnapshotDateTime());
-		position.setInstrument(instrument);
-		position.setPortfolio(holding.getPortfolio());
-		position.setQuantity(holding.getQuantity());
+		position.setInstrument(priceHoldingsContext.getCurrentHolding().getInstrument());
+		position.setPortfolio(priceHoldingsContext.getCurrentHolding().getPortfolio());
+		position.setQuantity(priceHoldingsContext.getCurrentHolding().getQuantity());
 
 		position.setPrice(price);
 
@@ -273,7 +265,20 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		exchangeRateService.fetchAndPersistExchangeRate(priceHoldingsContext.getSnapshotInstant(), fromCurrency, toCurrency);
 	}
 
-	private Price getPrice(Instrument instrument, IInstrumentDetail instrumentDetail) throws ApplicationException {
+//	private Price getPrice(Instrument instrument, IInstrumentDetail instrumentDetail) throws ApplicationException {
+//
+//		var instrumentPricingService = instrumentPricingServiceMap.get(instrument.getType());
+//		if (instrumentPricingService == null) {
+//			var typeList = Stream.of(InstrumentTypeEnum.values()).map(InstrumentTypeEnum::name).toList();
+//			throw new IllegalArgumentException(String.format("Supported instrument types are [%s]", String.join(", ", typeList)));
+//		}
+//		
+//		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotInstant(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
+//	}
+	
+	private Price getPrice(PriceHoldingsContext riceHoldingsContext) throws ApplicationException {
+		var instrument = priceHoldingsContext.getCurrentHolding().getInstrument();
+		var instrumentDetail = priceHoldingsContext.getCurrentHolding().getInstrumentDetail();
 
 		var instrumentPricingService = instrumentPricingServiceMap.get(instrument.getType());
 		if (instrumentPricingService == null) {
@@ -283,7 +288,6 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 		
 		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotInstant(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
 	}
-	
 	
 	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {};
 	/**
