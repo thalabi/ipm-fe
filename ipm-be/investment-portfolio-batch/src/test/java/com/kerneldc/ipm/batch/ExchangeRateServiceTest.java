@@ -20,7 +20,7 @@ class ExchangeRateServiceTest {
 
 	@BeforeEach
 	void setup() {
-		httpUtil = new HttpUtil(StringUtils.EMPTY, StringUtils.EMPTY);
+		httpUtil = new HttpUtil(true, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY);
 		exchangeRateService =  new ExchangeRateService(exchangeRateRepository, httpUtil);
 	}
 	@Test

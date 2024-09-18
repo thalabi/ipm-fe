@@ -60,8 +60,9 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 			} else {
 				price.setPrice(priceQuote.lastPrice);
 			}
+			
 			LOGGER.info("Retrieved price for {} {}: {} {}", ticker, exchange, price.getPrice(),
-					price.getPriceTimestamp().format(AppTimeUtils.DATE_TIME_FORMATTER));
+					LOGGER.isInfoEnabled() ? price.getPriceTimestamp().format(AppTimeUtils.DATE_TIME_FORMATTER) : null);
 			priceCache.put(instrument.getId(), price);
 		} else {
 			LOGGER.info("Found {} {} in price cache", ticker, exchange);

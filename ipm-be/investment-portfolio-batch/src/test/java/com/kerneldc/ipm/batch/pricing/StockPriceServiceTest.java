@@ -71,8 +71,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		var latestPriceList = List.of(price1, price2);
 		when(priceRepository.findLatestPriceList()).thenReturn(latestPriceList);
 		
-		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, httpUtil,
-				alphavantageApiUrlTemplate, alphavantageApiKey);
+		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, httpUtil);
 		
 		//spinupWebServer();
 	}
@@ -111,7 +110,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 //	    when(mockHttpURLConnection.getInputStream()).thenReturn(inputStream);
 	    
 	    //when(httpUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
-	    when(httpUtil.getUrlContent("http://localhost:8000/BCE.TO.html")).thenReturn(urlContent);
+	    when(httpUtil.alphavantageApiContent("BCE.TO")).thenReturn(urlContent);
 		
 //	    when(stockAndEtfPriceService.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
@@ -125,7 +124,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		instrumentStock.setInstrument(instrument2);
 		instrumentStock.setExchange(ExchangeEnum.NYSE);
 		
-		when(httpUtil.getUrlContent("http://localhost:8000/T.html")).thenThrow(ApplicationException.class);
+		when(httpUtil.alphavantageApiContent("T")).thenThrow(new ApplicationException());
 		
 		var priceQuote = stockAndEtfPriceService.quote(instrument2, instrumentStock);
 		System.out.println(priceQuote);
@@ -190,7 +189,7 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 					}
 				}
 			""";
-	    when(httpUtil.getUrlContent("http://localhost:8000/BHCC.TO.html")).thenReturn(urlContent);
+	    when(httpUtil.alphavantageApiContent("BHCC.TO")).thenReturn(urlContent);
 
 		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), is(not(nullValue())));

@@ -16,23 +16,36 @@ import org.springframework.stereotype.Service;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class HttpUtil {
 
+	private final boolean urlLoggingEnabled;
 	private final String bankOfCanadaUrlTemplate;
+	private final String alphavantageApiKey;
+	private final String alphavantageApiUrlTemplate;
 	private final String yahooFinanceApiUrlTemplate;
 	
-	public HttpUtil(@Value("${bank.of.canada.url.template}")String bankOfCanadaUrlTemplate, @Value("${yahoo.finance.api.url.template}") String yahooFinanceApiUrlTemplate) {
+	public HttpUtil(@Value("${httputil.url.logging.enabled:false}") boolean urlLoggingEnabled,
+			@Value("${bank.of.canada.url.template}") String bankOfCanadaUrlTemplate,
+			@Value("${alphavantage.api.url.template}") String alphavantageApiUrlTemplate,
+			@Value("${alphavantage.api.key}") String alphavantageApiKey,
+			@Value("${yahoo.finance.api.url.template}") String yahooFinanceApiUrlTemplate) {
+		this.urlLoggingEnabled = urlLoggingEnabled;
 		this.bankOfCanadaUrlTemplate = bankOfCanadaUrlTemplate;
+		this.alphavantageApiKey = alphavantageApiKey;
+		this.alphavantageApiUrlTemplate = alphavantageApiUrlTemplate;
 		this.yahooFinanceApiUrlTemplate = yahooFinanceApiUrlTemplate;
 	}
 
 	public String getUrlContent(String urlString) throws ApplicationException {
 		HttpURLConnection httpUrlConnection;
 		try {
+			if (urlLoggingEnabled) LOGGER.info("Hitting url: [{}]", urlString);
 			var url = new URL(urlString);
 			httpUrlConnection = (HttpURLConnection) url.openConnection();
-			// httpUrlConnection.connect();
 			var httpStatusCode = httpUrlConnection.getResponseCode();
 			if (httpStatusCode != HttpURLConnection.HTTP_OK) {
 				var message = String.format("Fetching contents of URL [%s], returned Http status code [%d]. ",
@@ -59,8 +72,8 @@ public class HttpUtil {
 	}
 
 	public String alphavantageApiContent(String ticker) throws ApplicationException {
-		// TODO copy source from StockAndEtfPriceService
-		return null;
+		var urlString = String.format(alphavantageApiUrlTemplate, alphavantageApiKey, ticker);
+		return getUrlContent(urlString);
 	}
 
 	public String yahooFinanceApiContent(String ticker) throws ApplicationException {

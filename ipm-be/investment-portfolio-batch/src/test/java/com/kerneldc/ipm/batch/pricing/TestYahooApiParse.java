@@ -8,12 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.alphavantage.YahooApiQuote;
+import com.kerneldc.ipm.batch.quote.YahooApiQuote;
 import com.kerneldc.ipm.commonservices.util.HttpUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ class TestYahooApiParse {
 		var objectMapper = new ObjectMapper();
 		//objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
 		
-		HttpUtil httpUtil = new HttpUtil(null, yahooFinanceApiUrlTemplate);
+		HttpUtil httpUtil = new HttpUtil(true, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, yahooFinanceApiUrlTemplate);
 		var urlContent = httpUtil.yahooFinanceApiContent("BCE.TO");
 		assertThat(urlContent, is(notNullValue()));
 		LOGGER.info("urlContent: {}", urlContent);
@@ -53,7 +54,7 @@ class TestYahooApiParse {
 	
 	@Test
 	void testInvalidTicker() throws IOException {
-		HttpUtil httpUtil = new HttpUtil(null, yahooFinanceApiUrlTemplate);
+		HttpUtil httpUtil = new HttpUtil(true, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, yahooFinanceApiUrlTemplate);
 		ApplicationException exception = assertThrows(ApplicationException.class, () -> {
 			httpUtil.yahooFinanceApiContent("INVALID");
 		});

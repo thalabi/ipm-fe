@@ -1,4 +1,4 @@
-package com.kerneldc.ipm.batch.alphavantage;
+package com.kerneldc.ipm.batch.quote;
 
 import java.time.LocalDate;
 
