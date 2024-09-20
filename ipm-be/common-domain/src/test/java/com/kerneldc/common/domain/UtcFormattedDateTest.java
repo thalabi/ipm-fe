@@ -10,7 +10,7 @@ class UtcFormattedDateTest {
 	@Test
 	void test1() {
 		var d = OffsetDateTime.now();
-		var fd = d.format(AbstractEntity.OFFSET_DATE_TIME_FORMATTER.withZone(ZoneOffset.UTC));
+		var fd = d.format(AbstractEntity.OFFSET_DATE_TIME_UTC_FORMATTER.withZone(ZoneOffset.UTC));
 		System.out.println(fd);
 	}
 }

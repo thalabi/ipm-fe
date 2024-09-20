@@ -1,10 +1,9 @@
 package com.kerneldc.ipm.batch.pricing;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,14 +11,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.quote.AlphavantageQuote;
-import com.kerneldc.ipm.batch.quote.YahooApiQuote;
-import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.InstrumentTypeEnum;
@@ -29,57 +23,53 @@ import com.kerneldc.ipm.repository.PriceRepository;
 import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.extern.slf4j.Slf4j;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 
 @Service
 @Slf4j
 public class StockAndEtfPriceService implements ITradingInstrumentPricingService<IListedInstrumentDetail> {
 
-	private enum STOCK_PRICE_SERVICE { YAHOO_FINANCE, ALPAVANTAGE, YAHOO_FINANCE_API }
-	//private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.ALPAVANTAGE;
-	private static final STOCK_PRICE_SERVICE ENABLED_STOCK_PRICE_SERVICE = STOCK_PRICE_SERVICE.YAHOO_FINANCE_API;
-	
+	private List<IMarketPriceQuoteService> marketPriceQuoteServices;
 	private final PriceRepository priceRepository;
-	private final HttpUtil httpUtil;
 	
 	protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
 	private Map<Long, Price> latestPriceByInstrumentId;
-	public StockAndEtfPriceService(PriceRepository priceRepository, HttpUtil httpUtil) {
+	public StockAndEtfPriceService(Collection<IMarketPriceQuoteService> marketPriceQuoteServices, PriceRepository priceRepository) {
 		
+		// sort price quote services by priority. 1 being top priority
+		this.marketPriceQuoteServices = marketPriceQuoteServices.stream().sorted(Comparator.comparingInt(IMarketPriceQuoteService::servicePriority)).toList();
+		this.marketPriceQuoteServices.forEach((mpqs) -> LOGGER.info("Loaded impl of IMarketPriceQuoteService [{}]", mpqs.getClass().getSimpleName()));
 		this.priceRepository = priceRepository;
-		this.httpUtil = httpUtil;
 		
 		fallbackPriceLookupTable.put("SENS", ExchangeEnum.CNSX, 0.01f);
 		fallbackPriceLookupTable.put("BHCC", ExchangeEnum.CNSX, 0.025f);
 		
-		var list1 = priceRepository.findLatestPriceList();
 		latestPriceByInstrumentId = priceRepository.findLatestPriceList().stream()
 				.collect(Collectors.toMap(p -> p.getInstrument().getId(), Function.identity()));
 	}
+	
 	@Override
-	public PriceQuote quote(Instrument instrument, IListedInstrumentDetail instrumentStock) {
-		try {
-			switch (ENABLED_STOCK_PRICE_SERVICE) {
-			case YAHOO_FINANCE -> {
-				return yahooFinanceQuoteService(instrument, instrumentStock);
+	public PriceQuote quote(OffsetDateTime snapshotDateTime, Instrument instrument, IListedInstrumentDetail instrumentStock) {
+		for (IMarketPriceQuoteService marketPriceQuoteService: marketPriceQuoteServices) {
+			try {
+				var priceQuote = marketPriceQuoteService.quote(instrument, instrumentStock);
+				checkStalePrice(instrument, priceQuote.tradeTime(), snapshotDateTime);
+				return priceQuote;
+			} catch (ApplicationException e) {
+				LOGGER.warn("Impl of IMarketPriceQuoteService [{}] failed with [{}]", marketPriceQuoteService.getClass().getSimpleName(), e.getMessage());
 			}
-			case ALPAVANTAGE -> {
-				return alphaVantageQuoteService(instrument, instrumentStock);
-			}
-			case YAHOO_FINANCE_API -> {
-				return yahooFinanceApiQuoteService(instrument, instrumentStock);
-			}
-			}
-//			if (ENABLED_STOCK_PRICE_SERVICE == STOCK_PRICE_SERVICE.YAHOO_FINANCE) {
-//				return yahooFinanceQuoteService(instrument, instrumentStock);
-//			} else {
-//				return alphaVantageQuoteService(instrument, instrumentStock);
-//			}
-			return null;
-		} catch (ApplicationException e) {
-			LOGGER.warn(e.getMessage());
-			return fallBackToLatestAvailablePrice(instrument);
+		}
+		return fallBackToLatestAvailablePrice(instrument);
+	}
+
+	private void checkStalePrice(Instrument instrument, OffsetDateTime priceTimestamp, OffsetDateTime snapshotDateTime) throws ApplicationException {
+		if (AppTimeUtils.differenceIsMoreThanOneDay(priceTimestamp, snapshotDateTime)) {
+			
+			var exceptionMessage = String.format(
+					"Stale price retrieved for ticker: %s. Price date is as of %s",
+					instrument.getTicker(), 
+					priceTimestamp.format(AppTimeUtils.DATE_TIME_FORMATTER));
+			LOGGER.warn(exceptionMessage);
+			throw new ApplicationException(exceptionMessage);
 		}
 	}
 
@@ -94,145 +84,6 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 		}
 		LOGGER.warn("Found price of [{}] with price timestamp of [{}].", latestPrice.getPrice(), latestPrice.getPriceTimestamp());
 		return new PriceQuote(latestPrice.getPrice(), latestPrice.getPriceTimestamp());
-	}
-
-	private PriceQuote yahooFinanceQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
-		var ticker = instrument.getTicker();
-		var exchange = instrumentStock.getExchange();
-		Stock stock;
-		// For instruments in the TSE and CNSX exchanges try appending .TO and then .CN to the symbol 
-		try {
-			if (Arrays.asList("TSE","CNSX").contains(exchange.name())) {
-				ticker = ticker.replace(".", "-");
-				stock = YahooFinance.get(ticker + ".TO");
-				if (stock == null) {
-					stock = YahooFinance.get(ticker + ".CN");
-				}
-			} else {
-				stock = YahooFinance.get(ticker);
-			}
-		} catch (IOException e) {
-			var message = String.format("Exception while getting price quote for stock %s from Yahoo Service", ticker); 
-			LOGGER.error(message, e);
-			throw new ApplicationException(message + " (" + e.getMessage() + ")");
-		}
-
-		if (stock == null) {
-			var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
-			LOGGER.warn(message);
-			throw new ApplicationException(message);
-		}
-		var quote =  stock.getQuote();
-		
-		return new PriceQuote(quote.getPrice(), AppTimeUtils.toOffsetDateTime(quote.getLastTradeTime()));
-	}
-	
-	private static final int MAX_RETRIES = 2;
-	protected PriceQuote alphaVantageQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
-		var ticker = instrument.getTicker();
-		var exchange = instrumentStock.getExchange();
-		
-		var alphavantageSymbol = ticker;
-		if (Arrays.asList("TSE","CNSX").contains(exchange.toString())) {
-			alphavantageSymbol = ticker.replace(".", "-") + ".TO";
-		}
-		
-		AlphavantageQuote quote = null;
-		try {
-			
-			for (int tries = 1; tries <= MAX_RETRIES; tries++) {
-				var objectMapper = new ObjectMapper();
-				objectMapper.findAndRegisterModules(); // auto-discover jackson-datatype-jsr310 that handles Java 8 new date API
-				
-				var urlContent = httpUtil.alphavantageApiContent(alphavantageSymbol);
-				//var jsonNode = objectMapper.readTree(url);
-				var jsonNode = objectMapper.readTree(urlContent);
-				
-				var globalQuoteJson = jsonNode.get("Global Quote");
-				if (globalQuoteJson != null && globalQuoteJson.isContainerNode()) { 
-					objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
-					quote = objectMapper.treeToValue(jsonNode, AlphavantageQuote.class);
-					//System.out.println(quote);
-					break; // success, don't retry
-				} else {
-					if (tries == MAX_RETRIES) {
-						throw new ApplicationException(String.format("Requesting quote from Alpha Vantage returned [%s]", jsonNode));
-					}
-					var noteJson = jsonNode.get("Note"); 
-					if (noteJson != null && noteJson.isValueNode()) {
-						var noteText = noteJson.textValue();
-						var wait = noteText.contains("call frequency");
-						if (wait) {
-							LOGGER.info("Sleeping one minute before requesting qoute from Alpha Vantage ...");
-							Thread.sleep(60*1000L);
-							continue;
-						}
-					}
-				}
-				LOGGER.error("Alpha Vantage returned: [{}]", jsonNode);
-				throw new ApplicationException(String.format("Requesting quote from Alpha Vantage returned [%s]", jsonNode));
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new ApplicationException(String.format("Exception requesting quote from Alpha Vantage for ticker [%s]", alphavantageSymbol), e);
-		} catch (InterruptedException e) {
-			LOGGER.warn("Interrupted!", e);
-		    // Restore interrupted state...
-		    Thread.currentThread().interrupt();
-
-		}
-		
-		if (quote == null || quote.getPrice() == null) {
-			var fallbackPrice = fallbackPriceLookupTable.get(ticker, exchange);
-			if (fallbackPrice != null) {
-				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
-				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());
-			} else {
-				var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
-				LOGGER.warn(message);
-				throw new ApplicationException(message);
-			}
-		} else {
-			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())),
-					AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));
-		}
-	}
-	
-	private PriceQuote yahooFinanceApiQuoteService(Instrument instrument, IListedInstrumentDetail instrumentStock) throws ApplicationException {
-		var ticker = instrument.getTicker();
-		var exchange = instrumentStock.getExchange();
-		// For instruments in the TSE and CNSX exchanges try appending .TO and then .CN
-		// to the symbol
-		YahooApiQuote yahooApiQuote;
-		try {
-			String urlContent;
-			if (Arrays.asList("TSE", "CNSX").contains(exchange.name())) {
-				ticker = ticker.replace(".", "-");
-				try {
-					urlContent = httpUtil.yahooFinanceApiContent(ticker + ".TO");
-				} catch (ApplicationException exception) {
-					urlContent = httpUtil.yahooFinanceApiContent(ticker + ".CN");
-				}
-			} else {
-				urlContent = httpUtil.yahooFinanceApiContent(ticker);
-			}
-
-			if (urlContent == null) {
-				var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
-				LOGGER.warn(message);
-				throw new ApplicationException(message);
-			}
-			var objectMapper = new ObjectMapper();
-			objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
-			yahooApiQuote = objectMapper.readValue(urlContent, YahooApiQuote.class);
-		} catch (IOException e) {
-			var message = String.format("Exception while getting price quote for stock %s from Yahoo api", ticker);
-			LOGGER.error(message, e);
-			throw new ApplicationException(message + " (" + e.getMessage() + ")");
-		}
-
-		return new PriceQuote(new BigDecimal(Float.toString(yahooApiQuote.getPrice())), yahooApiQuote.getPriceTimestamp());
 	}
 	
 	@Override

@@ -81,15 +81,12 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	private void populateInstrumentPricingServiceMap(
 			Collection<? extends IInstrumentPricingService<? extends IInstrumentDetail>> pricingServiceCollection) {
 		for (var instrumentPricingService : pricingServiceCollection) {
-			instrumentPricingService.canHandle();
 			for (InstrumentTypeEnum type : instrumentPricingService.canHandle()) {
 				instrumentPricingServiceMap.put(type, (IInstrumentPricingService<IInstrumentDetail>)instrumentPricingService);
 			}
 		}
 	}
 	
-//	private record PriceHoldingsContext(Instant snapshotInstant, OffsetDateTime snapshotDateTime, ApplicationException applicationException) {};
-//	private static final ThreadLocal<PriceHoldingsContext> priceHoldingsContext = new ThreadLocal<>();
 	private PriceHoldingsContext priceHoldingsContext;
 	public void priceHoldings(boolean sendNotifications, boolean batchProcessing) throws ApplicationException {
     	LOGGER.info("Begin ...");
@@ -115,19 +112,13 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
         		priceHoldingsContext.setCurrentHolding(holding);
         		position = getHoldingPrice(priceHoldingsContext);
 				positionList.add(position);
-
-				// Check that the price is not stale ie is as of today.
-				checkStalePrice(position, priceHoldingsExceptions);
 				
 			} catch (ApplicationException e) {
 				LOGGER.warn(e.getMessage());
 				priceHoldingsExceptions.addMessage(e.getMessage());
-				
-				
-				// get previous price and mark position as stale
-				
 			}
         }
+        
         persistPrices();
         persistPositions(positionList);
         if (sendNotifications) {
@@ -233,7 +224,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 	}
 
 	private Position getHoldingPrice(PriceHoldingsContext priceHoldingsContext) throws ApplicationException {
-		var price = getPrice(priceHoldingsContext);
+		var price = getPrice();
 
 		var position = new Position();
 		position.setPositionSnapshot(priceHoldingsContext.getSnapshotDateTime());
@@ -276,7 +267,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 //		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotInstant(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
 //	}
 	
-	private Price getPrice(PriceHoldingsContext riceHoldingsContext) throws ApplicationException {
+	private Price getPrice() throws ApplicationException {
 		var instrument = priceHoldingsContext.getCurrentHolding().getInstrument();
 		var instrumentDetail = priceHoldingsContext.getCurrentHolding().getInstrumentDetail();
 
@@ -286,7 +277,7 @@ public class HoldingPricingService /*implements ApplicationRunner*/ {
 			throw new IllegalArgumentException(String.format("Supported instrument types are [%s]", String.join(", ", typeList)));
 		}
 		
-		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotInstant(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
+		return instrumentPricingService.priceInstrument(priceHoldingsContext.getSnapshotDateTime(), instrument, instrumentDetail, priceHoldingsContext.getPriceCache());
 	}
 	
 	public record PurgePositionSnapshotResult(Long positionDeleteCount, Long priceDeleteCount) {};

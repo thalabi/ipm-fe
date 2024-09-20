@@ -1,6 +1,6 @@
 package com.kerneldc.ipm.batch.pricing;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import com.kerneldc.ipm.domain.instrumentdetail.IInstrumentDetail;
 
 public interface IInstrumentPricingService <D extends IInstrumentDetail> {
 
-	Price priceInstrument(Instant snapshotInstant, Instrument instrument, D instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException;
+	Price priceInstrument(OffsetDateTime snapshotDateTime, Instrument instrument, D instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException;
 
 	Collection<InstrumentTypeEnum> canHandle();
 }

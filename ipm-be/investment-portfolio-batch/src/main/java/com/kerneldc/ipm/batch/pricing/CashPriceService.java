@@ -1,6 +1,6 @@
 package com.kerneldc.ipm.batch.pricing;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class CashPriceService implements IInstrumentPricingService<IInstrumentDe
 	}
 
 	@Override
-	public Price priceInstrument(Instant snapshotInstant, Instrument instrument, IInstrumentDetail instrumentDetail,
+	public Price priceInstrument(OffsetDateTime snapshotDateTime, Instrument instrument, IInstrumentDetail instrumentDetail,
 			Map<Long, Price> priceCache) throws ApplicationException {
 		
 		return switch (instrument.getCurrency()) {

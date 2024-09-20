@@ -37,7 +37,7 @@ public class MutualFundPriceService implements ITradingInstrumentPricingService<
 	}
 
 	@Override
-	public PriceQuote quote(Instrument instrument, InstrumentMutualFund instrumentDetail) throws ApplicationException {
+	public PriceQuote quote(OffsetDateTime snapshotDateTime, Instrument instrument, InstrumentMutualFund instrumentDetail) throws ApplicationException {
 		return theGlobeAndMailQuoteService(instrument);
 	}
 

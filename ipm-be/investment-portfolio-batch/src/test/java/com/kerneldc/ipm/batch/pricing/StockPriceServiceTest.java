@@ -10,13 +10,13 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
@@ -28,13 +28,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.kerneldc.common.exception.ApplicationException;
-import com.kerneldc.ipm.batch.pricing.ITradingInstrumentPricingService.PriceQuote;
 import com.kerneldc.ipm.commonservices.util.HttpUtil;
 import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 import com.kerneldc.ipm.repository.PriceRepository;
+import com.kerneldc.ipm.util.AppTimeUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,7 +71,8 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		var latestPriceList = List.of(price1, price2);
 		when(priceRepository.findLatestPriceList()).thenReturn(latestPriceList);
 		
-		stockAndEtfPriceService = new StockAndEtfPriceService(priceRepository, httpUtil);
+		
+		stockAndEtfPriceService = new StockAndEtfPriceService(List.of(new AlphaVantageQuoteService(httpUtil)), priceRepository);
 		
 		//spinupWebServer();
 	}
@@ -101,19 +102,11 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 				}
 			}
 		""";
-//		InputStream inputStream = new ByteArrayInputStream(urlContent.getBytes(StandardCharsets.UTF_8));
-		
-//		URL mockUrl = mock(URL.class);
-//		HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
-//		when(mockUrl.openConnection()).thenReturn(mockHttpURLConnection);
-//	    when(mockHttpURLConnection.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
-//	    when(mockHttpURLConnection.getInputStream()).thenReturn(inputStream);
-	    
-	    //when(httpUtil.getUrlContent(any(URL.class))).thenReturn(urlContent);
 	    when(httpUtil.alphavantageApiContent("BCE.TO")).thenReturn(urlContent);
 		
-//	    when(stockAndEtfPriceService.getUrlContent(new URL("http://localhost:8000/BCE.TO.html"))).thenReturn(urlContent);
-		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
+	    var snapshotDateTime = AppTimeUtils.toOffsetDateTime(LocalDateTime.of(2024, 04, 03, 17, 0));
+	    
+		var priceQuote = stockAndEtfPriceService.quote(snapshotDateTime, instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 
@@ -126,42 +119,11 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		
 		when(httpUtil.alphavantageApiContent("T")).thenThrow(new ApplicationException());
 		
-		var priceQuote = stockAndEtfPriceService.quote(instrument2, instrumentStock);
+		var priceQuote = stockAndEtfPriceService.quote(OffsetDateTime.now(), instrument2, instrumentStock);
 		System.out.println(priceQuote);
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 	
-	@Disabled
-	@Test
-	void testAlphaVantageQuoteMultipleTimes(TestInfo testInfo) throws ApplicationException {
-		printTestName(testInfo);
-		var instrument = new Instrument();
-		var instrumentStock = new InstrumentStock();
-		instrumentStock.setInstrument(instrument);
-
-		PriceQuote priceQuote;
-//		instrument.setTicker("SENS");
-//		instrumentStock.setExchange(ExchangeEnum.CNSX);
-//		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-//		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrumentStock.setExchange(ExchangeEnum.TSE);
-		instrument.setTicker("BBD.B");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrument.setTicker("RY");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrument.setTicker("AGF.B");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrument.setTicker("SU");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-		instrument.setTicker("T");
-		priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
-	}
-
 	@Test
 	void testBhccIsUsingFallbackTable() throws ApplicationException {
 		float bhccFallbackPrice = stockAndEtfPriceService.fallbackPriceLookupTable.get("BHCC", ExchangeEnum.CNSX);
@@ -191,7 +153,8 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 			""";
 	    when(httpUtil.alphavantageApiContent("BHCC.TO")).thenReturn(urlContent);
 
-		var priceQuote = stockAndEtfPriceService.alphaVantageQuoteService(instrument, instrumentStock);
+	    var snapshotDateTime = AppTimeUtils.toOffsetDateTime(LocalDateTime.of(2024, 04, 03, 17, 0));
+		var priceQuote = stockAndEtfPriceService.quote(snapshotDateTime, instrument, instrumentStock);
 		assertThat(priceQuote.lastPrice(), is(not(nullValue())));
 		assertThat(priceQuote.lastPrice(), is(new BigDecimal(Float.toString(bhccFallbackPrice))));
 	}

@@ -3,7 +3,6 @@ package com.kerneldc.common.domain;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,7 +43,7 @@ public class LogicalKeyHolder implements Serializable, ILogicallyKeyed {
 				case "LocalDateTime" ->
 					stringKeyParts[i++] = ((LocalDateTime)keyPart).format(AbstractEntity.LOCAL_DATE_TIME_FORMATTER);
 				case "OffsetDateTime" ->
-					stringKeyParts[i++] = ((OffsetDateTime)keyPart).format(DateTimeFormatter.ISO_INSTANT); // to UTC
+					stringKeyParts[i++] = ((OffsetDateTime)keyPart).format(AbstractEntity.OFFSET_DATE_TIME_UTC_FORMATTER); // to UTC
 				default ->
 					throw new IllegalArgumentException(String.format("Unsupported data type in logical key: %s", keyPart.getClass().getSimpleName()));
 			}

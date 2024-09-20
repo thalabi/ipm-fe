@@ -2,7 +2,6 @@ package com.kerneldc.ipm.batch.pricing;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -27,18 +26,18 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 	static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	public record PriceQuote(BigDecimal lastPrice, OffsetDateTime tradeTime) {}
 	
-	PriceQuote quote(Instrument instrument, D instrumentDetail) throws ApplicationException;
+	PriceQuote quote(OffsetDateTime snapshotDateTime, Instrument instrument, D instrumentDetail) throws ApplicationException;
 	
 	@Override
-	default Price priceInstrument(Instant snapshotInstant, Instrument instrument, D instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException {
-		var price = priceCache.get(instrument.getId());
+	default Price priceInstrument(OffsetDateTime snapshotDateTime, Instrument instrument, D instrumentDetail, Map<Long, Price> priceCache) throws ApplicationException {
 		var ticker = instrument.getTicker();
 		var tradedInstrumentDetail = (IListedInstrumentDetail)instrumentDetail;
 		var exchange = tradedInstrumentDetail.getExchange();
 		
+		var price = priceCache.get(instrument.getId());
 		if (price == null) {
 			
-			var priceQuote = quote(instrument, instrumentDetail);
+			var priceQuote = quote(snapshotDateTime, instrument, instrumentDetail);
 
 			price = new Price();
 			price.setInstrument(instrument);
@@ -46,7 +45,7 @@ public interface ITradingInstrumentPricingService<D extends IInstrumentDetail> e
 				price.setPriceTimestamp(priceQuote.tradeTime);
 				price.setPriceTimestampFromSource(true);
 			} else {
-				price.setPriceTimestamp(AppTimeUtils.toOffsetDateTime(snapshotInstant));
+				price.setPriceTimestamp(snapshotDateTime);
 				price.setPriceTimestampFromSource(false);
 				LOGGER.warn("PriceTimestamp was not available from source for {} {}. Used current timestamp", ticker,
 						exchange);

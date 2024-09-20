@@ -1,6 +1,6 @@
 package com.kerneldc.ipm.batch.pricing;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class FixedPriceService implements IInstrumentPricingService<IFixedPriceI
 	private final PriceRepository priceRepository;
 
 	@Override
-	public Price priceInstrument(Instant snapshotInstant, Instrument instrument, IFixedPriceInstrumentDetail instrumentDetail,
+	public Price priceInstrument(OffsetDateTime snapshotDateTime, Instrument instrument, IFixedPriceInstrumentDetail instrumentDetail,
 			Map<Long, Price> priceCache) throws ApplicationException {
 		var price = priceCache.get(instrument.getId());
 		var ticker = instrument.getTicker();
@@ -35,7 +35,7 @@ public class FixedPriceService implements IInstrumentPricingService<IFixedPriceI
 		if (price == null) {
 			price = new Price();
 			price.setInstrument(instrument);
-			price.setPriceTimestamp(AppTimeUtils.toOffsetDateTime(snapshotInstant));
+			price.setPriceTimestamp(snapshotDateTime);
 			price.setPriceTimestampFromSource(true);
 
 			// check if the price is already in the table
