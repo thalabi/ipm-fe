@@ -2,20 +2,16 @@ package com.kerneldc.ipm.batch.pricing;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import com.kerneldc.common.exception.ApplicationException;
 import com.kerneldc.ipm.batch.pricing.ITradingInstrumentPricingService.PriceQuote;
 import com.kerneldc.ipm.batch.quote.AlphavantageQuote;
 import com.kerneldc.ipm.commonservices.util.HttpUtil;
-import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.Instrument;
 import com.kerneldc.ipm.domain.instrumentdetail.IListedInstrumentDetail;
 import com.kerneldc.ipm.util.AppTimeUtils;
@@ -29,14 +25,14 @@ public class AlphaVantageQuoteService implements IMarketPriceQuoteService {
 	private static final int MAX_RETRIES = 2;
 
 	private final HttpUtil httpUtil;
-	protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
+	//protected Table<String, ExchangeEnum, Float> fallbackPriceLookupTable = HashBasedTable.create();
 
 
 	public AlphaVantageQuoteService(HttpUtil httpUtil) {
 		this.httpUtil = httpUtil;
 		
-		fallbackPriceLookupTable.put("SENS", ExchangeEnum.CNSX, 0.01f);
-		fallbackPriceLookupTable.put("BHCC", ExchangeEnum.CNSX, 0.025f);
+//		fallbackPriceLookupTable.put("SENS", ExchangeEnum.CNSX, 0.01f);
+//		fallbackPriceLookupTable.put("BHCC", ExchangeEnum.CNSX, 0.025f);
 	}
 
 	@Override
@@ -96,15 +92,15 @@ public class AlphaVantageQuoteService implements IMarketPriceQuoteService {
 		}
 		
 		if (quote == null || quote.getPrice() == null) {
-			var fallbackPrice = fallbackPriceLookupTable.get(ticker, exchange);
-			if (fallbackPrice != null) {
-				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
-				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());
-			} else {
+//			var fallbackPrice = fallbackPriceLookupTable.get(ticker, exchange);
+//			if (fallbackPrice != null) {
+//				LOGGER.warn("Unable to get quote for ticker: {} and exchange: {}, using fallback table to set price", ticker, exchange);
+//				return new PriceQuote(new BigDecimal(Float.toString(fallbackPrice)), OffsetDateTime.now());
+//			} else {
 				var message = String.format("Unable to get quote for ticker: %s and exchange: %s", ticker, exchange);
 				LOGGER.warn(message);
 				throw new ApplicationException(message);
-			}
+//			}
 		} else {
 			return new PriceQuote(new BigDecimal(Float.toString(quote.getPrice())),
 					AppTimeUtils.toOffsetDateTime(quote.getLatestTradingDay()));

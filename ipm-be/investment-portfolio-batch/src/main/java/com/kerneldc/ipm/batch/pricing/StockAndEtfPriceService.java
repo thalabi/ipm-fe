@@ -51,6 +51,7 @@ public class StockAndEtfPriceService implements ITradingInstrumentPricingService
 	public PriceQuote quote(OffsetDateTime snapshotDateTime, Instrument instrument, IListedInstrumentDetail instrumentStock) {
 		for (IMarketPriceQuoteService marketPriceQuoteService: marketPriceQuoteServices) {
 			try {
+				LOGGER.info("Using service [{}] to get market quote for ticker [{}]", marketPriceQuoteService.getClass().getSimpleName(), instrument.getTicker());
 				var priceQuote = marketPriceQuoteService.quote(instrument, instrumentStock);
 				checkStalePrice(instrument, priceQuote.tradeTime(), snapshotDateTime);
 				return priceQuote;

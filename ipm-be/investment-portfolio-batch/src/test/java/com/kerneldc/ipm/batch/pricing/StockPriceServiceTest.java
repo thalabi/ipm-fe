@@ -1,8 +1,5 @@
 package com.kerneldc.ipm.batch.pricing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.when;
@@ -124,40 +121,6 @@ class StockPriceServiceTest extends AbstractBaseTest { // TODO fix to use com.ke
 		assertThat(priceQuote.lastPrice(), greaterThan(new BigDecimal("0")));
 	}
 	
-	@Test
-	void testBhccIsUsingFallbackTable() throws ApplicationException {
-		float bhccFallbackPrice = stockAndEtfPriceService.fallbackPriceLookupTable.get("BHCC", ExchangeEnum.CNSX);
-		
-		var instrument = new Instrument();
-		var instrumentStock = new InstrumentStock();
-		instrumentStock.setInstrument(instrument);
-		instrument.setTicker("BHCC");
-		instrumentStock.setExchange(ExchangeEnum.CNSX);
-		
-		//0.025
-		var urlContent = """
-				{
-			    "Global Quote": {
-			        "01. symbol": "BHCC",
-			        "02. open": "0.025",
-			        "03. high": "0.025",
-			        "04. low": "0.025",
-			        "05. price": "0.025",
-			        "06. volume": "35255306",
-			        "07. latest trading day": "2024-04-03",
-			        "08. previous close": "0.025",
-			        "09. change": "0.0900",
-			        "10. change percent": "0.0007%"
-					}
-				}
-			""";
-	    when(httpUtil.alphavantageApiContent("BHCC.TO")).thenReturn(urlContent);
-
-	    var snapshotDateTime = AppTimeUtils.toOffsetDateTime(LocalDateTime.of(2024, 04, 03, 17, 0));
-		var priceQuote = stockAndEtfPriceService.quote(snapshotDateTime, instrument, instrumentStock);
-		assertThat(priceQuote.lastPrice(), is(not(nullValue())));
-		assertThat(priceQuote.lastPrice(), is(new BigDecimal(Float.toString(bhccFallbackPrice))));
-	}
 
 	private static final Price price1 = new Price();
 	private static final Price price2 = new Price();
