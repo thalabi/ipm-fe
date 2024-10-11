@@ -46,7 +46,7 @@ public class EmailService {
 	
 	@Value("${application.email.holdingsReportFrom}")
 	private String holdingsReportFrom;
-	@Value("${application.email.holdingsReportFrom}")
+	@Value("${application.email.holdingsReportTo}")
 	private String holdingsReportTo;
 
 	
