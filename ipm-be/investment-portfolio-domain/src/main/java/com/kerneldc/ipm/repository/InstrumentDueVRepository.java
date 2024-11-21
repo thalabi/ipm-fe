@@ -5,7 +5,7 @@ import java.util.List;
 import com.kerneldc.common.BaseViewRepository;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.InstrumentDueV;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 
 public interface InstrumentDueVRepository extends BaseViewRepository<InstrumentDueV, Long> {
 	
@@ -14,7 +14,7 @@ public interface InstrumentDueVRepository extends BaseViewRepository<InstrumentD
 	
 	@Override
 	default IEntityEnum canHandle() {
-		return InvestmentPortfolioTableEnum.INSTRUMENT_DUE_V;
+		return InvestmentPortfolioEntityEnum.INSTRUMENT_DUE_V;
 	}
 
 	

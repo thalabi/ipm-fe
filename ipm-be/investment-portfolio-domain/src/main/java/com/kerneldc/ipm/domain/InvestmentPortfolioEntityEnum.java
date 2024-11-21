@@ -11,7 +11,7 @@ import com.kerneldc.ipm.domain.instrumentdetail.InstrumentInterestBearing;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentMutualFund;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 
-public enum InvestmentPortfolioTableEnum implements IEntityEnum {
+public enum InvestmentPortfolioEntityEnum implements IEntityEnum {
 	INSTRUMENT(Instrument.class, false, new String[] {"NAME","TICKER","EXCHANGE","CURRENCY"}),
 	INSTRUMENT_STOCK(InstrumentStock.class, false),
 	INSTRUMENT_ETF(InstrumentEtf.class, false),
@@ -34,11 +34,11 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	boolean immutable;
 	String[] writeColumnOrder;
 	
-	InvestmentPortfolioTableEnum(Class<? extends AbstractEntity> entity, boolean immutable) {
+	InvestmentPortfolioEntityEnum(Class<? extends AbstractEntity> entity, boolean immutable) {
 		this.entity = entity;
 		this.immutable = immutable;
 	}
-	InvestmentPortfolioTableEnum(Class<? extends AbstractEntity> entity, boolean immutable, String[] writeColumnOrder) {
+	InvestmentPortfolioEntityEnum(Class<? extends AbstractEntity> entity, boolean immutable, String[] writeColumnOrder) {
 		this.entity = entity;
 		this.immutable = immutable;
 		// tag SOURCECSVLINENUMBER to the end of the writeColumnOrder
@@ -62,7 +62,7 @@ public enum InvestmentPortfolioTableEnum implements IEntityEnum {
 	}
 	
 	public static IEntityEnum valueIfPresent(String name) {
-	    return Enums.getIfPresent(InvestmentPortfolioTableEnum.class, name).orNull();
+	    return Enums.getIfPresent(InvestmentPortfolioEntityEnum.class, name).orNull();
 	}
 
 }

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.kerneldc.common.BaseViewRepository;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.HoldingPriceInterdayV;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 
 public interface HoldingPriceInterdayVRepository extends BaseViewRepository<HoldingPriceInterdayV, Long> {
 	
@@ -26,7 +26,7 @@ public interface HoldingPriceInterdayVRepository extends BaseViewRepository<Hold
 	
 	@Override
 	default IEntityEnum canHandle() {
-		return InvestmentPortfolioTableEnum.HOLDING_PRICE_INTERDAY_V;
+		return InvestmentPortfolioEntityEnum.HOLDING_PRICE_INTERDAY_V;
 	}
 	
 }

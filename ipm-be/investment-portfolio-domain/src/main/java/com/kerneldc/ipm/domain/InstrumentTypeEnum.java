@@ -2,18 +2,18 @@ package com.kerneldc.ipm.domain;
 
 public enum InstrumentTypeEnum {
 	CASH(null),
-	STOCK(InvestmentPortfolioTableEnum.INSTRUMENT_STOCK),
-	ETF(InvestmentPortfolioTableEnum.INSTRUMENT_ETF),
-	MUTUAL_FUND(InvestmentPortfolioTableEnum.INSTRUMENT_MUTUAL_FUND),
-	INTEREST_BEARING(InvestmentPortfolioTableEnum.INSTRUMENT_INTEREST_BEARING),
-	BOND(InvestmentPortfolioTableEnum.INSTRUMENT_BOND);//, MONEY_MARKET, INV_SAVINGS_ACC, GIC, SAVINGS_ACC
+	STOCK(InvestmentPortfolioEntityEnum.INSTRUMENT_STOCK),
+	ETF(InvestmentPortfolioEntityEnum.INSTRUMENT_ETF),
+	MUTUAL_FUND(InvestmentPortfolioEntityEnum.INSTRUMENT_MUTUAL_FUND),
+	INTEREST_BEARING(InvestmentPortfolioEntityEnum.INSTRUMENT_INTEREST_BEARING),
+	BOND(InvestmentPortfolioEntityEnum.INSTRUMENT_BOND);//, MONEY_MARKET, INV_SAVINGS_ACC, GIC, SAVINGS_ACC
 	
-	InvestmentPortfolioTableEnum investmentPortfolioTableEnum;
-	InstrumentTypeEnum(InvestmentPortfolioTableEnum investmentPortfolioTableEnum) {
+	InvestmentPortfolioEntityEnum investmentPortfolioTableEnum;
+	InstrumentTypeEnum(InvestmentPortfolioEntityEnum investmentPortfolioTableEnum) {
 		this.investmentPortfolioTableEnum = investmentPortfolioTableEnum;
 	}
 	
-	public InvestmentPortfolioTableEnum getInvestmentPortfolioTableEnum() {
+	public InvestmentPortfolioEntityEnum getInvestmentPortfolioTableEnum() {
 		return investmentPortfolioTableEnum;
 	}
 }

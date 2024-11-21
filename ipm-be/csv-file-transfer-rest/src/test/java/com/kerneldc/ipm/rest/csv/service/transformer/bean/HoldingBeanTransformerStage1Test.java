@@ -17,7 +17,7 @@ import com.kerneldc.ipm.domain.ExchangeEnum;
 import com.kerneldc.ipm.domain.FinancialInstitutionEnum;
 import com.kerneldc.ipm.domain.Holding;
 import com.kerneldc.ipm.domain.Instrument;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.domain.instrumentdetail.InstrumentStock;
 import com.kerneldc.ipm.repository.InstrumentRepository;
@@ -45,7 +45,7 @@ class HoldingBeanTransformerStage1Test {
 	
 	@BeforeEach
 	void init() {
-		context = new FileProcessingContext(InvestmentPortfolioTableEnum.HOLDING);
+		context = new FileProcessingContext(InvestmentPortfolioEntityEnum.HOLDING);
 	}
 
 	@Test

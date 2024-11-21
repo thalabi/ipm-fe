@@ -12,7 +12,7 @@ import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.Instrument;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Portfolio;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.domain.Price;
@@ -88,7 +88,7 @@ public class PositionBeanTransformerStage1 implements IBeanTransformer {
 
 	@Override
 	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
-		return uploadTableEnum.equals(InvestmentPortfolioTableEnum.POSITION)
+		return uploadTableEnum.equals(InvestmentPortfolioEntityEnum.POSITION)
 				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_ONE);
 	}
 

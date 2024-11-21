@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.Holding;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 
 public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 
@@ -72,6 +72,6 @@ public interface HoldingRepository extends BaseTableRepository<Holding, Long> {
 
 	@Override
 	default IEntityEnum canHandle() {
-		return InvestmentPortfolioTableEnum.HOLDING;
+		return InvestmentPortfolioEntityEnum.HOLDING;
 	}
 }

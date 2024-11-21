@@ -21,7 +21,7 @@ import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.common.enums.UploadTableEnum;
 import com.kerneldc.common.search.EntitySpecification;
 import com.kerneldc.ipm.commonservices.repository.EntityRepositoryFactory;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 
 import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
@@ -115,7 +115,7 @@ public class GenericEntityController {
 		if (Enums.getIfPresent(UploadTableEnum.class, tableName.toUpperCase()).isPresent()) {
 			tEnum = UploadTableEnum.valueOf(tableName.toUpperCase());
 		} else {
-			tEnum = InvestmentPortfolioTableEnum.valueOf(tableName.toUpperCase());
+			tEnum = InvestmentPortfolioEntityEnum.valueOf(tableName.toUpperCase());
 		}
 		return tEnum;
 	}

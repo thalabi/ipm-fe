@@ -12,7 +12,7 @@ import com.kerneldc.common.domain.AbstractPersistableEntity;
 import com.kerneldc.common.domain.LogicalKeyHolder;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.Instrument;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.repository.InstrumentRepository;
 import com.kerneldc.ipm.rest.csv.service.transformer.FileProcessingContext;
@@ -63,7 +63,7 @@ public class PriceBeanTransformerStage implements IBeanTransformer {
 
 	@Override
 	public boolean canHandle(IEntityEnum uploadTableEnum, TransformationStageEnum transformationStageEnum) {
-		return uploadTableEnum.equals(InvestmentPortfolioTableEnum.PRICE)
+		return uploadTableEnum.equals(InvestmentPortfolioEntityEnum.PRICE)
 				&& transformationStageEnum.equals(TransformationStageEnum.STAGE_ONE);
 	}
 

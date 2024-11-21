@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Price;
 import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService.BeanReferentialEntityEnrichmentResult;
 
@@ -29,7 +29,7 @@ public class PriceBeanReferentialEntityEnrichmentStage1 implements IBeanReferent
 
 	@Override
 	public boolean canHandle(IEntityEnum entityEnum, EnrichmentStageEnum enrichmentStageEnum) {
-		return entityEnum.equals(InvestmentPortfolioTableEnum.PRICE)
+		return entityEnum.equals(InvestmentPortfolioEntityEnum.PRICE)
 				&& enrichmentStageEnum.equals(EnrichmentStageEnum.STAGE_ONE);
 	}
 

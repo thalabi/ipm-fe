@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Position;
 import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService.BeanReferentialEntityEnrichmentResult;
 
@@ -35,7 +35,7 @@ public class PositionBeanReferentialEntityEnrichmentStage1 implements IBeanRefer
 
 	@Override
 	public boolean canHandle(IEntityEnum entityEnum, EnrichmentStageEnum enrichmentStageEnum) {
-		return entityEnum.equals(InvestmentPortfolioTableEnum.POSITION)
+		return entityEnum.equals(InvestmentPortfolioEntityEnum.POSITION)
 				&& enrichmentStageEnum.equals(EnrichmentStageEnum.STAGE_ONE);
 	}
 

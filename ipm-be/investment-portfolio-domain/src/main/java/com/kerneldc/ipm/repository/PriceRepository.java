@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.enums.IEntityEnum;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.domain.Price;
 
 public interface PriceRepository extends BaseTableRepository<Price, Long> {
@@ -31,7 +31,7 @@ public interface PriceRepository extends BaseTableRepository<Price, Long> {
 	
 	@Override
 	default IEntityEnum canHandle() {
-		return InvestmentPortfolioTableEnum.PRICE;
+		return InvestmentPortfolioEntityEnum.PRICE;
 	}
 	
 }

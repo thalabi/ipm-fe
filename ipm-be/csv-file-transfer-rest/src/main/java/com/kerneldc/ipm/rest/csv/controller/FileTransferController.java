@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.common.enums.UploadTableEnum;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.rest.csv.service.GenericFileTransferService;
 import com.kerneldc.ipm.util.AppTimeUtils;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -43,7 +43,7 @@ public class FileTransferController {
 	public ResponseEntity<TableListResponse> getTableList() {
     	LOGGER.info(BEGIN);
     	var tableList = Arrays.asList(UploadTableEnum.values()).stream().map(Enum::toString).collect(Collectors.toList());
-    	tableList.addAll(Arrays.asList(InvestmentPortfolioTableEnum.values()).stream().map(Enum::toString).toList());
+    	tableList.addAll(Arrays.asList(InvestmentPortfolioEntityEnum.values()).stream().map(Enum::toString).toList());
     	
 		LOGGER.info(END);
     	return ResponseEntity.ok(TableListResponse.builder().tableList(tableList).build());
@@ -87,6 +87,6 @@ public class FileTransferController {
 	private IEntityEnum tableEnumFromString(String tableName) {
     	var upperTableName = tableName.toUpperCase();
 		return ObjectUtils.defaultIfNull(UploadTableEnum.valueIfPresent(upperTableName),
-				InvestmentPortfolioTableEnum.valueIfPresent(upperTableName));
+				InvestmentPortfolioEntityEnum.valueIfPresent(upperTableName));
 	}
 }

@@ -7,7 +7,7 @@ import com.kerneldc.common.BaseTableRepository;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.CurrencyEnum;
 import com.kerneldc.ipm.domain.ExchangeRate;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 
 public interface ExchangeRateRepository extends BaseTableRepository<ExchangeRate, Long> {
 	
@@ -17,7 +17,7 @@ public interface ExchangeRateRepository extends BaseTableRepository<ExchangeRate
 	
 	@Override
 	default IEntityEnum canHandle() {
-		return InvestmentPortfolioTableEnum.EXCHANGE_RATE;
+		return InvestmentPortfolioEntityEnum.EXCHANGE_RATE;
 	}
 	
 }

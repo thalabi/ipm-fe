@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.kerneldc.common.domain.AbstractEntity;
 import com.kerneldc.common.enums.IEntityEnum;
 import com.kerneldc.ipm.domain.Holding;
-import com.kerneldc.ipm.domain.InvestmentPortfolioTableEnum;
+import com.kerneldc.ipm.domain.InvestmentPortfolioEntityEnum;
 import com.kerneldc.ipm.rest.csv.service.enrichment.BeanReferentialEntityEnrichmentService.BeanReferentialEntityEnrichmentResult;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class HoldingBeanReferentialEntityEnrichmentStage1 implements IBeanRefere
 
 	@Override
 	public boolean canHandle(IEntityEnum entityEnum, EnrichmentStageEnum enrichmentStageEnum) {
-		return entityEnum.equals(InvestmentPortfolioTableEnum.HOLDING)
+		return entityEnum.equals(InvestmentPortfolioEntityEnum.HOLDING)
 				&& enrichmentStageEnum.equals(EnrichmentStageEnum.STAGE_ONE);
 	}
 
