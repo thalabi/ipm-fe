@@ -60,8 +60,13 @@ public class EntitySpecification<T> implements Specification<T> {
 			return new Filter(criterionParts[0], QueryOperatorEnum.fromName(criterionParts[1]), criterionParts[2]);
 		}).toList();
 	}
-
-	private Specification<T> getSpecificationFromFilters() {
+	
+	@Override
+	public Predicate toPredicate(Root<T> entity, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+		return buildSpecificationFromFilters().toPredicate(entity, query, criteriaBuilder);
+	}
+	
+	private Specification<T> buildSpecificationFromFilters() {
 		if (filterList.isEmpty()) {
 			return Specification.where(null);
 		}
@@ -98,44 +103,29 @@ public class EntitySpecification<T> implements Specification<T> {
 		}
 		
 	}
-	private Specification<T> handleLocalDateTimeFieldType(Filter inputFilter, String field, String value) {
-		var localDateTimeValue = LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
-		switch (inputFilter.operator()) {
-		case DATE_IS -> {
-				return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(field), localDateTimeValue);
-		}
-		case DATE_IS_NOT -> {
-				return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get(field), localDateTimeValue);
-		}
-		case DATE_BEFORE -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.lessThan(root.get(field), localDateTimeValue);
-		}
-		case DATE_AFTER -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get(field), localDateTimeValue);
-		}
-		default -> throw new IllegalArgumentException("Unexpected value: " + inputFilter.operator());
-		}
-	}
 
+	private Specification<T> x(String field, String value) {
+		return (entity, query, criteriaBuilder) -> criteriaBuilder.equal(criteriaBuilder.lower(entity.get(field)), value.toLowerCase());
+	}
 	private Specification<T> handleStringFieldType(Filter inputFilter, String field, String value) {
 		switch (inputFilter.operator()) {
 		case EQUALS -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.equal(criteriaBuilder.lower(root.get(field)), value.toLowerCase());
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.equal(criteriaBuilder.lower(entity.get(field)), value.toLowerCase());
 		}
 		case NOT_EQUALS -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(criteriaBuilder.lower(root.get(field)), value.toLowerCase());
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.notEqual(criteriaBuilder.lower(entity.get(field)), value.toLowerCase());
 		}
 		case STARTS_WITH -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get(field)), value.toLowerCase() + "%");
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(entity.get(field)), value.toLowerCase() + "%");
 		}
 		case CONTAINS -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get(field)), "%" + value.toLowerCase() + "%");
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(entity.get(field)), "%" + value.toLowerCase() + "%");
 		}
 		case NOT_CONTAINS -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.not(criteriaBuilder.like(criteriaBuilder.lower(root.get(field)), "%" + value.toLowerCase() + "%"));
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.not(criteriaBuilder.like(criteriaBuilder.lower(entity.get(field)), "%" + value.toLowerCase() + "%"));
 		}
 		case ENDS_WITH -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get(field)), "%" + value.toLowerCase());
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(entity.get(field)), "%" + value.toLowerCase());
 		}
 		default -> throw new IllegalArgumentException("Unexpected value: " + inputFilter.operator());
 		}
@@ -144,31 +134,44 @@ public class EntitySpecification<T> implements Specification<T> {
 	private Specification<T> handleNumberFieldType(Filter inputFilter, String field, String value) {
 		switch (inputFilter.operator()) {
 		case EQUALS -> {
-				return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(field), value);
+				return (entity, query, criteriaBuilder) -> criteriaBuilder.equal(entity.get(field), value);
 		}
 		case NOT_EQUALS -> {
-				return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get(field), value);
+				return (entity, query, criteriaBuilder) -> criteriaBuilder.notEqual(entity.get(field), value);
 		}
 		case GREATER_THAN, GT -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get(field), value);
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.greaterThan(entity.get(field), value);
 		}
 		case GREATER_THAN_OR_EQUAL_TO -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get(field), value);
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(entity.get(field), value);
 		}
 		case LESS_THAN, LT -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.lessThan(root.get(field), value);
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.lessThan(entity.get(field), value);
 		}
 		case LESS_THAN_OR_EQUAL_TO -> {
-			return (root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get(field), value);
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(entity.get(field), value);
 		}
 		default -> throw new IllegalArgumentException("Unexpected value: " + inputFilter.operator());
 		}
 	}
 
-
-	@Override
-	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-		return getSpecificationFromFilters().toPredicate(root, query, criteriaBuilder);
+	private Specification<T> handleLocalDateTimeFieldType(Filter inputFilter, String field, String value) {
+		var localDateTimeValue = LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
+		switch (inputFilter.operator()) {
+		case DATE_IS -> {
+				return (entity, query, criteriaBuilder) -> criteriaBuilder.equal(entity.get(field), localDateTimeValue);
+		}
+		case DATE_IS_NOT -> {
+				return (entity, query, criteriaBuilder) -> criteriaBuilder.notEqual(entity.get(field), localDateTimeValue);
+		}
+		case DATE_BEFORE -> {
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.lessThan(entity.get(field), localDateTimeValue);
+		}
+		case DATE_AFTER -> {
+			return (entity, query, criteriaBuilder) -> criteriaBuilder.greaterThan(entity.get(field), localDateTimeValue);
+		}
+		default -> throw new IllegalArgumentException("Unexpected value: " + inputFilter.operator());
+		}
 	}
 
 }
