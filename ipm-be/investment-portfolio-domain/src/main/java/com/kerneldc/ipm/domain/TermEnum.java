@@ -1,6 +1,7 @@
 package com.kerneldc.ipm.domain;
 
 public enum TermEnum {
+	TERM_4_MONTH,
 	TERM_1_YEAR,
 	TERM_18_MONTH,
 	TERM_2_YEAR,
